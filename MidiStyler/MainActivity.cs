@@ -290,7 +290,7 @@ namespace MidiStyler
             Bundle b = new Bundle();
             b.PutByteArray("MIDI", data);
             b.PutInt("CH", channel);
-            msg.Data = b;
+            msg.Data = b; 
 
 
             midiOut.SendMidiOnThread(data); ////////TYV
