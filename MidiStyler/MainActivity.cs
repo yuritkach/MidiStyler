@@ -96,6 +96,26 @@ namespace MidiStyler
 
             midiSystemLoad(this);
 
+
+            System.Timers.Timer Timer1 = new System.Timers.Timer();
+        
+            Timer1.Interval = 1000;
+            Timer1.Enabled = true;
+            Timer1.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
+            {
+                RunOnUiThread(() =>
+                {
+                    var aaa = millisBeetwenMidiClock; 
+
+                    var tv = (TextView)FindViewById(Resource.Id.currentTempoTextView);
+                    tv.Text = aaa.ToString();
+
+
+                });
+                //Delete time since it will no longer be used.
+            };
+            Timer1.Start();
+
         }
 
         protected override void OnDestroy()
@@ -285,18 +305,93 @@ namespace MidiStyler
 		 * and you may risk having data overwritten before you see it appearing in
 		 * Handler.handleMessage() otherwise.
 		*/
-            Message msg = Message.Obtain();
-            msg.What = 0;
-            Bundle b = new Bundle();
-            b.PutByteArray("MIDI", data);
-            b.PutInt("CH", channel);
-            msg.Data = b; 
+            processMidiData(data);
+
+//            Message msg = Message.Obtain();
+//            msg.What = 0;
+//            Bundle b = new Bundle();
+//            b.PutByteArray("MIDI", data);
+//            b.PutInt("CH", channel);
+//            msg.Data = b; 
 
 
             midiOut.SendMidiOnThread(data); ////////TYV
 
-            midiLogger.SendMessage(msg);
+//            midiLogger.SendMessage(msg);
         }
+
+        protected enum CurrentMidiCommand { None, NoteOff, NoteOn, AfterTouch, ControlChange, ProgramChange, ChanelPressure, PitchWhile };
+        protected bool inSysEx = false;
+
+        protected void processMidiData(byte[] data) {
+            byte cmd = data[0];
+            if (cmd > 0x7F)
+            {
+                if (cmd >= 0x80 && cmd <= 0x8F) /*doNoteOff()*/;
+                if (cmd >= 0x90 && cmd <= 0x9F) /*doNoteOn()*/;
+                if (cmd >= 0xA0 && cmd <= 0xAF) /*doAfterTouch()*/;
+                if (cmd >= 0xB0 && cmd <= 0xBF) 
+                    /*doControlChange()*/;
+                if (cmd >= 0xC0 && cmd <= 0xCF) /*doProgramChange()*/;
+                if (cmd >= 0xD0 && cmd <= 0xDF) /*doChanelPressure()*/;
+                if (cmd >= 0xE0 && cmd <= 0xEF) /*doPtichWhile()*/;
+                if (cmd >= 0xF0 && cmd <= 0xFF) doCommonMessages(data);
+            }
+            else
+            {
+                // process current command
+            }
+        }
+
+        protected void doCommonMessages(byte[] data) {
+            switch (data[0])
+            {
+                case (0xF0):
+                    break; // Start SysEx message
+                case (0xF1):
+                    break; // MidiClocks per quarter
+                case (0xF2):
+                    break; // Song position pointer
+                case (0xF3):
+                    break; // Song select
+                case (0xF4):
+                    break; // not used
+                case (0xF5):
+                    break; // not used
+                case (0xF6):
+                    break; // Calibrate device
+                case (0xF7):
+                    break; // Stop SysEx message
+                case (0xF8):doProcessMidiClock();break; // MidiClock sync byte
+                case (0xF9):
+                    break; // Tick (sendet every 10 milliseconds)
+                case (0xFA):
+                    break; // MidiStart - start playing from 0 position
+                case (0xFB):
+                    break; // MidiContinue - start playing from Current position
+                case (0xFC):
+                    break; // MidiStop - stop playing song
+                case (0xFD):
+                    break; // not used
+                case (0xFE):
+                    break; // ActiveSense - sync byte 1 time per 300 ms (device is ready?)
+                case (0xFF):
+                    break; // Device reset
+            }
+
+        }
+
+        protected long oldMillis = 0;
+        protected long currentMillis = 0;
+
+        protected long millisBeetwenMidiClock = 0;
+        protected void doProcessMidiClock()
+        {
+            currentMillis = Java.Lang.JavaSystem.CurrentTimeMillis();
+            millisBeetwenMidiClock = currentMillis - oldMillis;
+            oldMillis = currentMillis;
+        }
+
 
         public void SystemChanged(int channel, int property, int value)
         {

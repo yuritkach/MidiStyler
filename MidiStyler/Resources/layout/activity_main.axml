@@ -10,5 +10,12 @@
 <Button android:id="@+id/Button01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="send MIDI" android:layout_gravity="center"></Button>
 <TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minLines="10" android:layout_gravity="center" android:text="nmj"></TextView>
 <Button android:id="@+id/Button02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="setup" android:layout_gravity="center"></Button>
-
+	<TextView 
+	    android:id="@+id/currentTempoTextView" 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:minLines="10" 
+	    android:layout_gravity="center" 
+	    android:text="0">
+	</TextView>
 </LinearLayout>

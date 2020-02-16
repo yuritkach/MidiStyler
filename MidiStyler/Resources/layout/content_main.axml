@@ -29,4 +29,14 @@
 	    android:text="nmj">
 	</TextView>
 
+	<TextView 
+	    android:id="@+id/currentTempoTextView" 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:minLines="10" 
+	    android:layout_gravity="center" 
+	    android:text="0">
+	</TextView>
+
+
 </LinearLayout>
