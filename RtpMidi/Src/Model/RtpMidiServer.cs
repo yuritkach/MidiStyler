@@ -7,7 +7,7 @@ namespace rtpmidi.model {
      */
 
     public class RtpMidiServer {
-        private InetAddress inetAddress;
-        private int port;
+        public InetAddress InetAddress { get; protected set; } 
+        public int Port { get; protected set; }
     }
 }

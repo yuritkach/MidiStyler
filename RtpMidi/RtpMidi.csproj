@@ -69,7 +69,7 @@
     <Content Include="Src\Error\AppleMidiControlServerRuntimeException.java" />
     <Content Include="Src\Error\AppleMidiSessionInstantiationException.java" />
     <Content Include="Src\Error\AppleMidiSessionServerRuntimeException.java" />
-    <Content Include="Src\Handler\AppleMidiCommandHandler.java" />
+    <Compile Include="Src\Handler\RtpMidiCommandHandler.cs" />
     <Content Include="Src\Handler\AppleMidiCommandLogListener.java" />
     <Content Include="Src\Handler\AppleMidiMessageHandler.java" />
     <Content Include="Src\Handler\AppleMidiMessageLogListener.java" />
@@ -87,13 +87,13 @@
     <Compile Include="Src\Messages\RtpHeader.cs" />
     <Compile Include="Src\Model\RtpMidiServer.cs" />
     <Compile Include="Src\Model\MidiMessage.cs" />
-    <Content Include="Src\Model\ShortMessage.java" />
-    <Content Include="Src\Model\SysexMessage.java" />
+    <Compile Include="Src\Model\ShortMessage.cs" />
+    <Compile Include="Src\Model\SysexMessage.cs" />
     <Compile Include="Src\Session\RtpMidiMessageSender.cs" />
     <Compile Include="Src\Session\RtpMidiSession.cs" />
     <Content Include="Src\Session\AppleMidiSessionConnection.java" />
     <Compile Include="Src\Session\RtpMidiSessionSender.cs" />
-    <Content Include="Src\Session\AppleMidiSessionServer.java" />
+    <Compile Include="Src\Session\RtpMidiSessionServer.cs" />
     <Compile Include="Src\Session\SessionChangeListener.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
