@@ -65,7 +65,7 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Src\Control\AppleMidiControlServer.java" />
+    <Compile Include="Src\Control\RtpMidiControlServer.cs" />
     <Content Include="Src\Error\AppleMidiControlServerRuntimeException.java" />
     <Content Include="Src\Error\AppleMidiSessionInstantiationException.java" />
     <Content Include="Src\Error\AppleMidiSessionServerRuntimeException.java" />
@@ -73,27 +73,26 @@
     <Content Include="Src\Handler\AppleMidiCommandLogListener.java" />
     <Content Include="Src\Handler\AppleMidiMessageHandler.java" />
     <Content Include="Src\Handler\AppleMidiMessageLogListener.java" />
-    <Content Include="Src\Messages\AppleMidiClockSynchronization.java" />
+    <Compile Include="Src\Messages\RtpMidiClockSynchronization.cs" />
     <Compile Include="Src\Messages\RtpMidiCommand.cs" />
     <Compile Include="Src\Messages\RtpMidiEndSession.cs" />
     <Compile Include="Src\Messages\RtpMidiInvitation.cs" />
     <Content Include="Src\Messages\AppleMidiInvitationAccepted.java" />
     <Content Include="Src\Messages\AppleMidiInvitationDeclined.java" />
     <Compile Include="Src\Messages\RtpMidiInvitationRequest.cs" />
-    <Content Include="Src\Messages\AppleMidiMessage.java" />
+    <Compile Include="Src\Messages\RtpMidiMessage.cs" />
     <Compile Include="Src\Messages\CommandWord.cs" />
-    <Content Include="Src\Messages\MidiCommandHeader.java" />
-    <Content Include="Src\Messages\MidiTimestampPair.java" />
-    <Content Include="Src\Messages\package-info.java" />
-    <Content Include="Src\Messages\RtpHeader.java" />
+    <Compile Include="Src\Messages\MidiCommandHeader.cs" />
+    <Compile Include="Src\Messages\MidiTimestampPair.cs" />
+    <Compile Include="Src\Messages\RtpHeader.cs" />
     <Compile Include="Src\Model\RtpMidiServer.cs" />
-    <Content Include="Src\Model\MidiMessage.java" />
+    <Compile Include="Src\Model\MidiMessage.cs" />
     <Content Include="Src\Model\ShortMessage.java" />
     <Content Include="Src\Model\SysexMessage.java" />
-    <Content Include="Src\Session\AppleMidiMessageSender.java" />
+    <Compile Include="Src\Session\RtpMidiMessageSender.cs" />
     <Compile Include="Src\Session\RtpMidiSession.cs" />
     <Content Include="Src\Session\AppleMidiSessionConnection.java" />
-    <Content Include="Src\Session\AppleMidiSessionSender.java" />
+    <Compile Include="Src\Session\RtpMidiSessionSender.cs" />
     <Content Include="Src\Session\AppleMidiSessionServer.java" />
     <Compile Include="Src\Session\SessionChangeListener.cs" />
   </ItemGroup>

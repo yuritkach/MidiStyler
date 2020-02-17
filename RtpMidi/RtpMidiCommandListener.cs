@@ -1,8 +1,4 @@
-﻿//import io.github.leovr.rtipmidi.messages.AppleMidiClockSynchronization;
-//import io.github.leovr.rtipmidi.messages.AppleMidiInvitationRequest;
-//import io.github.leovr.rtipmidi.model.AppleMidiServer;
-
-//import javax.annotation.Nonnull;
+﻿using rtpmidi.messages;
 
 namespace rtpmidi
 {

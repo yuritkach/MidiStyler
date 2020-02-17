@@ -1,7 +1,7 @@
 using Android.Util;
-using rtipmidi.session;
+using rtpmidi.session;
 
-namespace rtipmidi { 
+namespace rtpmidi { 
     /**
     * Main class for the RTP MIDI communication. This class instantiates the {@link RtpMidiControlServer} and the {@link
     * RtpMidiSessionServer}. In order to receive midi messages a {@link RtpMidiSession} should be registerd via {@link

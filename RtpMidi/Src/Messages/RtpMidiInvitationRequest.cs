@@ -1,4 +1,4 @@
-namespace rtipmidi.messages { 
+namespace rtpmidi.messages { 
 
     public class RtpMidiInvitationRequest:RtpMidiInvitation {
 

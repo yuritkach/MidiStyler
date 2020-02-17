@@ -1,4 +1,4 @@
-namespace rtipmidi.session
+namespace rtpmidi.session
 {
 
     public interface ISessionChangeListener

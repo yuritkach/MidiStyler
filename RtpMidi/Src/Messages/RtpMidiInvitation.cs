@@ -1,7 +1,7 @@
 using Java.IO;
 using System.IO;
 
-namespace rtipmidi.messages { 
+namespace rtpmidi.messages { 
 
     public abstract class RtpMidiInvitation:RtpMidiCommand {
 
