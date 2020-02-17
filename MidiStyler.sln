@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiStyler", "MidiStyler\Mi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nmj", "nmj\nmj.csproj", "{52DB1065-4E82-4C3E-9A9A-B60DD8764386}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RtpMidi", "RtpMidi\RtpMidi.csproj", "{DE900A71-6C1C-466F-A436-B1151369CECB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{52DB1065-4E82-4C3E-9A9A-B60DD8764386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{52DB1065-4E82-4C3E-9A9A-B60DD8764386}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52DB1065-4E82-4C3E-9A9A-B60DD8764386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE900A71-6C1C-466F-A436-B1151369CECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE900A71-6C1C-466F-A436-B1151369CECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE900A71-6C1C-466F-A436-B1151369CECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE900A71-6C1C-466F-A436-B1151369CECB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
