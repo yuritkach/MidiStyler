@@ -10,11 +10,6 @@ using System.Text;
 
 namespace rtpmidi.handler { 
 
-//import static io.github.leovr.rtipmidi.messages.AppleMidiCommand.MIDI_COMMAND_HEADER1;
-//import static io.github.leovr.rtipmidi.messages.AppleMidiCommand.MIDI_COMMAND_HEADER2;
-//import static java.nio.charset.StandardCharsets.UTF_8;
-
-
     public class AppleMidiCommandHandler {
 
         private static int NUMBER_OF_PADDING_BYTES = 3;
