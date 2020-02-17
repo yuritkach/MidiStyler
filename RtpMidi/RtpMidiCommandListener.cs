@@ -12,17 +12,17 @@ namespace rtpmidi
              * This method is called for every invitation request.
              *
              * param invitation      The invitation request
-             * param appleMidiServer The origin server of this message
+             * param rtpMidiServer The origin server of this message
              */
-        void onMidiInvitation(AppleMidiInvitationRequest invitation, AppleMidiServer appleMidiServer);
+        void OnMidiInvitation(RtpMidiInvitationRequest invitation, RtpMidiServer rtpMidiServer);
 
         /**
          * This method is called for every clock synchronization request.
          *
          * param clockSynchronization The clock synchronization request
-         * param appleMidiServer      The origin server of this message
+         * param rtpMidiServer      The origin server of this message
          */
-        void onClockSynchronization(AppleMidiClockSynchronization clockSynchronization,AppleMidiServer appleMidiServer);
+        void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization,RtpMidiServer rtpMidiServer);
     }
 }
 

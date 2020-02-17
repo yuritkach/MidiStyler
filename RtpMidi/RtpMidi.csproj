@@ -91,11 +91,11 @@
     <Content Include="Src\Model\ShortMessage.java" />
     <Content Include="Src\Model\SysexMessage.java" />
     <Content Include="Src\Session\AppleMidiMessageSender.java" />
-    <Content Include="Src\Session\AppleMidiSession.java" />
+    <Compile Include="Src\Session\RtpMidiSession.cs" />
     <Content Include="Src\Session\AppleMidiSessionConnection.java" />
     <Content Include="Src\Session\AppleMidiSessionSender.java" />
     <Content Include="Src\Session\AppleMidiSessionServer.java" />
-    <Content Include="Src\Session\SessionChangeListener.java" />
+    <Compile Include="Src\Session\SessionChangeListener.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

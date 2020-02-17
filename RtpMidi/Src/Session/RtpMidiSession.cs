@@ -1,35 +1,34 @@
-package io.github.leovr.rtipmidi.session;
+//import io.github.leovr.rtipmidi.AppleMidiCommandListener;
+//import io.github.leovr.rtipmidi.AppleMidiMessageListener;
+//import io.github.leovr.rtipmidi.messages.AppleMidiClockSynchronization;
+//import io.github.leovr.rtipmidi.messages.AppleMidiEndSession;
+//import io.github.leovr.rtipmidi.messages.AppleMidiInvitationRequest;
+//import io.github.leovr.rtipmidi.messages.MidiCommandHeader;
+//import io.github.leovr.rtipmidi.model.AppleMidiServer;
+//import io.github.leovr.rtipmidi.model.MidiMessage;
+//import lombok.Getter;
+//import lombok.Setter;
+//import lombok.extern.slf4j.Slf4j;
 
-import io.github.leovr.rtipmidi.AppleMidiCommandListener;
-import io.github.leovr.rtipmidi.AppleMidiMessageListener;
-import io.github.leovr.rtipmidi.messages.AppleMidiClockSynchronization;
-import io.github.leovr.rtipmidi.messages.AppleMidiEndSession;
-import io.github.leovr.rtipmidi.messages.AppleMidiInvitationRequest;
-import io.github.leovr.rtipmidi.messages.MidiCommandHeader;
-import io.github.leovr.rtipmidi.model.AppleMidiServer;
-import io.github.leovr.rtipmidi.model.MidiMessage;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+//import javax.annotation.Nonnull;
+//import java.lang.management.ManagementFactory;
+//import java.util.Random;
 
-import javax.annotation.Nonnull;
-import java.lang.management.ManagementFactory;
-import java.util.Random;
+
+using System;
+
+namespace rtpmidi.session
+{
 
 /**
  * This class represents a single MIDI session with a remote server. It simplifies the methods of {@link
- * AppleMidiMessageListener} and {@link AppleMidiCommandListener} for the subclasses.
+ * RtpMidiMessageListener} and {@link RtpMidiCommandListener} for the subclasses.
  */
-@Slf4j
-@Getter
-@Setter
-public abstract class AppleMidiSession implements AppleMidiMessageListener, AppleMidiCommandListener {
+public abstract class RtpMidiSession:RtpMidiMessageListener, RtpMidiCommandListener {
 
     private long offsetEstimate;
-    @Setter
-    private AppleMidiSessionSender sender;
-    @Setter
-    protected int timestampOffset = new Random().nextInt();
+    private RtpMidiSessionSender sender;
+    protected int timestampOffset = new Random().Next();
 
     /**
      * Returns the current timestamp in 100 microseconds. The default implementation uses the JVM startup time as
@@ -37,7 +36,7 @@ public abstract class AppleMidiSession implements AppleMidiMessageListener, Appl
      *
      * @return The timestamp in 100 microseconds or -1 if the session does not care about the timestamp
      */
-    public long getCurrentTimestamp() {
+    public long GetCurrentTimestamp() {
         return timestampOffset + ManagementFactory.getRuntimeMXBean().getUptime() * 10;
     }
 
@@ -90,4 +89,5 @@ public abstract class AppleMidiSession implements AppleMidiMessageListener, Appl
      */
     protected void onEndSession() {
     }
+}
 }
