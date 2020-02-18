@@ -66,9 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Src\Control\RtpMidiControlServer.cs" />
-    <Content Include="Src\Error\AppleMidiControlServerRuntimeException.java" />
-    <Content Include="Src\Error\AppleMidiSessionInstantiationException.java" />
-    <Content Include="Src\Error\AppleMidiSessionServerRuntimeException.java" />
+    <Compile Include="Src\Deque.cs" />
+    <Compile Include="Src\Error\RtpMidiControlServerRuntimeException.cs" />
+    <Compile Include="Src\Error\RtpMidiSessionInstantiationException.cs" />
+    <Compile Include="Src\Error\RtpMidiSessionServerRuntimeException.cs" />
     <Compile Include="Src\Handler\RtpMidiCommandHandler.cs" />
     <Compile Include="Src\Handler\RtpMidiCommandLogListener.cs" />
     <Compile Include="Src\Handler\RtpMidiMessageHandler.cs" />
@@ -77,8 +78,8 @@
     <Compile Include="Src\Messages\RtpMidiCommand.cs" />
     <Compile Include="Src\Messages\RtpMidiEndSession.cs" />
     <Compile Include="Src\Messages\RtpMidiInvitation.cs" />
-    <Content Include="Src\Messages\AppleMidiInvitationAccepted.java" />
-    <Content Include="Src\Messages\AppleMidiInvitationDeclined.java" />
+    <Compile Include="Src\Messages\RtpMidiInvitationAccepted.cs" />
+    <Compile Include="Src\Messages\RtpMidiInvitationDeclined.cs" />
     <Compile Include="Src\Messages\RtpMidiInvitationRequest.cs" />
     <Compile Include="Src\Messages\RtpMidiMessage.cs" />
     <Compile Include="Src\Messages\CommandWord.cs" />

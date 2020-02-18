@@ -43,7 +43,7 @@ namespace rtpmidi {
         * @param session The session to be added
         */
         public void AddRtpMidiSession(RtpMidiSession session) {
-            sessionServer.AddAppleMidiSession(session);
+            sessionServer.AddRtpMidiSession(session);
         }
 
         /**

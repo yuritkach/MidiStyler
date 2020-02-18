@@ -1,9 +1,14 @@
 using Android.Util;
+using deque;
 using Java.Lang;
+using Java.Net;
 using Java.Util.Concurrent;
 using rtpmidi;
+using rtpmidi.handler;
 using rtpmidi.messages;
 using rtpmidi.model;
+using System;
+using System.Collections.Generic;
 
 namespace rtpmidi.session { 
 
@@ -31,50 +36,58 @@ namespace rtpmidi.session {
         public string Name { get; protected set; }
         private RtpMidiCommandHandler midiCommandHandler = new RtpMidiCommandHandler();
         private RtpMidiMessageHandler midiMessageHandler = new RtpMidiMessageHandler();
-        private int port;
+        public int Port { get; protected set; }
         private bool running = true;
         private DatagramSocket socket;
-        private Deque<RtpMidiSession> sessions = new ArrayDeque<>();
-        private Map<Integer, RtpMidiSessionConnection> currentSessions = new HashMap<>();
-        private List<SessionChangeListener> sessionChangeListeners = new ArrayList<>();
+        private Deque<RtpMidiSession> sessions = new Deque<RtpMidiSession>();
+        private Dictionary<Integer, RtpMidiSessionConnection> currentSessions = new Dictionary<Integer, RtpMidiSessionConnection>();
+        private List<ISessionChangeListener> sessionChangeListeners = new List<ISessionChangeListener>();
         private Thread thread;
 
         /**
         * @param name The name under which the other peers should see this server
         * @param port The session server port which must be {@code control port + 1}
         */
-        public RtpMidiSessionServer(@Nonnull final String name, final int port) {
-            this(name, port, Executors.newCachedThreadPool());
+        public RtpMidiSessionServer(string name,int port):this(name, port, Executors.NewCachedThreadPool())
+        {
         }
 
-        RtpMidiSessionServer(@Nonnull final String name, final int port, final ExecutorService executorService) {
-            this.port = port;
-            this.ssrc = new Random().nextInt();
-            this.name = name;
+        public RtpMidiSessionServer(string name, int port, IExecutorService executorService) {
+            Port = port;
+            Ssrc = new Random().Next();
+            Name = name;
             this.executorService = executorService;
 
             midiCommandHandler.registerListener(this);
             midiMessageHandler.registerListener(this);
         }
 
-        Thread createThread(final @Nonnull String name) {
+        Thread CreateThread(string name) {
             return new Thread(this, name + "SessionThread");
         }
 
-        public synchronized void start() {
-            thread = createThread(name);
-            try {
-                socket = createSocket();
-                socket.setSoTimeout(SOCKET_TIMEOUT);
-            } catch (final SocketException e) {
-                throw new AppleMidiSessionServerRuntimeException("DatagramSocket cannot be opened", e);
+        public void Start() {
+            object lck = new object();
+            lock (lck)
+            {
+                thread = CreateThread(Name);
+                try
+                {
+                    socket = CreateSocket();
+                    socket.SoTimeout = SOCKET_TIMEOUT;
+                }
+                catch (SocketException e)
+                {
+                    throw new RtpMidiSessionServerRuntimeException("DatagramSocket cannot be opened", e);
+                }
+                thread.start();
+                Log.Debug("RtpMidi","MIDI session server started");
             }
-            thread.start();
-            log.debug("MIDI session server started");
         }
 
-        DatagramSocket createSocket() throws SocketException {
-            return new DatagramSocket(port);
+        protected DatagramSocket CreateSocket()
+        {
+            return new DatagramSocket(Port);
         }
 
         

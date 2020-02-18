@@ -10,7 +10,7 @@ using System.Text;
 
 namespace rtpmidi.handler { 
 
-    public class AppleMidiCommandHandler {
+    public class RtpMidiCommandHandler {
 
         private static int NUMBER_OF_PADDING_BYTES = 3;
         private static int PROTOCOL_VERSION = 2;
@@ -18,7 +18,7 @@ namespace rtpmidi.handler {
         private static string NUL_TERMINATOR = "\u0000";
         private List<IRtpMidiCommandListener> listeners = new List<IRtpMidiCommandListener>();
 
-        public AppleMidiCommandHandler() {
+        public RtpMidiCommandHandler() {
             listeners.Add(new RtpMidiCommandLogListener());
         }
 
