@@ -9,14 +9,24 @@ namespace rtpmidi.messages
         public bool J { get; protected set; }
         public bool Z { get; protected set; }
         public bool P { get; protected set; }
-        public short length;
-        private RtpHeader rtpHeader;
+        public short Length { get; protected set; }
+        public RtpHeader RtpHeader { get; protected set; }
+
+        public MidiCommandHeader(bool b, bool j, bool z, bool p, short length, RtpHeader rtpHeader)
+        {
+            B = b;
+            J = j;
+            Z = z;
+            P = p;
+            Length = length;
+            RtpHeader = rtpHeader;
+        }
 
         public byte[] ToByteArray()
         {
             MemoryStream byteArrayOutputStream = new MemoryStream();
             DataOutputStream outputStream = new DataOutputStream(byteArrayOutputStream);
-            outputStream.Write(rtpHeader.ToByteArray());
+            outputStream.Write(RtpHeader.ToByteArray());
 
             byte midiCommandHeader1 = 0;
 
@@ -26,11 +36,11 @@ namespace rtpmidi.messages
             midiCommandHeader1 |= (byte)((P ? 1 : 0) << 4);
 
             if (B) {
-                midiCommandHeader1 |= (byte)((length & 0x0F00) >> 8);
+                midiCommandHeader1 |= (byte)((Length & 0x0F00) >> 8);
                 outputStream.WriteByte(midiCommandHeader1);
-                outputStream.WriteByte(length & 0x00FF);
+                outputStream.WriteByte(Length & 0x00FF);
             } else {
-                midiCommandHeader1 |= (byte) length;
+                midiCommandHeader1 |= (byte) Length;
                 outputStream.WriteByte(midiCommandHeader1);
             }
 

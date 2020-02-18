@@ -8,19 +8,25 @@ namespace rtpmidi.messages {
 
     public class RtpMidiMessage {
 
-        private MidiCommandHeader midiCommandHeader;
-        private List<MidiTimestampPair> messages;
+        public MidiCommandHeader MidiCommandHeader { get; protected set; }
+        public List<MidiTimestampPair> Messages { get; protected set; }
+
+        public RtpMidiMessage(MidiCommandHeader midiCommandHeader, List<MidiTimestampPair> messages)
+        {
+            MidiCommandHeader = midiCommandHeader;
+            Messages = messages;
+        }
 
         public byte[] ToByteArray()
         {
             MemoryStream byteArrayOutputStream = new MemoryStream();
             DataOutputStream outputStream = new DataOutputStream(byteArrayOutputStream);
 
-            outputStream.Write(midiCommandHeader.ToByteArray());
+            outputStream.Write(MidiCommandHeader.ToByteArray());
 
             bool first = true;
-            foreach (MidiTimestampPair message in messages) {
-                if (first && !midiCommandHeader.Z) {
+            foreach (MidiTimestampPair message in Messages) {
+                if (first && !MidiCommandHeader.Z) {
                     first = false;
                 }
                 else
