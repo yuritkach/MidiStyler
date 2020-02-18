@@ -17,14 +17,14 @@ namespace rtpmidi {
         private RtpMidiSessionServer sessionServer;
 
         /**
-        * Creates a {@link AppleMidiServer} with {@link #DEFAULT_NAME} and {@link #DEFAULT_PORT}
+        * Creates a {@link RtpMidiServer} with {@link #DEFAULT_NAME} and {@link #DEFAULT_PORT}
         */
         public RtpMidiServer():this(DEFAULT_NAME, DEFAULT_PORT)
         {
         }
 
         /**
-        * Creates a new {@link AppleMidiServer} with the given name and port
+        * Creates a new {@link RtpMidiServer} with the given name and port
         *
         * @param name The name under which the other peers should see this server
         * @param port The control port. A session server will be created on the {@code port + 1}

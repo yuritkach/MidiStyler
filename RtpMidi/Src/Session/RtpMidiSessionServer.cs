@@ -4,13 +4,16 @@ using Java.Lang;
 using Java.Net;
 using Java.Util.Concurrent;
 using rtpmidi;
+using rtpmidi.error;
 using rtpmidi.handler;
 using rtpmidi.messages;
 using rtpmidi.model;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 
-namespace rtpmidi.session { 
+namespace rtpmidi.session {
 
 
     /**
@@ -20,7 +23,27 @@ namespace rtpmidi.session {
     * + 1}
     */
 
-    public class RtpMidiSessionServer:IRtpMidiCommandListener,IRtpMidiMessageListener, Runnable,IRtpMidiMessageSender
+    public class BaseRunable:IRunnable
+    {
+        private Runnable _runable;
+
+        protected BaseRunable()
+        {
+            _runable = new Runnable(Run);
+        }
+
+        public IntPtr Handle => throw new NotImplementedException();
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        // Thread methods / properties
+        public virtual void Run() => _runable.Run();
+    }
+
+    public class RtpMidiSessionServer: BaseRunable, IRtpMidiCommandListener, IRtpMidiMessageListener,IRtpMidiMessageSender
     {
 
         private static int SOCKET_TIMEOUT = 1000;
@@ -58,8 +81,8 @@ namespace rtpmidi.session {
             Name = name;
             this.executorService = executorService;
 
-            midiCommandHandler.registerListener(this);
-            midiMessageHandler.registerListener(this);
+            midiCommandHandler.RegisterListener(this);
+            midiMessageHandler.RegisterListener(this);
         }
 
         Thread CreateThread(string name) {
@@ -80,7 +103,7 @@ namespace rtpmidi.session {
                 {
                     throw new RtpMidiSessionServerRuntimeException("DatagramSocket cannot be opened", e);
                 }
-                thread.start();
+                thread.Start();
                 Log.Debug("RtpMidi","MIDI session server started");
             }
         }
@@ -91,32 +114,40 @@ namespace rtpmidi.session {
         }
 
         
-        public void Run() {
+        public override void Run() {
             while (running) {
 
-                try {
-                    final byte[] receiveData = new byte[RECEIVE_BUFFER_LENGTH];
-                    final DatagramPacket incomingPacket = new DatagramPacket(receiveData, receiveData.length);
-                    socket.receive(incomingPacket);
-                    executorService.execute(new Runnable() {
+                try
+                {
+                    byte[] receiveData = new byte[RECEIVE_BUFFER_LENGTH];
+                    DatagramPacket incomingPacket = new DatagramPacket(receiveData, receiveData.Length);
+                    socket.Receive(incomingPacket);
 
-                        @Override
-                        public void run() {
-                            if (receiveData[0] == AppleMidiCommand.MIDI_COMMAND_HEADER1) {
-                                midiCommandHandler.handle(receiveData,
-                                    new AppleMidiServer(incomingPacket.getAddress(), incomingPacket.getPort()));
-                            } else {
-                                midiMessageHandler.handle(receiveData,
-                                    new AppleMidiServer(incomingPacket.getAddress(), incomingPacket.getPort()));
-                            }
+                    System.Threading.Thread thread = new System.Threading.Thread(new ThreadStart(()=> {
+                        if (receiveData[0] == RtpMidiCommand.MIDI_COMMAND_HEADER1)
+                        {
+                            midiCommandHandler.handle(receiveData,
+                                new RtpMidiServer(incomingPacket.Address.HostAddress, incomingPacket.Port));
                         }
-                    });
-                } catch (final SocketTimeoutException ignored) {
-                } catch (final IOException e) {
-                    log.error("IOException while receiving", e);
+                        else
+                        {
+                            midiMessageHandler.Handle(receiveData,
+                                new RtpMidiServer(incomingPacket.Address.HostName, incomingPacket.Port));
+                        }
+
+                    }));
+                    thread.Start();
+                    
+                }
+                catch (SocketTimeoutException ignored)
+                {
+                }
+                catch (IOException e)
+                {
+                    Log.Error("RtpMidi","IOException while receiving", e);
                 }
             }
-            socket.close();
+            socket.Close();
         }
 
         /**
@@ -282,8 +313,8 @@ namespace rtpmidi.session {
         * Informs all {@link SessionChangeListener} about the new number of available sessions
         */
         private void NotifyMaxNumberOfSessions() {
-            foreach (SessionChangeListener listener in sessionChangeListeners) {
-                listener.OnMaxNumberOfSessionsChange(sessions.Size());
+            foreach (ISessionChangeListener listener in sessionChangeListeners) {
+                listener.OnMaxNumberOfSessionsChange(sessions.Count);
             }
         }
 
@@ -299,7 +330,7 @@ namespace rtpmidi.session {
         *
         * @param listener The listener to be registerd
         */
-        public void RegisterSessionChangeListener(SessionChangeListener listener) {
+        public void RegisterSessionChangeListener(ISessionChangeListener listener) {
             sessionChangeListeners.Add(listener);
         }
 
@@ -308,7 +339,7 @@ namespace rtpmidi.session {
         *
         * @param listener The listener to be unregisterd
         */
-        public void UnregisterSessionChangeListener(SessionChangeListener listener) {
+        public void UnregisterSessionChangeListener(ISessionChangeListener listener) {
             sessionChangeListeners.Remove(listener);
         }
 

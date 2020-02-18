@@ -1,12 +1,23 @@
 using Android.Util;
+using Java.Lang;
+using Java.Net;
+using Java.Nio;
+using Java.Nio.FileNio;
+using Java.Security;
+using Java.Util;
 using rtpmidi;
+using rtpmidi.error;
+using rtpmidi.handler;
 using rtpmidi.messages;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
 
 namespace rtpmidi.control
-{ 
+{
 
 
     /**
@@ -14,17 +25,33 @@ namespace rtpmidi.control
     * accept invitations and reject otherwise.
     */
 
-    public class RtpMidiControlServer:Thread,IRtpMidiCommandListener {
+    public abstract class BaseThread
+    {
+        private System.Threading.Thread _thread;
+
+        protected BaseThread()
+        {
+            _thread = new System.Threading.Thread(new ThreadStart(this.Start));
+        }
+
+        // Thread methods / properties
+        public virtual void Start() => _thread.Start();
+        public virtual void Join() => _thread.Join();
+        public virtual bool IsAlive => _thread.IsAlive;
+
+        // Override in base class
+       //public abstract void RunThread();
+    }
+
+    public class RtpMidiControlServer:BaseThread,IRtpMidiCommandListener {
 
         private static int SOCKET_TIMEOUT = 1000;
 
-        private enum State {
-            ACCEPT_INVITATIONS, FULL
-        }
+        private enum State { ACCEPT_INVITATIONS, FULL }
 
         private static int RECEIVE_BUFFER_LENGTH = 1024;
         private static string THREAD_SUFFIX = "ControlThread";
-        private int port;
+        public int Port { get; protected set; }
         
         private int maxNumberOfSessions;
         private bool running = true;
@@ -49,39 +76,39 @@ namespace rtpmidi.control
         * @param name    The name under which the other peers should see this server
         * @param port    The control port
         */
-        RtpMidiControlServer(RtpMidiCommandHandler handler, string name, int port):base(name + THREAD_SUFFIX)
+        RtpMidiControlServer(RtpMidiCommandHandler handler, string name, int port)
         {
             this.handler = handler;
-            this.port = port;
-            this.name = name;
-            handler.registerListener(this);
+            Port = port;
+            Name = name;
+            handler.RegisterListener(this);
         }
 
 
-        public void Start()
+        public override void Start()
         {
-        private object _locker = new object();
+            object _locker = new object();
             lock (_locker)
             {
                 try
                 {
-                    socket = initDatagramSocket();
-                    socket.setSoTimeout(SOCKET_TIMEOUT);
+                    socket = InitDatagramSocket();
+                    socket.SoTimeout = SOCKET_TIMEOUT;
 
-                    String hostName;
+                    string hostName;
                     try
                     {
-                        hostName = InetAddress.getLocalHost().getHostName();
+                        hostName = InetAddress.LocalHost.HostName;
                     }
-                    catch (final UnknownHostException e) 
+                    catch (UnknownHostException e) 
                     {
                         hostName = "";
                     }
                     Initialize(hostName);
                 }
-                catch (final SocketException e) 
+                catch (SocketException e) 
                 {
-                    throw new AppleMidiControlServerRuntimeException("DatagramSocket cannot be opened", e);
+                    throw new RtpMidiControlServerRuntimeException("DatagramSocket cannot be opened", e);
                 }
                 base.Start();
                 Log.Debug("RtpMidi","MIDI control server started");
@@ -89,36 +116,40 @@ namespace rtpmidi.control
         
         }
 
-        private void Initialize(string hostName) {
+        private void Initialize(string hostName)
+        {
             Ssrc = CreateSsrc(hostName);
         }
 
-        private int CreateSsrc(final String hostName) {
+        private int CreateSsrc(string hostName)
+        {
             try
             {
-                final MessageDigest md = MessageDigest.getInstance("MD5");
-                md.update(String.valueOf(new Date().getTime()).getBytes());
-                md.update(String.valueOf(System.identityHashCode(this)).getBytes());
-                md.update(Paths.get("").toAbsolutePath().normalize().toString().getBytes());
-                md.update(hostName.getBytes());
-                final byte[] md5 = md.digest();
+                ObjectIDGenerator obGen = new ObjectIDGenerator();
+
+                MessageDigest md = MessageDigest.GetInstance("MD5");
+                md.Update(Encoding.GetEncoding("UTF-8").GetBytes(Convert.ToString(new Date().Time).ToCharArray()));
+                md.Update(Encoding.GetEncoding("UTF-8").GetBytes(Convert.ToString(obGen.ToString().ToCharArray())));
+                md.Update(Encoding.GetEncoding("UTF-8").GetBytes(Paths.Get("").ToAbsolutePath().Normalize().ToString().ToCharArray()));
+                md.Update(Encoding.GetEncoding("UTF-8").GetBytes(hostName.ToCharArray()));
+                byte[] md5 = md.Digest();
                 int ssrc = 0;
-                final ByteBuffer byteBuffer = ByteBuffer.wrap(md5);
+                ByteBuffer byteBuffer = ByteBuffer.Wrap(md5);
                 for (int i = 0; i < 3; i++)
                 {
-                    ssrc ^= byteBuffer.getInt();
+                    ssrc ^= byteBuffer.Int;
                 }
                 return ssrc;
             }
-            catch (final NoSuchAlgorithmException e) 
+            catch (NoSuchAlgorithmException e) 
             {
                 throw new RuntimeException("Could not get MD5 algorithm", e);
             }
         }
 
-        protected DatagramSocket initDatagramSocket()
+        protected DatagramSocket InitDatagramSocket()
         {
-            return new DatagramSocket(port);
+            return new DatagramSocket(Port);
         }
 
         /**
@@ -126,80 +157,77 @@ namespace rtpmidi.control
         */
         public void StopServer()
         {
-            for (final AppleMidiServer server : acceptedServers) 
+            foreach (RtpMidiServer server in acceptedServers) 
             {
                 try
                 {
-                    log.info("Sending end session to {}", server);
-                    send(new AppleMidiEndSession(2, getNewInitiatorToken(), ssrc), server);
+                    Log.Info("RtpMidi","Sending end session to {}", server);
+                    Send(new RtpMidiEndSession(2, GetNewInitiatorToken(), Ssrc), server);
                 }
-                catch (final IOException e) 
+                catch (IOException e) 
                 {
-                    log.info("Error closing session with server: {}", server, e);
+                    Log.Info("RtpMidi","Error closing session with server: {}", server, e);
                 }
             }
             running = false;
-            acceptedServers.clear();
-            log.debug("MIDI control server stopped");
+            acceptedServers.Clear();
+            Log.Debug("RtpMidi","MIDI control server stopped");
         }
 
         int GetNewInitiatorToken()
         {
-            return new Random().Next();
+            return new System.Random().Next();
         }
 
     
-        public override void Run()
+        public void Run()
         {
             while (running)
             {
                 try
                 {
-                    final byte[] receiveData = new byte[RECEIVE_BUFFER_LENGTH];
+                    byte[] receiveData = new byte[RECEIVE_BUFFER_LENGTH];
 
-                    final DatagramPacket incomingPacket = initDatagramPacket(receiveData);
-                    socket.receive(incomingPacket);
-                    handler.handle(receiveData, new AppleMidiServer(incomingPacket.getAddress(), incomingPacket.getPort()));
+                    DatagramPacket incomingPacket = InitDatagramPacket(receiveData);
+                    socket.Receive(incomingPacket);
+                    handler.handle(receiveData, new RtpMidiServer(incomingPacket.Address.HostAddress, incomingPacket.Port));
                 }
-                catch (final SocketTimeoutException ignored) 
+                catch (SocketTimeoutException ignored) 
                 {
                 } 
-                catch (final IOException e) 
+                catch (IOException e) 
                 {
-                    log.error("IOException while receiving", e);
+                    Log.Error("RtpMidi","IOException while receiving", e);
                 }
             }
-            socket.close();
+            socket.Close();
         }
 
-        DatagramPacket initDatagramPacket(final byte[] receiveData)
+        DatagramPacket InitDatagramPacket(byte[] receiveData)
         {
-            return new DatagramPacket(receiveData, receiveData.length);
+            return new DatagramPacket(receiveData, receiveData.Length);
         }
 
 
 
-    public void OnMidiInvitation(RtpMidiInvitationRequest invitation, RtpMidiServer rtpMidiServer)
-    {
-            Log.Info("RtpMidi","MIDI invitation from: {}", appleMidiServer);
-            bool contains = acceptedServers.contains(appleMidiServer);
+        public void OnMidiInvitation(RtpMidiInvitationRequest invitation, RtpMidiServer rtpMidiServer)
+        {
+            Log.Info("RtpMidi","MIDI invitation from: {}", rtpMidiServer);
+            bool contains = acceptedServers.Contains(rtpMidiServer);
             if (contains)
             {
-                log.info("Server {} was still in accepted servers list. Removing old entry.", appleMidiServer);
-                OnEndSession(new AppleMidiEndSession(invitation.getProtocolVersion(), invitation.getInitiatorToken(),
-                    invitation.getSsrc()), appleMidiServer);
+                Log.Info("RtpMidi","Server {} was still in accepted servers list. Removing old entry.", rtpMidiServer);
+                OnEndSession(new RtpMidiEndSession(invitation.ProtocolVersion, invitation.InitiatorToken,invitation.Ssrc), rtpMidiServer);
             }
             if (getServerState() == State.ACCEPT_INVITATIONS) {
-                sendMidiInvitationAnswer(appleMidiServer, "accept",
-                    new AppleMidiInvitationAccepted(invitation.getProtocolVersion(), invitation.getInitiatorToken(),
-                            ssrc, name));
-                acceptedServers.add(appleMidiServer);
+                SendMidiInvitationAnswer(rtpMidiServer, "accept",
+                    new RtpMidiInvitationAccepted(invitation.ProtocolVersion, invitation.InitiatorToken, Ssrc, Name));
+                acceptedServers.Add(rtpMidiServer);
             }
             else
             {
-                sendMidiInvitationAnswer(appleMidiServer, "decline",
-                    new AppleMidiInvitationDeclined(invitation.getProtocolVersion(), invitation.getInitiatorToken(),
-                            ssrc, name));
+                SendMidiInvitationAnswer(rtpMidiServer, "decline",
+                    new RtpMidiInvitationDeclined(invitation.ProtocolVersion, invitation.InitiatorToken, Ssrc, Name));
             }
 
         }
@@ -221,8 +249,7 @@ namespace rtpmidi.control
         {
             byte[] invitationAcceptedBytes = midiCommand.ToByteArray();
 
-            socket.Send(new DatagramPacket(invitationAcceptedBytes, invitationAcceptedBytes.Length,
-                rtpMidiServer.getInetAddress(), rtpMidiServer.Port));
+            socket.Send(new DatagramPacket(invitationAcceptedBytes, invitationAcceptedBytes.Length,rtpMidiServer.InetAddress, rtpMidiServer.Port));
         }
 
     

@@ -115,13 +115,15 @@ namespace rtpmidi.handler {
             }
             int initiatorToken = dataInputStream.ReadInt();
             int ssrc = dataInputStream.ReadInt();
-            Scanner scanner = new Scanner(dataInputStream).UseDelimiter(NUL_TERMINATOR);
-            if (!scanner.HasNext)
-            {
-                Log.Info("RtpMidi","Could not find \\0 terminating string");
-                return;
-            }
-            string name = scanner.Next();
+            //Scanner scanner = new Scanner(dataInputStream).UseDelimiter(NUL_TERMINATOR);
+            //if (!scanner.HasNext)
+            //{
+            //    Log.Info("RtpMidi","Could not find \\0 terminating string");
+            //    return;
+            //}
+            //string name = scanner.Next();
+            string name = dataInputStream.ReadLine();
+
             foreach (IRtpMidiCommandListener listener in listeners)
             {
                 listener.OnMidiInvitation(new RtpMidiInvitationRequest(protocolVersion, initiatorToken, ssrc, name),rtpMidiServer);
