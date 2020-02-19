@@ -22,7 +22,7 @@ namespace rtpmidi.handler {
             listeners.Add(new RtpMidiCommandLogListener());
         }
 
-        public void handle(byte[] data, RtpMidiServer appleMidiServer) {
+        public void handle(byte[] data, model.RtpMidiServer appleMidiServer) {
             DataInputStream dataInputStream = new DataInputStream(new MemoryStream(data));
             try {
                 byte header1 = (byte) dataInputStream.ReadByte();
@@ -70,7 +70,7 @@ namespace rtpmidi.handler {
             }
         }
 
-        private void HandleEndSession(DataInputStream dataInputStream, RtpMidiServer rtpMidiServer)
+        private void HandleEndSession(DataInputStream dataInputStream, model.RtpMidiServer rtpMidiServer)
         {
             int protocolVersion = dataInputStream.ReadInt();
             if (protocolVersion != PROTOCOL_VERSION)
@@ -86,7 +86,7 @@ namespace rtpmidi.handler {
             }
         }
 
-        private void HandleSynchronization(DataInputStream dataInputStream, RtpMidiServer rtpMidiServer)
+        private void HandleSynchronization(DataInputStream dataInputStream, model.RtpMidiServer rtpMidiServer)
         {
             int ssrc = dataInputStream.ReadInt();
             byte count = (byte) dataInputStream.ReadByte();
@@ -105,7 +105,7 @@ namespace rtpmidi.handler {
             }
         }
 
-        private void HandleInvitation(DataInputStream dataInputStream, RtpMidiServer rtpMidiServer)
+        private void HandleInvitation(DataInputStream dataInputStream, model.RtpMidiServer rtpMidiServer)
         {
             int protocolVersion = dataInputStream.ReadInt();
             if (protocolVersion != PROTOCOL_VERSION)

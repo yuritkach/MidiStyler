@@ -10,7 +10,7 @@ namespace rtpmidi
              * param invitation      The invitation request
              * param rtpMidiServer The origin server of this message
              */
-        void OnMidiInvitation(RtpMidiInvitationRequest invitation, RtpMidiServer rtpMidiServer);
+        void OnMidiInvitation(RtpMidiInvitationRequest invitation, model.RtpMidiServer rtpMidiServer);
 
         /**
          * This method is called for every clock synchronization request.
@@ -18,7 +18,7 @@ namespace rtpmidi
          * param clockSynchronization The clock synchronization request
          * param rtpMidiServer      The origin server of this message
          */
-        void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization,RtpMidiServer rtpMidiServer);
+        void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization,model.RtpMidiServer rtpMidiServer);
     }
 }
 

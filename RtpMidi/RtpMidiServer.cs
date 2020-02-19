@@ -13,6 +13,7 @@ namespace rtpmidi {
         private static int DEFAULT_PORT = 50004;
         private static string DEFAULT_NAME = "rtpMIDIXamarinAndroid";
         public int Port { get; protected set; }
+        public string Name { get; protected set; }
         private RtpMidiControlServer controlServer;
         private RtpMidiSessionServer sessionServer;
 
@@ -31,6 +32,7 @@ namespace rtpmidi {
         */
         public RtpMidiServer(string name, int port) {
             Port = port;
+            Name = name;
             controlServer = new RtpMidiControlServer(name, port);
             sessionServer = new RtpMidiSessionServer(name, port + 1);
             sessionServer.RegisterSessionChangeListener(this);
@@ -57,7 +59,7 @@ namespace rtpmidi {
 
     
         public void OnMaxNumberOfSessionsChange(int maxNumberOfSessions) {
-            controlServer.SetMaxNumberOfSessions(maxNumberOfSessions);
+            controlServer.MaxNumberOfSessions = maxNumberOfSessions;
         }
 
         /**

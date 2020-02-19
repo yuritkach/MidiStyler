@@ -14,6 +14,6 @@ namespace rtpmidi.session
          * @param appleMidiServer  The target server
          * @throws IOException When a communication failure happens
          */
-        void Send(RtpMidiMessage rtpMidiMessage, RtpMidiServer rtpMidiServer);
+        void Send(RtpMidiMessage rtpMidiMessage, model.RtpMidiServer rtpMidiServer);
     }
 }

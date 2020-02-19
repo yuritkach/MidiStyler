@@ -12,6 +12,6 @@ namespace rtpmidi
          * param rtpMidiEndSession The end session request
          * param rtpMidiServer     The origin server of this message
          */
-        void OnEndSession(RtpMidiEndSession appleMidiEndSession,RtpMidiServer appleMidiServer);
+        void OnEndSession(RtpMidiEndSession appleMidiEndSession,model.RtpMidiServer rtpMidiServer);
     }
 }

@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Thread = Java.Lang.Thread;
 
 namespace rtpmidi.session {
 
@@ -63,7 +64,7 @@ namespace rtpmidi.session {
         private bool running = true;
         private DatagramSocket socket;
         private Deque<RtpMidiSession> sessions = new Deque<RtpMidiSession>();
-        private Dictionary<Integer, RtpMidiSessionConnection> currentSessions = new Dictionary<Integer, RtpMidiSessionConnection>();
+        private Dictionary<int, RtpMidiSessionConnection> currentSessions = new Dictionary<int, RtpMidiSessionConnection>();
         private List<ISessionChangeListener> sessionChangeListeners = new List<ISessionChangeListener>();
         private Thread thread;
 
@@ -127,7 +128,7 @@ namespace rtpmidi.session {
                         if (receiveData[0] == RtpMidiCommand.MIDI_COMMAND_HEADER1)
                         {
                             midiCommandHandler.handle(receiveData,
-                                new RtpMidiServer(incomingPacket.Address.HostAddress, incomingPacket.Port));
+                                new model.RtpMidiServer(incomingPacket.Address, incomingPacket.Port));
                         }
                         else
                         {
@@ -155,44 +156,44 @@ namespace rtpmidi.session {
         */
         public void StopServer() {
             running = false;
-            currentSessions.clear();
-            sessions.clear();
-            executorService.shutdown();
-            log.debug("MIDI session server stopped");
+            currentSessions.Clear();
+            sessions.Clear();
+            executorService.Shutdown();
+            Log.Debug("RtpMidi","MIDI session server stopped");
         }
 
-        private void Send(RtpMidiCommand midiCommand, RtpMidiServer rtpMidiServer)
+        private void Send(RtpMidiCommand midiCommand, model.RtpMidiServer rtpMidiServer)
         {
             Send(midiCommand.ToByteArray(), rtpMidiServer);
         }
 
-        private void Send(byte[] data, RtpMidiServer rtpMidiServer)
+        private void Send(byte[] data, model.RtpMidiServer rtpMidiServer)
         {
-            if (Log.isTraceEnabled()) {
-                Log.trace("Sending data {} to server {}", Hex.encodeHexString(data), rtpMidiServer);
-            }
-            socket.Send(new DatagramPacket(data, data.length, rtpMidiServer.InetAddress, rtpMidiServer.Port));
+            
+            Log.Debug("RtpMidi","Sending data {} to server {}", BitConverter.ToString(data).Replace("-", ""), rtpMidiServer);
+            
+            socket.Send(new DatagramPacket(data, data.Length, rtpMidiServer.InetAddress, rtpMidiServer.Port));
         }
 
         
-        public void Send(RtpMidiMessage rtpMidiMessage,RtpMidiServer rtpMidiServer)
+        public void Send(RtpMidiMessage rtpMidiMessage,model.RtpMidiServer rtpMidiServer)
         { 
             Send(rtpMidiMessage.ToByteArray(), rtpMidiServer);
         }
 
         
-        public void OnMidiInvitation(RtpMidiInvitationRequest invitation, RtpMidiServer appleMidiServer)
+        public void OnMidiInvitation(RtpMidiInvitationRequest invitation, model.RtpMidiServer rtpMidiServer)
         {
             Log.Info("RtpMidi","MIDI invitation from: {}", rtpMidiServer);
             if (GetSessionServerState() == State.ACCEPT_INVITATIONS) {
                 SendMidiInvitationAnswer(rtpMidiServer, "accept",
                         new RtpMidiInvitationAccepted(invitation.ProtocolVersion, invitation.InitiatorToken,Ssrc, Name));
-                RtpMidiSession rtpMidiSession = sessions.pop();
+                RtpMidiSession rtpMidiSession = sessions.Last; // Pop()
                 RtpMidiSessionConnection connection =
                         new RtpMidiSessionConnection(rtpMidiSession, rtpMidiServer, Ssrc, this);
-                rtpMidiSession.SetSender(connection);
-                currentSessions.put(invitation.Ssrc, connection);
-                notifyMaxNumberOfSessions();
+                rtpMidiSession.Sender = connection;
+                currentSessions.Add(invitation.Ssrc, connection);
+                NotifyMaxNumberOfSessions();
             } else {
                 SendMidiInvitationAnswer(rtpMidiServer, "decline",
                         new RtpMidiInvitationDeclined(invitation.ProtocolVersion, invitation.InitiatorToken,Ssrc, Name));
@@ -203,10 +204,10 @@ namespace rtpmidi.session {
         * @return {@link State#FULL} if no sessions are available. {@link State#ACCEPT_INVITATIONS} otherwise
         */
         private State GetSessionServerState() {
-            return sessions.isEmpty() ? State.FULL : State.ACCEPT_INVITATIONS;
+            return sessions.IsEmpty ? State.FULL : State.ACCEPT_INVITATIONS;
         }
 
-        private void SendMidiInvitationAnswer(RtpMidiServer rtpMidiServer,string type,RtpMidiInvitation midiInvitation) {
+        private void SendMidiInvitationAnswer(model.RtpMidiServer rtpMidiServer,string type,RtpMidiInvitation midiInvitation) {
             try {
                 Log.Info("RtpMidi","Sending invitation {} to: {}", type, rtpMidiServer);
                 Send(midiInvitation, rtpMidiServer);
@@ -217,37 +218,50 @@ namespace rtpmidi.session {
         }
 
         
-        public void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization, RtpMidiServer rtpMidiServer) {
+        public void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization, model.RtpMidiServer rtpMidiServer)
+        {
             if (clockSynchronization.Count == (byte) 0) {
-                RtpMidiSessionConnection sessionTuple = currentSessions.get(clockSynchronization.getSsrc());
+                RtpMidiSessionConnection sessionTuple = currentSessions.GetValueOrDefault(clockSynchronization.Ssrc);
                 long currentTimestamp;
-                if (sessionTuple != null) {
-                    long sessionTimestamp = sessionTuple.getRtpMidiSession().CurrentTimestamp;
-                    if (sessionTimestamp != -1) {
+                if (sessionTuple != null)
+                {
+                    long sessionTimestamp = sessionTuple.RtpMidiSession.GetCurrentTimestamp();
+                    if (sessionTimestamp != -1)
+                    {
                         currentTimestamp = sessionTimestamp;
-                    } else {
-                        currentTimestamp = getFallbackTimestamp();
                     }
-                } else {
-                    currentTimestamp = getFallbackTimestamp();
+                    else
+                    {
+                        currentTimestamp = GetFallbackTimestamp();
+                    }
+                }
+                else
+                {
+                    currentTimestamp = GetFallbackTimestamp();
                 }
                 Log.Debug("RtpMidi","Answering with timestamp: {}", currentTimestamp);
                 RtpMidiClockSynchronization clockSynchronizationAnswer =
-                        new RtpMidiClockSynchronization(ssrc, (byte) 1, clockSynchronization.getTimestamp1(),
+                        new RtpMidiClockSynchronization(Ssrc, (byte) 1, clockSynchronization.Timestamp1,
                                 currentTimestamp, 0L);
-                try {
+                try
+                {
                     Send(clockSynchronizationAnswer, rtpMidiServer);
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     Log.Error("RtpMidi","IOException while sending clock synchronization", e);
                 }
-            } else if (clockSynchronization.getCount() == (byte) 2) {
+            }
+            else 
+            if (clockSynchronization.Count == (byte) 2)
+            {
                 long offsetEstimate =
-                        (clockSynchronization.getTimestamp3() + clockSynchronization.getTimestamp1()) / 2 -
-                                clockSynchronization.getTimestamp2();
+                        (clockSynchronization.Timestamp3 + clockSynchronization.Timestamp1) / 2 -
+                                clockSynchronization.Timestamp2;
 
-                RtpMidiSessionConnection midiServer = currentSessions.get(clockSynchronization.getSsrc());
+                RtpMidiSessionConnection midiServer = currentSessions.GetValueOrDefault(clockSynchronization.Ssrc);
                 if (midiServer != null) {
-                    midiServer.getRtpMidiSession().setOffsetEstimate(offsetEstimate);
+                    midiServer.RtpMidiSession.OffsetEstimate = offsetEstimate;
                 }   
             }
         }   
@@ -258,15 +272,16 @@ namespace rtpmidi.session {
         }
 
         
-        public void OnEndSession(RtpMidiEndSession rtpMidiEndSession, RtpMidiServer rtpMidiServer) {
+        public void OnEndSession(RtpMidiEndSession rtpMidiEndSession, model.RtpMidiServer rtpMidiServer) {
             Log.Info("RtpMidi","Session end from: {}", rtpMidiServer);
-            RtpMidiSessionConnection midiServer = currentSessions.get(rtpMidiEndSession.Ssrc);
+            RtpMidiSessionConnection midiServer = currentSessions.GetValueOrDefault(rtpMidiEndSession.Ssrc);
             if (midiServer != null) {
-                RtpMidiSession RtpMidiSession = midiServer.getRtpMidiSession();
-                rtpMidiSession.setSender(null);
-                rtpMidiSession.OnEndSession(rtpMidiEndSession, rtpMidiServer);
+                RtpMidiSession RtpMidiSession = midiServer.RtpMidiSession;
+                RtpMidiSession.Sender=null;
+                RtpMidiSession.OnEndSession(rtpMidiEndSession, rtpMidiServer);
             }
-            RtpMidiSessionConnection sessionTuple = currentSessions.remove(rtpMidiEndSession.Ssrc);
+            currentSessions.Remove(rtpMidiEndSession.Ssrc);
+            RtpMidiSessionConnection sessionTuple = 
             if (sessionTuple != null) {
                 sessions.add(sessionTuple.getRtpMidiSession());
                 notifyMaxNumberOfSessions();

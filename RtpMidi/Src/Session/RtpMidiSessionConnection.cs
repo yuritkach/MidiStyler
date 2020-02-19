@@ -15,13 +15,13 @@ namespace rtpmidi.session {
     class RtpMidiSessionConnection:IRtpMidiSessionSender
     {
         public RtpMidiSession RtpMidiSession { get; protected set; }
-        public RtpMidiServer RtpMidiServer { get; protected set; }
+        public model.RtpMidiServer RtpMidiServer { get; protected set; }
         public int Ssrc { get; protected set; }
         public IRtpMidiMessageSender RtpMidiMessageSender { get; protected set; }
 
         private short sequenceNumber = (short)new System.Random().Next(Short.MaxValue + 1);
 
-        public RtpMidiSessionConnection(RtpMidiSession rtpMidiSession,RtpMidiServer rtpMidiServer, int ssrc, IRtpMidiMessageSender rtpMidiMessageSender)
+        public RtpMidiSessionConnection(RtpMidiSession rtpMidiSession,model.RtpMidiServer rtpMidiServer, int ssrc, IRtpMidiMessageSender rtpMidiMessageSender)
         {
             RtpMidiSession = rtpMidiSession;
             RtpMidiServer = rtpMidiServer;

@@ -9,6 +9,7 @@ using rtpmidi;
 using rtpmidi.error;
 using rtpmidi.handler;
 using rtpmidi.messages;
+using rtpmidi.model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,14 +54,14 @@ namespace rtpmidi.control
         private static string THREAD_SUFFIX = "ControlThread";
         public int Port { get; protected set; }
         
-        private int maxNumberOfSessions;
+        public int MaxNumberOfSessions { get; set; }
         private bool running = true;
         
         public int Ssrc { get; protected set; }
         public string Name { get; protected set; }
         private RtpMidiCommandHandler handler;
         private DatagramSocket socket;
-        private List<RtpMidiServer> acceptedServers = new List<RtpMidiServer>();
+        private List<model.RtpMidiServer> acceptedServers = new List<model.RtpMidiServer>();
         private List<IEndSessionListener> endSessionListeners = new List<IEndSessionListener>();
 
         /**
@@ -157,7 +158,7 @@ namespace rtpmidi.control
         */
         public void StopServer()
         {
-            foreach (RtpMidiServer server in acceptedServers) 
+            foreach (model.RtpMidiServer server in acceptedServers) 
             {
                 try
                 {
@@ -190,7 +191,7 @@ namespace rtpmidi.control
 
                     DatagramPacket incomingPacket = InitDatagramPacket(receiveData);
                     socket.Receive(incomingPacket);
-                    handler.handle(receiveData, new RtpMidiServer(incomingPacket.Address.HostAddress, incomingPacket.Port));
+                    handler.handle(receiveData, new model.RtpMidiServer(incomingPacket.Address, incomingPacket.Port));
                 }
                 catch (SocketTimeoutException ignored) 
                 {
@@ -210,7 +211,7 @@ namespace rtpmidi.control
 
 
 
-        public void OnMidiInvitation(RtpMidiInvitationRequest invitation, RtpMidiServer rtpMidiServer)
+        public void OnMidiInvitation(RtpMidiInvitationRequest invitation, model.RtpMidiServer rtpMidiServer)
         {
             Log.Info("RtpMidi","MIDI invitation from: {}", rtpMidiServer);
             bool contains = acceptedServers.Contains(rtpMidiServer);
@@ -232,7 +233,7 @@ namespace rtpmidi.control
 
         }
 
-        private void SendMidiInvitationAnswer(RtpMidiServer rtpMidiServer, string type, RtpMidiInvitation midiInvitation)
+        private void SendMidiInvitationAnswer(model.RtpMidiServer rtpMidiServer, string type, RtpMidiInvitation midiInvitation)
         {
             try
             {
@@ -245,7 +246,7 @@ namespace rtpmidi.control
             }
         }
 
-        private void Send(RtpMidiCommand midiCommand, RtpMidiServer rtpMidiServer)
+        private void Send(RtpMidiCommand midiCommand, model.RtpMidiServer rtpMidiServer)
         {
             byte[] invitationAcceptedBytes = midiCommand.ToByteArray();
 
@@ -253,23 +254,23 @@ namespace rtpmidi.control
         }
 
     
-        public void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization,RtpMidiServer rtpMidiServer)
+        public void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization,model.RtpMidiServer rtpMidiServer)
         {
         }
 
         private State getServerState()
         {
-            return acceptedServers.size() < maxNumberOfSessions ? State.ACCEPT_INVITATIONS : State.FULL;
+            return acceptedServers.Count < MaxNumberOfSessions ? State.ACCEPT_INVITATIONS : State.FULL;
         }
 
     
-        public override void OnEndSession(RtpMidiEndSession rtpMidiEndSession, RtpMidiServer rtpMidiServer)
+        public void OnEndSession(RtpMidiEndSession rtpMidiEndSession, model.RtpMidiServer rtpMidiServer)
         {
             Log.Info("RtpMidi","Session ended with: {}", rtpMidiServer);
             acceptedServers.Remove(rtpMidiServer);
-            for (final EndSessionListener listener : endSessionListeners)
+            foreach (IEndSessionListener listener in endSessionListeners)
             {
-                listener.onEndSession(appleMidiEndSession, appleMidiServer);
+                listener.OnEndSession(rtpMidiEndSession, rtpMidiServer);
             }
         }
 
@@ -278,9 +279,9 @@ namespace rtpmidi.control
         *
         * @param listener The listener to be registerd
         */
-        public void RegisterEndSessionListener(EndSessionListener listener)
+        public void RegisterEndSessionListener(IEndSessionListener listener)
         {
-            endSessionListeners.add(listener);
+            endSessionListeners.Add(listener);
         }
 
         /**
@@ -288,10 +289,9 @@ namespace rtpmidi.control
         *
         * @param listener The listener to be unregisterd
         */
-        public void UnRegisterEndSessionListener(EndSessionListener listener)
+        public void UnRegisterEndSessionListener(IEndSessionListener listener)
         {
-            endSessionListeners.remove(listener);
+            endSessionListeners.Remove(listener);
         }
-
     }
 }

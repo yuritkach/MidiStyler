@@ -9,5 +9,10 @@ namespace rtpmidi.model {
     public class RtpMidiServer {
         public InetAddress InetAddress { get; protected set; } 
         public int Port { get; protected set; }
+        public RtpMidiServer(InetAddress inetAddress, int port)
+        {
+            InetAddress = inetAddress;
+            Port = port;
+        }
     }
 }

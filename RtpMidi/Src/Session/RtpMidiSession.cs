@@ -12,8 +12,8 @@ namespace rtpmidi.session
     */
     public abstract class RtpMidiSession:IRtpMidiMessageListener, IRtpMidiCommandListener {
 
-        private long OffsetEstimate;
-        private IRtpMidiSessionSender sender;
+        public long OffsetEstimate { get; set; }
+        public IRtpMidiSessionSender Sender { get; set; }
         protected int timestampOffset = new Random().Next();
 
         /**
@@ -46,25 +46,25 @@ namespace rtpmidi.session
         * @param timestamp The timestamp of the message
         */
         public void SendMidiMessage(MidiMessage message, long timestamp) {
-            if (sender == null)
+            if (Sender == null)
             {
                 Log.Debug("RtpMidi","No sender available. Not sending message");
                 return;
             }
-            sender.SendMidiMessage(message, timestamp);
+            Sender.SendMidiMessage(message, timestamp);
         }
 
     
-        public void OnMidiInvitation(RtpMidiInvitationRequest invitation,RtpMidiServer appleMidiServer)
+        public void OnMidiInvitation(RtpMidiInvitationRequest invitation,model.RtpMidiServer rtpMidiServer)
         {
         }
 
     
-        public void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization, RtpMidiServer appleMidiServer)
+        public void OnClockSynchronization(RtpMidiClockSynchronization clockSynchronization, model.RtpMidiServer rtpMidiServer)
         {
         }
 
-        public void OnEndSession(RtpMidiEndSession rtpMidiEndSession, RtpMidiServer rtpMidiServer)
+        public void OnEndSession(RtpMidiEndSession rtpMidiEndSession, model.RtpMidiServer rtpMidiServer)
         {
             OnEndSession();
         }
