@@ -1,3 +1,4 @@
+using Android.OS;
 using Android.Util;
 using Java.Lang;
 using Java.Net;
@@ -26,17 +27,41 @@ namespace rtpmidi.control
     * accept invitations and reject otherwise.
     */
 
+
+    public class GetLocalHostNameAsyncTask : AsyncTask
+    {
+        private string GetLocalHostName()
+        {
+            string address;
+            try
+            {
+                address = InetAddress.LocalHost.HostName;
+            }
+            catch (System.Exception e)
+            {
+                return "";
+            }
+            return address;
+        }
+
+        protected override Java.Lang.Object DoInBackground(params Java.Lang.Object[] @params)
+        {
+            var res = GetLocalHostName();
+            return res;
+        }
+    }
+
     public abstract class BaseThread
     {
         private System.Threading.Thread _thread;
 
         protected BaseThread()
         {
-            _thread = new System.Threading.Thread(new ThreadStart(this.Start));
+            _thread = new System.Threading.Thread(new ThreadStart(this.StartAsync));
         }
 
         // Thread methods / properties
-        public virtual void Start() => _thread.Start();
+        public virtual void StartAsync() => _thread.Start();
         public virtual void Join() => _thread.Join();
         public virtual bool IsAlive => _thread.IsAlive;
 
@@ -86,22 +111,20 @@ namespace rtpmidi.control
         }
 
 
-        public override void Start()
+        public override async void StartAsync()
         {
-            object _locker = new object();
-            lock (_locker)
-            {
-                try
-                {
+            try { 
                     socket = InitDatagramSocket();
                     socket.SoTimeout = SOCKET_TIMEOUT;
 
                     string hostName;
                     try
                     {
-                        hostName = InetAddress.LocalHost.HostName;
+                        var task = new GetLocalHostNameAsyncTask();
+                        task.Execute();
+                        hostName = (string) await task.GetAsync();
                     }
-                    catch (UnknownHostException e) 
+                    catch 
                     {
                         hostName = "";
                     }
@@ -111,9 +134,9 @@ namespace rtpmidi.control
                 {
                     throw new RtpMidiControlServerRuntimeException("DatagramSocket cannot be opened", e);
                 }
-                base.Start();
+                base.StartAsync();
                 Log.Debug("RtpMidi","MIDI control server started");
-            }
+            
         
         }
 

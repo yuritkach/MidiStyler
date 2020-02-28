@@ -24,20 +24,13 @@ namespace rtpmidi.session {
     * + 1}
     */
 
-    public class BaseRunable:IRunnable
+    public class BaseRunable:Java.Lang.Object,IRunnable
     {
         private Runnable _runable;
 
         protected BaseRunable()
         {
             _runable = new Runnable(Run);
-        }
-
-        public IntPtr Handle => throw new NotImplementedException();
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
         }
 
         // Thread methods / properties
@@ -281,20 +274,20 @@ namespace rtpmidi.session {
                 RtpMidiSession.OnEndSession(rtpMidiEndSession, rtpMidiServer);
             }
             currentSessions.Remove(rtpMidiEndSession.Ssrc);
-            RtpMidiSessionConnection sessionTuple = 
+            RtpMidiSessionConnection sessionTuple = currentSessions.GetValueOrDefault(rtpMidiEndSession.Ssrc);
             if (sessionTuple != null) {
-                sessions.add(sessionTuple.getRtpMidiSession());
-                notifyMaxNumberOfSessions();
+                sessions.AddLast(sessionTuple.RtpMidiSession);
+                NotifyMaxNumberOfSessions();
             }
         }
 
         
         public void OnMidiMessage(MidiCommandHeader midiCommandHeader, MidiMessage message, int timestamp) {
-            RtpMidiSessionConnection sessionTuple = currentSessions.get(midiCommandHeader.getRtpHeader().Ssrc);
+            RtpMidiSessionConnection sessionTuple = currentSessions.GetValueOrDefault(midiCommandHeader.RtpHeader.Ssrc);
             if (sessionTuple != null) {
-                sessionTuple.getRtpMidiSession().onMidiMessage(midiCommandHeader, message, timestamp);
+                sessionTuple.RtpMidiSession.OnMidiMessage(midiCommandHeader, message, timestamp);
             } else {
-                Log.Debug("RtpMidi","Could not find session for ssrc: {}", ssrc);
+                Log.Debug("RtpMidi","Could not find session for ssrc: {}", Ssrc);
             }
         }
 
@@ -304,8 +297,8 @@ namespace rtpmidi.session {
         * @param session The session to be added
         */
         public void AddRtpMidiSession(RtpMidiSession session) {
-            sessions.Add(session);
-            notifyMaxNumberOfSessions();
+            sessions.AddLast(session);
+            NotifyMaxNumberOfSessions();
         }
 
         /**
@@ -314,12 +307,12 @@ namespace rtpmidi.session {
         * @param session The session to be removed
         */
         public void RemoveRtpMidiSession(RtpMidiSession session) {
-            sessions.Remove(session);
-            foreach (Map.Entry<Integer, RtpMidiSessionConnection> entry in currentSessions.entrySet()) {
-                if (entry.getValue().getRtpMidiSession().equals(session)) {
-                    Integer ssrc = entry.getKey();
+            sessions.RemoveLast(/*session*/);
+            foreach (var entry in currentSessions) {
+                if (entry.Value.RtpMidiSession.Equals(session)) {
+                    int ssrc = entry.Key;
                     currentSessions.Remove(ssrc);
-                    notifyMaxNumberOfSessions();
+                    NotifyMaxNumberOfSessions();
                 }
             }
         }
@@ -337,7 +330,7 @@ namespace rtpmidi.session {
         * @return The current number of available sessions for receiving MIDI messages
         */
         public int GetNumberOfAvailableSessions() {
-            return sessions.Size();
+            return sessions.Count;
         }
 
         /**

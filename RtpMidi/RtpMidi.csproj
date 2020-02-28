@@ -97,6 +97,17 @@
     <Compile Include="Src\Session\RtpMidiSessionServer.cs" />
     <Compile Include="Src\Session\SessionChangeListener.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Src\Adapter\ShortMessageAdapter.cs" />
+    <Compile Include="Src\Adapter\SysexMessageAdapter.cs" />
+    <Compile Include="Src\NetRtpMidiSession.cs" />
+    <Compile Include="Src\NetMidiMessageConverter.cs" />
+    <Content Include="Src\MidiDeviceAppleMidiSession.java" />
+    <Compile Include="Src\MidiDeviceMode.cs" />
+    <Compile Include="Src\MidiDeviceModePair.cs" />
+    <Compile Include="Src\MidiReceiverRtpMidiSession.cs" />
+    <Content Include="Src\MidiTransmitterAppleMidiSession.java" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

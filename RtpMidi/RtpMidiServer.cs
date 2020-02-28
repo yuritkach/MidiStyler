@@ -67,7 +67,7 @@ namespace rtpmidi {
         */
         public void Start() {
             sessionServer.Start();
-            controlServer.Start();
+            controlServer.StartAsync();
             Log.Info("RtpMidi","RtpMidiServer started");
         }
 

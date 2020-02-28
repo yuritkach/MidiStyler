@@ -27,7 +27,7 @@ namespace rtpmidi.session
         }
 
     
-        public void OnMidiMessage(MidiCommandHeader midiCommandHeader, MidiMessage message, int timestamp) {
+        public virtual void OnMidiMessage(MidiCommandHeader midiCommandHeader, MidiMessage message, int timestamp) {
             OnMidiMessage(message, timestamp + OffsetEstimate);
         }
 
@@ -45,7 +45,7 @@ namespace rtpmidi.session
         * @param message   The {@link MidiMessage} to deliver
         * @param timestamp The timestamp of the message
         */
-        public void SendMidiMessage(MidiMessage message, long timestamp) {
+        public virtual void SendMidiMessage(MidiMessage message, long timestamp) {
             if (Sender == null)
             {
                 Log.Debug("RtpMidi","No sender available. Not sending message");
