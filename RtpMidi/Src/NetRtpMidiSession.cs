@@ -1,7 +1,7 @@
 using rtpmidi.model;
 using rtpmidi.session;
 
-namespace rtipmidi
+namespace rtpmidi
 {
 
 /**

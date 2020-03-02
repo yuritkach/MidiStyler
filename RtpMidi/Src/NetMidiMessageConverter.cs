@@ -2,7 +2,7 @@ using Java.Lang;
 using rtpmidi.model;
 using rtpmidi.adapter;
 
-namespace rtipmidi {
+namespace rtpmidi {
     
     /**
      * Converter class to convert from {@link io.github.leovr.rtipmidi.model.MidiMessage} to {@link MidiMessage}

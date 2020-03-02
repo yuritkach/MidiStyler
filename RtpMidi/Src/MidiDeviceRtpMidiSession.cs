@@ -1,25 +1,13 @@
-package io.github.leovr.rtipmidi;
-
-import io.github.leovr.rtipmidi.error.AppleMidiSessionInstantiationException;
-import io.github.leovr.rtipmidi.session.AppleMidiSession;
-
-import javax.annotation.Nonnull;
-import javax.sound.midi.MidiDevice;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
+using Android.Media.Midi;
+using System.Collections.Generic;
+namespace rtpmidi { 
 /**
  * {@link AppleMidiSession} with one or more {@link MidiDevice} as the receiver or sender of the MIDI messages
  */
-public class MidiDeviceAppleMidiSession extends JavaxAppleMidiSession {
+public class MidiDeviceAppleMidiSession:NetRtpMidiSession {
 
-    private final List<MidiDevice> midiDevices = new ArrayList<>();
-    private List<Receiver> receivers = new ArrayList<>();
+    private List<MidiDevice> midiDevices = new List<MidiDevice>();
+    private List<Receiver> receivers = new List<Receiver>();
 
     public MidiDeviceAppleMidiSession(@Nonnull final MidiDeviceModePair midiDeviceModePair) {
         this(Collections.singletonList(midiDeviceModePair));
@@ -117,4 +105,5 @@ public class MidiDeviceAppleMidiSession extends JavaxAppleMidiSession {
         public void close() {
         }
     }
+}
 }

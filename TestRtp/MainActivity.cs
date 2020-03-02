@@ -1,12 +1,9 @@
 ﻿using Android.App;
 using Android.OS;
 using Android.Support.V7.App;
-using Android.Runtime;
-using Android.Widget;
-using Android.Media.Midi;
-using rtpmidi;
-using rtipmidi;
-using System.IO;
+using Java.Net;
+using Android.Net.Rtp;
+using System;
 
 namespace TestRtp
 {
@@ -21,35 +18,20 @@ namespace TestRtp
 
             try
             {
-//                JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost());
+                InetAddress multicastAddress = InetAddress.GetByName("192.168.2.229");
+                DatagramSocket socket = new DatagramSocket(5004);
+                byte[] buff = new byte[18];
 
-  //              ServiceInfo serviceInfo =
-    //                    ServiceInfo.create("_apple-midi._udp.local.", "rtpMidiJava", 50004, "apple-midi");
-    //            jmdns.registerService(serviceInfo);
-
-                //MidiDevice midiDevice =  ;//get MIDI device
-
-                RtpMidiServer server = new RtpMidiServer();
-                server.AddRtpMidiSession(
-                    new MidiReceiverRtpMidiSession(new TestMidiReceiver()));
-                //new MidiDeviceAppleMidiSession(new MidiDeviceModePair(midiDevice, MidiDeviceMode.READ_ONLY)));
-                server.Start();
-
-                server.Stop();
+                DatagramPacket packet = new DatagramPacket(buff,buff.Length);
+                socket.ConnectAsync(multicastAddress,5008);
+                socket.ReceiveAsync(packet);
             }
-            catch (IOException e) {
-            }
-
-
-            }
-    }
-
-        public class TestMidiReceiver : MidiReceiver
-        {
-            public override void OnSend(byte[] msg, int offset, int count, long timestamp)
+            catch (Exception e)
             {
-                throw new System.NotImplementedException();
             }
-        }
 
+
+        }
     }
+ 
+}

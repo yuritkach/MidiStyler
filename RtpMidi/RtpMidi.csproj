@@ -102,7 +102,7 @@
     <Compile Include="Src\Adapter\SysexMessageAdapter.cs" />
     <Compile Include="Src\NetRtpMidiSession.cs" />
     <Compile Include="Src\NetMidiMessageConverter.cs" />
-    <Content Include="Src\MidiDeviceAppleMidiSession.java" />
+    <Compile Include="Src\MidiDeviceRtpMidiSession.cs" />
     <Compile Include="Src\MidiDeviceMode.cs" />
     <Compile Include="Src\MidiDeviceModePair.cs" />
     <Compile Include="Src\MidiReceiverRtpMidiSession.cs" />
