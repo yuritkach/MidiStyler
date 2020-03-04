@@ -1,4 +1,6 @@
 
+using Android.OS;
+
 namespace midi.events {
 
     public class MIDIConnectionEndEvent {

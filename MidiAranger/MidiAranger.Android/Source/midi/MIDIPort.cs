@@ -29,7 +29,7 @@ public class MIDIPort {
 
     private Java.Lang.Thread thread = new Java.Lang.Thread();
 
-    static MIDIPort NewUsing(int port) {
+    public static MIDIPort NewUsing(int port) {
         return new MIDIPort(port);
     }
    
@@ -113,7 +113,7 @@ public class MIDIPort {
         thread.Priority=(int)priority;
     }
 
-    void Start() {
+    public void Start() {
         isListening = true;
 
 //        final Thread thread = new Thread(this);
@@ -125,7 +125,7 @@ public class MIDIPort {
 
     }
 
-    void Stop() {
+    public void Stop() {
         isListening = false;
     }
 
@@ -158,7 +158,7 @@ public class MIDIPort {
     }
 
 
-    void SendMidi(MIDIControl control, Bundle rinfo) {
+    public void SendMidi(MIDIControl control, Bundle rinfo) {
 //        Log.d("MIDIPort2","sendMidi(control)");
         if (!isListening) {
             Log.Debug(TAG,"not listening...");
@@ -167,13 +167,13 @@ public class MIDIPort {
         AddToOutboundQueue(control.GenerateBuffer(),rinfo);
     }
 
-    void sendMidi(MIDIMessage message, Bundle rinfo) {
+    public void SendMidi(MIDIMessage message, Bundle rinfo) {
 //        Log.d("MIDIPort","sendMidi(message)");
         if (!isListening) {
             Log.Debug(TAG,"not listening...");
             return;
         }
-        AddToOutboundQueue(message.generateBuffer(),rinfo);
+        AddToOutboundQueue(message.GenerateBuffer(),rinfo);
     }
 
     private void AddToOutboundQueue(byte[] data, Bundle rinfo) {

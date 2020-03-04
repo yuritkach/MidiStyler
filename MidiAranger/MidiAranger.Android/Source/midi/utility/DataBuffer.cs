@@ -1,3 +1,5 @@
+using Java.Util;
+
 namespace midi.utility {
 
     public class DataBuffer {
@@ -33,7 +35,7 @@ namespace midi.utility {
             return streamPosition;
         }
 
-        public byte[] slice(int position) {
+        public byte[] Slice(int position) {
             return Arrays.CopyOfRange(this.bytes, position, bytesLength);
         }
     }

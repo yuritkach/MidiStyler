@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JmDNS-Bindings", "JmDNS\JmDNS-Bindings.csproj", "{3E8EAC06-E226-4FB2-90B4-0AD65A618EAE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiAranger.Android", "MidiAranger\MidiAranger.Android\MidiAranger.Android.csproj", "{B9A4B3E0-409C-4C77-97F3-6FC9AE190034}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiAranger", "MidiAranger\MidiAranger\MidiAranger.csproj", "{40D9EB41-D5C2-47CF-8A26-7F4D03455AB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiAranger", "MidiAranger\MidiAranger\MidiAranger.csproj", "{40D9EB41-D5C2-47CF-8A26-7F4D03455AB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3E8EAC06-E226-4FB2-90B4-0AD65A618EAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E8EAC06-E226-4FB2-90B4-0AD65A618EAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E8EAC06-E226-4FB2-90B4-0AD65A618EAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9A4B3E0-409C-4C77-97F3-6FC9AE190034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B9A4B3E0-409C-4C77-97F3-6FC9AE190034}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9A4B3E0-409C-4C77-97F3-6FC9AE190034}.Debug|Any CPU.Deploy.0 = Debug|Any CPU

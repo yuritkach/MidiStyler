@@ -1,69 +1,65 @@
+using Android.OS;
+using Java.Lang;
+
 namespace midi {
 
-    //import android.os.Bundle;
+    public class MIDIAddressBookEntry {
 
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_ADDR;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_NAME;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_PORT;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_RECON;
-
-public class MIDIAddressBookEntry {
-
-        private String address;
+        private string address;
         private int port;
-        private String name;
-        private Boolean reconnect;
+        private string name;
+        private bool reconnect;
 
         public MIDIAddressBookEntry() {
         }
 
         public MIDIAddressBookEntry(Bundle rinfo) {
-            address = rinfo.getString(RINFO_ADDR, "");
-            port = rinfo.getInt(RINFO_PORT);
-            name = rinfo.getString(RINFO_NAME, "");
-            reconnect = rinfo.getBoolean(RINFO_RECON, false);
+            address = rinfo.GetString(MIDIConstants.RINFO_ADDR, "");
+            port = rinfo.GetInt(MIDIConstants.RINFO_PORT);
+            name = rinfo.GetString(MIDIConstants.RINFO_NAME, "");
+            reconnect = rinfo.GetBoolean(MIDIConstants.RINFO_RECON, false);
         }
 
         public Bundle rinfo() {
             Bundle rinfo = new Bundle();
-            rinfo.putString(RINFO_NAME, name);
-            rinfo.putString(RINFO_ADDR, address);
-            rinfo.putInt(RINFO_PORT, port);
-            rinfo.putBoolean(RINFO_RECON, reconnect);
+            rinfo.PutString(MIDIConstants.RINFO_NAME, name);
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, address);
+            rinfo.PutInt(MIDIConstants.RINFO_PORT, port);
+            rinfo.PutBoolean(MIDIConstants.RINFO_RECON, reconnect);
             return rinfo;
         }
 
-        public void setAddress(String a) {
+        public void SetAddress(string a) {
             address = a;
         }
 
-        public String getAddress() {
+        public string GetAddress() {
             return address;
         }
 
-        public void setPort(int p) {
+        public void SetPort(int p) {
             port = p;
         }
 
-        public int getPort() {
+        public int GetPort() {
             return port;
         }
 
-        public String getAddressPort() { return address + ":" + port; }
+        public string GetAddressPort() { return address + ":" + port; }
 
-        public void setName(String n) {
+        public void SetName(string n) {
             name = n;
         }
 
-        public String getName() {
+        public string GetName() {
             return name;
         }
 
-        public void setReconnect(boolean b) {
+        public void SetReconnect(bool b) {
             reconnect = b;
         }
 
-        public boolean getReconnect() {
+        public bool GetReconnect() {
             return reconnect;
         }
 

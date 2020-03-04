@@ -1,7 +1,13 @@
 using Android.Content;
+using Android.Net;
 using Android.Net.Nsd;
+using Android.Net.Wifi;
 using Android.OS;
+using Android.Runtime;
+using Android.Support.Compat;
 using Android.Util;
+using Java.Lang;
+using Java.Math;
 using Java.Net;
 using midi.events;
 using midi.internal_events;
@@ -9,6 +15,8 @@ using MidiAranger.Droid.Source.common;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
+using Math = Java.Lang.Math;
+using String = Java.Lang.String;
 
 namespace midi {
 
@@ -93,22 +101,22 @@ namespace midi {
 
         private void Subscribe()
         {
-            MessagingCenter.Subscribe<AddressBookReadyEvent>(this, "AddressBookReadyEvent", onAddressBookReadyEvent);
-            MessagingCenter.Subscribe<StreamConnectedEvent>(this, "StreamConnectedEvent", onStreamConnected);
-            MessagingCenter.Subscribe<ListeningEvent>(this, "ListeningEvent", onMIDI2ListeningEvent);
-            MessagingCenter.Subscribe<SyncronizeStartedEvent>(this, "SyncronizeStartedEvent", onSyncronizeStartedEvent);
-            MessagingCenter.Subscribe<SyncronizeStoppedEvent>(this, "SyncronizeStoppedEvent", onSyncronizeStoppedEvent);
-            MessagingCenter.Subscribe<ConnectionEstablishedEvent>(this, "ConnectionEstablishedEvent", onConnectionEstablishedEvent);
-            MessagingCenter.Subscribe<PacketEvent>(this, "PacketEvent", onPacketEvent);
-            MessagingCenter.Subscribe<StreamDisconnectEvent>(this, "StreamDisconnectEvent", onStreamDisconnectEvent);
-            MessagingCenter.Subscribe<ConnectionFailedEvent>(this, "ConnectionFailedEvent", onConnectionFailedEvent);
+            MessagingCenter.Subscribe<AddressBookReadyEvent>(this, "AddressBookReadyEvent", OnAddressBookReadyEvent);
+            MessagingCenter.Subscribe<StreamConnectedEvent>(this, "StreamConnectedEvent", OnStreamConnected);
+            MessagingCenter.Subscribe<ListeningEvent>(this, "ListeningEvent", OnMIDI2ListeningEvent);
+            MessagingCenter.Subscribe<SyncronizeStartedEvent>(this, "SyncronizeStartedEvent", OnSyncronizeStartedEvent);
+            MessagingCenter.Subscribe<SyncronizeStoppedEvent>(this, "SyncronizeStoppedEvent", OnSyncronizeStoppedEvent);
+            MessagingCenter.Subscribe<ConnectionEstablishedEvent>(this, "ConnectionEstablishedEvent", OnConnectionEstablishedEvent);
+            MessagingCenter.Subscribe<PacketEvent>(this, "PacketEvent", OnPacketEvent);
+            MessagingCenter.Subscribe<StreamDisconnectEvent>(this, "StreamDisconnectEvent", OnStreamDisconnectEvent);
+            MessagingCenter.Subscribe<ConnectionFailedEvent>(this, "ConnectionFailedEvent", OnConnectionFailedEvent);
         }
 
         private MIDISession() {
             this.rate = 10000;
             this.port = 5004;
             Random rand = new Random();
-            this.ssrc = (int)Math.Round(rand.NextDouble() * Math.Pow(2, 8 * 4));
+            this.ssrc = (int)Math.Round(rand.NextDouble() * Java.Lang.Math.Pow(2, 8 * 4));
             this.startTime = (Common.CurrentTimeMillis() / 1000L) * (long)this.rate;
             this.startTimeHR = System.DateTime.Now.Millisecond;// nanoTime();
             this.registered_eb = false;
@@ -125,14 +133,14 @@ namespace midi {
             return midiSessionInstance;
         }
 
-        private Boolean shouldBeRunning = false;
-        private Boolean isRunning = false;
+        private bool shouldBeRunning = false;
+        private bool isRunning = false;
         private Context appContext = null;
         private SparseArray<MIDIStream> streams;
         private SparseArray<MIDIStream> pendingStreams;
         private Dictionary<String, Bundle> failedConnections;
 
-        public String bonjourName = Build.Model;
+        public string bonjourName = Build.Model;
         public InetAddress bonjourHost = null;
         public InetAddress netmask = null;
 
@@ -141,10 +149,10 @@ namespace midi {
         public int port;
         public int ssrc;
         private int readyState;
-        private Boolean registered_eb = false;
-        private Boolean published_bonjour = false;
-        private Boolean initialized = false;
-        private Boolean started = false;
+        private bool registered_eb = false;
+        private bool published_bonjour = false;
+        private bool initialized = false;
+        private bool started = false;
 
         private int lastMessageTime;
         private int rate;
@@ -217,7 +225,7 @@ namespace midi {
 
             this.streams = new SparseArray<midi.MIDIStream>(2);
             this.pendingStreams = new SparseArray<midi.MIDIStream>(2);
-            this.failedConnections = new Dictionary<string, Bundle>(2);
+            this.failedConnections = new Dictionary<String, Bundle>(2);
             try {
                 InitializeResolveListener();
                 RegisterService();
@@ -226,7 +234,7 @@ namespace midi {
 
                 //EventBus.getDefault().post(new MIDISessionStartEvent());
                 MessagingCenter.Send<MIDISessionStartEvent>(new MIDISessionStartEvent(), "MIDISessionStartEvent");
-                checkAddressBookForReconnect();
+                CheckAddressBookForReconnect();
             } catch (UnknownHostException e) {
                 e.PrintStackTrace();
             }
@@ -252,7 +260,7 @@ namespace midi {
                 messageChannel.Stop();
             }
             isRunning = false;
-            shutdownNSDListener();
+            ShutdownNSDListener();
             //EventBus.getDefault().post(new MIDISessionStopEvent());
             MessagingCenter.Send<MIDISessionStopEvent>(new MIDISessionStopEvent(), "MIDISessionStopEvent");
 
@@ -268,7 +276,7 @@ namespace midi {
 
         public void Connect(Bundle rinfo) {
             if (isRunning) {
-                if (!isAlreadyConnected(rinfo)) {
+                if (!IsAlreadyConnected(rinfo)) {
                     Log.Debug(TAG, "opening connection to " + rinfo);
                     MIDIStream stream = new MIDIStream();
 
@@ -295,7 +303,7 @@ namespace midi {
 
         public void Disconnect(Bundle rinfo) {
             Log.Debug(TAG, "disconnect " + rinfo);
-            MIDIStream s = getStream(rinfo);
+            MIDIStream s = GetStream(rinfo);
             if (s != null) {
                 Log.Debug(TAG, "stream to disconnect : " + s.ssrc);
                 s.SendEnd();
@@ -316,7 +324,7 @@ namespace midi {
         private MIDIStream GetStream(Bundle rinfo) {
             for (int i = 0; i < streams.Size(); i++) {
                 MIDIStream s = streams.Get(streams.KeyAt(i));
-                if (s.connectionMatch(rinfo)) {
+                if (s.ConnectionMatch(rinfo)) {
                     return s;
                 }
             }
@@ -327,18 +335,18 @@ namespace midi {
             autoReconnect = b;
         }
 
-        public bool getAutoReconnect() {
+        public bool GetAutoReconnect() {
             return autoReconnect;
         }
 
-        private Boolean isAlreadyConnected(Bundle rinfo) {
+        private bool IsAlreadyConnected(Bundle rinfo) {
             Log.Debug(TAG, "isAlreadyConnected " + pendingStreams.Size() + " " + streams.Size());
             bool existsInPendingStreams = false;
             bool existsInStreams = false;
             Log.Error(TAG, "checking pendingStreams... (" + pendingStreams.Size() + ") " + rinfo.ToString());
             for (int i = 0; i < pendingStreams.Size(); i++) {
                 MIDIStream ps = pendingStreams.Get(pendingStreams.KeyAt(i));
-                if ((ps != null) && ps.connectionMatch(rinfo)) {
+                if ((ps != null) && ps.ConnectionMatch(rinfo)) {
                     existsInPendingStreams = true;
                     break;
                 }
@@ -351,7 +359,7 @@ namespace midi {
                         Log.Error(TAG, "error in isAlreadyConnected " + i + " rinfo " + rinfo.ToString());
                     } else {
                         Log.Error(TAG, "checking streams...");
-                        if (streams.Get(streams.KeyAt(i)).connectionMatch(rinfo)) {
+                        if (streams.Get(streams.KeyAt(i)).ConnectionMatch(rinfo)) {
                             existsInStreams = true;
                         }
                     }
@@ -376,7 +384,7 @@ namespace midi {
             if (control != null && rinfo != null) {
                 Log.Debug("MIDISession", "sendUDPMessage:control " + rinfo.ToString());
 
-                if (rinfo.getInt(com.disappointedpig.midi.MIDIConstants.RINFO_PORT) % 2 == 0) {
+                if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0) {
                     Log.Debug("MIDISession", "sendUDPMessage control 5004 rinfo:" + rinfo.ToString());
                     //            controlChannel.sendMidi(control, rinfo);
                     controlChannel.SendMidi(control, rinfo);
@@ -405,96 +413,96 @@ namespace midi {
 
         public void SendMessage(Bundle m) {
             if (published_bonjour && streams.Size() > 0) {
-                //            Log.d("MIDISession", "sendMessage c:"+m.getInt("command",0x09)+" ch:"+m.getInt("channel",0)+" n:"+m.getInt("note",0)+" v:"+m.getInt("velocity",0));
+                //            Log.Debug("MIDISession", "sendMessage c:"+m.getInt("command",0x09)+" ch:"+m.getInt("channel",0)+" n:"+m.getInt("note",0)+" v:"+m.getInt("velocity",0));
 
                 MIDIMessage message = new MIDIMessage();
-                message.createNote(
+                message.CreateNote(
                         m.GetInt(midi.MIDIConstants.MSG_COMMAND, 0x09),
                         m.GetInt(midi.MIDIConstants.MSG_CHANNEL, 0),
                         m.GetInt(midi.MIDIConstants.MSG_NOTE, 0),
                         m.GetInt(midi.MIDIConstants.MSG_VELOCITY, 0));
                 message.ssrc = this.ssrc;
 
-                for (int i = 0; i < streams.size(); i++) {
-                    streams.get(streams.keyAt(i)).sendMessage(message);
+                for (int i = 0; i < streams.Size(); i++) {
+                    streams.Get(streams.KeyAt(i)).SendMessage(message);
                 }
             }
         }
 
         public void SendMessage(int note, int velocity) {
-            if (published_bonjour && streams.size() > 0) {
-                //            Log.d("MIDISession", "note:" + note + " velocity:" + velocity);
+            if (published_bonjour && streams.Size() > 0) {
+                //            Log.Debug("MIDISession", "note:" + note + " velocity:" + velocity);
 
                 MIDIMessage message = new MIDIMessage();
-                message.createNote(note, velocity);
+                message.CreateNote(note, velocity);
                 message.ssrc = this.ssrc;
 
-                for (int i = 0; i < streams.size(); i++) {
-                    streams.get(streams.keyAt(i)).sendMessage(message);
+                for (int i = 0; i < streams.Size(); i++) {
+                    streams.Get(streams.KeyAt(i)).SendMessage(message);
                 }
             }
         }
 
         // TODO : figure out what this is supposed to return... becuase I don't think this is right
         // getNow returns a unix (long)timestamp
-        public long getNow() {
-            long hrtime = System.nanoTime() - this.startTimeHR;
-            long result = Math.round((hrtime / 1000L / 1000L / 1000L) * this.rate);
+        public long GetNow() {
+            long hrtime = System.DateTime.Now.Millisecond - this.startTimeHR;
+            long result = Math.Round((hrtime / 1000L / 1000L / 1000L) * this.rate);
             return result;
         }
 
-        public async void onAddressBookReadyEvent(AddressBookReadyEvent _event) {
-            Log.d(TAG, "Addressbook ready");
-            checkAddressBookForReconnect();
-            dumpAddressBook();
+        public void OnAddressBookReadyEvent(AddressBookReadyEvent _event) {
+            Log.Debug(TAG, "Addressbook ready");
+            CheckAddressBookForReconnect();
+            DumpAddressBook();
         }
 
         // streamConnectedEvent is called when client initiates connection... ...
-        public async void onStreamConnected(StreamConnectedEvent e) {
-            Log.d("MIDISession", "StreamConnectedEvent");
-            Log.d(TAG, "get " + e.initiator_token + " from pendingStreams");
-            MIDIStream stream = pendingStreams.get(e.initiator_token);
+        public void OnStreamConnected(StreamConnectedEvent e) {
+            Log.Debug("MIDISession", "StreamConnectedEvent");
+            Log.Debug(TAG, "get " + e.initiator_token + " from pendingStreams");
+            MIDIStream stream = pendingStreams.Get(e.initiator_token);
 
             if (stream != null) {
-                Log.d(TAG, "put " + e.initiator_token + " in  streams");
-                streams.put(stream.ssrc, stream);
+                Log.Debug(TAG, "put " + e.initiator_token + " in  streams");
+                streams.Put(stream.ssrc, stream);
             }
-            Log.d(TAG, "remove " + e.initiator_token + " from pendingStreams");
+            Log.Debug(TAG, "remove " + e.initiator_token + " from pendingStreams");
 
-            pendingStreams.delete(e.initiator_token);
+            pendingStreams.Delete(e.initiator_token);
             //        EventBus.getDefault().post(new MIDIConnectionEstablishedEvent());
         }
 
 
-        public async void onMIDI2ListeningEvent(ListeningEvent e) {
+        public void OnMIDI2ListeningEvent(ListeningEvent e) {
 
         }
 
-        public async void onSyncronizeStartedEvent(SyncronizeStartedEvent e) {
-            //        Log.d("MIDISession","SyncronizeStartedEvent");
+        public void OnSyncronizeStartedEvent(SyncronizeStartedEvent e) {
+            //        Log.Debug("MIDISession","SyncronizeStartedEvent");
 
             EventBus.getDefault().post(new MIDISyncronizationStartEvent(e.rinfo));
         }
 
 
-        public async void onSyncronizeStoppedEvent(SyncronizeStoppedEvent e) {
-            //        Log.d("MIDISession","SyncronizeStoppedEvent");
+        public void OnSyncronizeStoppedEvent(SyncronizeStoppedEvent e) {
+            //        Log.Debug("MIDISession","SyncronizeStoppedEvent");
             EventBus.getDefault().post(new MIDISyncronizationCompleteEvent(e.rinfo));
         }
 
 
-        public async void onConnectionEstablishedEvent(ConnectionEstablishedEvent e) {
+        public void OnConnectionEstablishedEvent(ConnectionEstablishedEvent e) {
             if (DEBUG) {
-                Log.d("MIDISession", "ConnectionEstablishedEvent");
+                Log.Debug("MIDISession", "ConnectionEstablishedEvent");
             }
             EventBus.getDefault().post(new MIDIConnectionEstablishedEvent(e.rinfo));
-            addToAddressBook(e.rinfo);
+            AddToAddressBook(e.rinfo);
 
         }
 
 
-        public async void onPacketEvent(PacketEvent e) {
-            Log.d("MIDISession", "PacketEvent packet from " + e.getAddress().getHostAddress() + ":" + e.getPort());
+        public void OnPacketEvent(PacketEvent e) {
+            Log.Debug("MIDISession", "PacketEvent packet from " + e.getAddress().getHostAddress() + ":" + e.getPort());
 
             // try control first
             MIDIControl applecontrol = new MIDIControl();
@@ -502,7 +510,7 @@ namespace midi {
 
             if (applecontrol.parse(e)) {
                 if (DEBUG) {
-                    Log.d("MIDISession", "- parsed as apple control packet");
+                    Log.Debug("MIDISession", "- parsed as apple control packet");
                 }
                 if (applecontrol.isValid()) {
                     //                applecontrol.dumppacket();
@@ -511,7 +519,7 @@ namespace midi {
                         MIDIStream pending = pendingStreams.get(applecontrol.initiator_token);
                         if (pending != null) {
                             if (DEBUG) {
-                                Log.d("MIDISession", " - got pending stream by token");
+                                Log.Debug("MIDISession", " - got pending stream by token");
                             }
                             pending.handleControlMessage(applecontrol, e.getRInfo());
                             return;
@@ -524,25 +532,25 @@ namespace midi {
                         // else, check if this is an invitation
                         //       create stream and tell stream to handle invite
                         if (DEBUG) {
-                            Log.d("MIDISession", "- create new stream " + applecontrol.ssrc);
+                            Log.Debug("MIDISession", "- create new stream " + applecontrol.ssrc);
                         }
                         stream = new MIDIStream();
                         streams.put(applecontrol.ssrc, stream);
                     } else {
                         if (DEBUG) {
-                            Log.d("MIDISession", " - got existing stream by ssrc " + applecontrol.ssrc);
+                            Log.Debug("MIDISession", " - got existing stream by ssrc " + applecontrol.ssrc);
                         }
 
                     }
                     if (DEBUG) {
-                        Log.d("MIDISession", "- pass control packet to stream");
+                        Log.Debug("MIDISession", "- pass control packet to stream");
                     }
 
                     stream.handleControlMessage(applecontrol, e.getRInfo());
                 }
                 // control packet
             } else {
-                //            Log.d("MIDISession","message?");
+                //            Log.Debug("MIDISession","message?");
                 message.parseMessage(e);
                 if (message.isValid()) {
                     EventBus.getDefault().post(new MIDIReceivedEvent(message.toBundle()));
@@ -551,25 +559,25 @@ namespace midi {
         }
 
 
-        public async void onStreamDisconnectEvent(StreamDisconnectEvent e) {
+        public void OnStreamDisconnectEvent(StreamDisconnectEvent e) {
             if (DEBUG) {
-                Log.d(TAG, "onStreamDisconnectEvent - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.size() + " #pendstreams:" + pendingStreams.size());
+                Log.Debug(TAG, "onStreamDisconnectEvent - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.size() + " #pendstreams:" + pendingStreams.size());
             }
-            MIDIStream a = streams.get(e.stream_ssrc, null);
+            MIDIStream a = streams.Get(e.stream_ssrc, null);
 
             if (a == null) {
-                Log.d(TAG, "can't find stream with ssrc " + e.stream_ssrc);
+                Log.Debug(TAG, "can't find stream with ssrc " + e.stream_ssrc);
             } else {
-                Bundle rinfo = (Bundle)a.getRinfo1().clone();
-                a.shutdown();
-                streams.delete(e.stream_ssrc);
-                checkAddressBookForReconnect();
+                Bundle rinfo = (Bundle)a.rinfo1.clone();
+                a.Shutdown();
+                streams.Delete(e.stream_ssrc);
+                CheckAddressBookForReconnect();
 
                 //            if(rinfo.getBoolean(MIDIConstants.RINFO_RECON,false)) {
-                //                Log.d(TAG,"will try reconnect to "+rinfo.getString(RINFO_ADDR));
+                //                Log.Debug(TAG,"will try reconnect to "+rinfo.getString(RINFO_ADDR));
                 //                connect(rinfo);
                 //            } else {
-                //                Log.d(TAG,"will not reconnect to "+rinfo.getString(RINFO_ADDR));
+                //                Log.Debug(TAG,"will not reconnect to "+rinfo.getString(RINFO_ADDR));
                 //            }
                 //            if(autoReconnect) {
                 //                connect(rinfo);
@@ -578,7 +586,7 @@ namespace midi {
             if (e.initiator_token != 0) {
                 MIDIStream p = pendingStreams.get(e.initiator_token, null);
                 if (p == null) {
-                    Log.d(TAG, "can't find pending stream with IT " + e.initiator_token);
+                    Log.Debug(TAG, "can't find pending stream with IT " + e.initiator_token);
                 } else {
                     p.shutdown();
                     pendingStreams.delete(e.initiator_token);
@@ -589,46 +597,46 @@ namespace midi {
             }
 
             if (DEBUG) {
-                Log.d(TAG, "                     - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.size() + " #pendstreams:" + pendingStreams.size());
+                Log.Debug(TAG, "                     - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.size() + " #pendstreams:" + pendingStreams.size());
             }
         }
 
 
-        public async void onConnectionFailedEvent(ConnectionFailedEvent e) {
-            Log.d(TAG, "onConnectionFailedEvent");
+        public void OnConnectionFailedEvent(ConnectionFailedEvent e) {
+            Log.Debug(TAG, "onConnectionFailedEvent");
             switch (e.code) {
                 case REJECTED_INVITATION:
-                    Log.d(TAG, "...REJECTED_INVITATION initiator_code " + e.initiator_code);
+                    Log.Debug(TAG, "...REJECTED_INVITATION initiator_code " + e.initiator_code);
                     break;
                 case SYNC_FAILURE:
-                    Log.d(TAG, "...SYNC_FAILURE initiator_code " + e.initiator_code);
+                    Log.Debug(TAG, "...SYNC_FAILURE initiator_code " + e.initiator_code);
                     break;
                 case UNABLE_TO_CONNECT:
-                    Log.d(TAG, "...UNABLE_TO_CONNECT initiator_code " + e.initiator_code);
+                    Log.Debug(TAG, "...UNABLE_TO_CONNECT initiator_code " + e.initiator_code);
                     break;
                 case CONNECTION_LOST:
-                    Log.d(TAG, "...CONNECTION_LOST initiator_code " + e.initiator_code);
+                    Log.Debug(TAG, "...CONNECTION_LOST initiator_code " + e.initiator_code);
                     break;
                 default:
                     break;
 
             }
-            pendingStreams.delete(e.initiator_code);
+            pendingStreams.Delete(e.initiator_code);
 
             String key = rinfoToKey(e.rinfo);
-            if (failedConnections.containsKey(key)) {
-                Bundle r = failedConnections.get(key);
-                int fail = r.getInt(RINFO_FAIL, 0);
-                r.putInt(RINFO_FAIL, fail + 1);
+            if (failedConnections.ContainsKey(key)) {
+                Bundle r = failedConnections.Get(key);
+                int fail = r.GetInt(RINFO_FAIL, 0);
+                r.PutInt(RINFO_FAIL, fail + 1);
                 failedConnections.put(key, r);
-                Log.d(TAG, " rinfo: " + r.toString());
+                Log.Debug(TAG, " rinfo: " + r.toString());
             } else {
-                e.rinfo.putInt(RINFO_FAIL, 1);
-                failedConnections.put(key, e.rinfo);
-                Log.d(TAG, " rinfo: " + e.rinfo.toString());
+                e.rinfo.PutInt(RINFO_FAIL, 1);
+                failedConnections.Put(key, e.rinfo);
+                Log.Debug(TAG, " rinfo: " + e.rinfo.toString());
 
             }
-            checkAddressBookForReconnect();
+            CheckAddressBookForReconnect();
         }
 
         //    @TargetApi(21)
@@ -652,19 +660,19 @@ namespace midi {
         //
         //        Iterator<InetAddress> dns = prop.getDnsServers().iterator();
         //        while (dns.hasNext()) {
-        //            Log.d(TAG,"DNS: "+dns.next().getHostAddress());
+        //            Log.Debug(TAG,"DNS: "+dns.next().getHostAddress());
         //        }
         //
-        //        Log.d(TAG,"DNS: "+prop.getDnsServers());
-        //        Log.d(TAG,"domains: "+prop.getDomains());
-        //        Log.d(TAG,"imterface: "+prop.getInterfaceName());
-        //        Log.d(TAG,"string: "+prop.toString());
-        //        Log.d(TAG,"mask: "+prop.);
+        //        Log.Debug(TAG,"DNS: "+prop.getDnsServers());
+        //        Log.Debug(TAG,"domains: "+prop.getDomains());
+        //        Log.Debug(TAG,"imterface: "+prop.getInterfaceName());
+        //        Log.Debug(TAG,"string: "+prop.toString());
+        //        Log.Debug(TAG,"mask: "+prop.);
         //
         //        Iterator<LinkAddress> iter = prop.getLinkAddresses().iterator();
         //        while(iter.hasNext()) {
         //            a = iter.next().getAddress();
-        //            Log.d(TAG,"address: "+a.getHostAddress());
+        //            Log.Debug(TAG,"address: "+a.getHostAddress());
         //        }
         //        return a;
         //
@@ -673,21 +681,21 @@ namespace midi {
         public InetAddress getWifiAddress() {
             try {
                 if (appContext == null) {
-                    return InetAddress.getByName("127.0.0.1");
+                    return InetAddress.GetByName("127.0.0.1");
                 }
                 DhcpInfo dhcpInfo;
-                WifiManager wm = (WifiManager)appContext.getSystemService(WIFI_SERVICE);
+                WifiManager wm = (WifiManager)appContext.GetSystemService(Context.WifiService);
 
-                dhcpInfo = wm.getDhcpInfo();
+                dhcpInfo = wm.DhcpInfo;
 
-                Log.d(TAG, "DNS 1: " + intToIp(dhcpInfo.dns1));
-                Log.d(TAG, "DNS 2: " + intToIp(dhcpInfo.dns2));
-                Log.d(TAG, "Gateway: " + intToIp(dhcpInfo.gateway));
-                Log.d(TAG, "ip Address: " + intToIp(dhcpInfo.ipAddress));
-                Log.d(TAG, "lease time: " + intToIp(dhcpInfo.leaseDuration));
-                Log.d(TAG, "mask: " + dhcpInfo.netmask);
+                Log.Debug(TAG, "DNS 1: " + intToIp(dhcpInfo.Dns1));
+                Log.Debug(TAG, "DNS 2: " + intToIp(dhcpInfo.Dns2));
+                Log.Debug(TAG, "Gateway: " + intToIp(dhcpInfo.Gateway));
+                Log.Debug(TAG, "ip Address: " + intToIp(dhcpInfo.IpAddress));
+                Log.Debug(TAG, "lease time: " + intToIp(dhcpInfo.LeaseDuration));
+                Log.Debug(TAG, "mask: " + dhcpInfo.Netmask);
 
-                Log.d(TAG, "server ip: " + intToIp(dhcpInfo.serverAddress));
+                Log.Debug(TAG, "server ip: " + intToIp(dhcpInfo.ServerAddress));
 
 
                 //
@@ -697,10 +705,10 @@ namespace midi {
                 //            vServerAddress="Server IP: "+intToIp(dhcpInfo.serverAddress);
 
 
-                byte[] ipbytearray = BigInteger.valueOf(wm.getConnectionInfo().getIpAddress()).toByteArray();
+                byte[] ipbytearray = BigInteger.ValueOf(wm.ConnectionInfo.IpAddress).ToByteArray();
                 reverseByteArray(ipbytearray);
-                if (ipbytearray.length != 4) {
-                    return InetAddress.getByName("127.0.0.1");
+                if (ipbytearray.Length != 4) {
+                    return InetAddress.GetByName("127.0.0.1");
                 }
 
                 Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
@@ -709,10 +717,10 @@ namespace midi {
                     Iterator<InterfaceAddress> intAs = ni.getInterfaceAddresses().iterator();
                     while (intAs.hasNext()) {
                         InterfaceAddress ia = intAs.next();
-                        Log.d(TAG, " ia: " + ia.getAddress().getHostAddress());
+                        Log.Debug(TAG, " ia: " + ia.getAddress().getHostAddress());
                         if (sameIP(ia.getAddress(), InetAddress.getByAddress(ipbytearray))) {
-                            Log.d(TAG, "same!!! " + ia.getAddress().getHostAddress() + "/" + ia.getNetworkPrefixLength());
-                            Log.d(TAG, "netmask: " + intToIp(prefixLengthToNetmaskInt(ia.getNetworkPrefixLength())));
+                            Log.Debug(TAG, "same!!! " + ia.getAddress().getHostAddress() + "/" + ia.getNetworkPrefixLength());
+                            Log.Debug(TAG, "netmask: " + intToIp(prefixLengthToNetmaskInt(ia.getNetworkPrefixLength())));
                             netmask = InetAddress.getByName(intToIp(prefixLengthToNetmaskInt(ia.getNetworkPrefixLength())));
                         }
                     }
@@ -720,9 +728,9 @@ namespace midi {
                     //                Enumeration<InetAddress> inetAs = ni.getInetAddresses();
                     //                while(inetAs.hasMoreElements()) {
                     //                    InetAddress addr = inetAs.nextElement();
-                    //                    Log.d(TAG, " ia: "+addr.getHostAddress());
+                    //                    Log.Debug(TAG, " ia: "+addr.getHostAddress());
                     //                    if(sameIP(addr,InetAddress.getByAddress(ipbytearray))) {
-                    //                        Log.d(TAG,"same!!! "+ni.getDisplayName() + "  "+ni.toString());
+                    //                        Log.Debug(TAG,"same!!! "+ni.getDisplayName() + "  "+ni.toString());
                     //
                     //                    }
                     //                }
@@ -733,11 +741,11 @@ namespace midi {
                 //            for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
                 //
                 //                    networkInterface.isLoopback()
-                //                    Log.d(TAG, "network prefix: " + address.getNetworkPrefixLength());
+                //                    Log.Debug(TAG, "network prefix: " + address.getNetworkPrefixLength());
                 //            }
 
                 //            if(ipbytearray != null && ipbytearray.length > 0) {
-                //                Log.d(TAG, "new netmask: " + intToIp(prefixLengthToNetmaskInt(getNetmask(InetAddress.getByAddress(ipbytearray)))));
+                //                Log.Debug(TAG, "new netmask: " + intToIp(prefixLengthToNetmaskInt(getNetmask(InetAddress.getByAddress(ipbytearray)))));
                 //            }
 
                 return InetAddress.getByAddress(ipbytearray);
@@ -785,7 +793,7 @@ namespace midi {
         {
             try
             {
-                Log.d(TAG, "prefixLengthToNetmaskInt:" + prefixLength);
+                Log.Debug(TAG, "prefixLengthToNetmaskInt:" + prefixLength);
                 if (prefixLength < 0 || prefixLength > 32)
                 {
                     //            throw new IllegalArgumentException("Invalid prefix length (0 <= prefix <= 32)");
@@ -806,9 +814,9 @@ namespace midi {
         public int getNetmask(InetAddress addr) {
             try {
                 NetworkInterface networkInterface = NetworkInterface.getByInetAddress(addr);
-                Log.d(TAG, "    interface: " + addr.getHostAddress());
+                Log.Debug(TAG, "    interface: " + addr.getHostAddress());
                 foreach (InterfaceAddress address in networkInterface.getInterfaceAddresses()) {
-                    Log.d(TAG, "    " + address.getAddress().getHostAddress() + "/" + address.getNetworkPrefixLength());
+                    Log.Debug(TAG, "    " + address.getAddress().getHostAddress() + "/" + address.getNetworkPrefixLength());
 
                     int netPrefix = address.getNetworkPrefixLength();
                     return netPrefix;
@@ -848,36 +856,36 @@ namespace midi {
         // bonjour stuff
         //
 
-        public void setBonjourName(String name) {
+        public void SetBonjourName(string name) {
             this.bonjourName = name;
         }
 
-        private void registerService() {
+        private void RegisterService() {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
                     // Create the NsdServiceInfo object, and populate it.
                     serviceInfo = new NsdServiceInfo();
 
                     // The name is subject to change based on conflicts
                     // with other services advertised on the same network.
 
-                    serviceInfo.setServiceName(this.bonjourName);
-                    serviceInfo.setServiceType(BONJOUR_TYPE);
-                    serviceInfo.setHost(this.bonjourHost);
-                    serviceInfo.setPort(this.bonjourPort);
+                    serviceInfo.ServiceName=this.bonjourName;
+                    serviceInfo.ServiceType=BONJOUR_TYPE;
+                    serviceInfo.Host=this.bonjourHost;
+                    serviceInfo.Port=this.bonjourPort;
 
                     //            if(DEBUG) {
-                    //                Log.d(TAG,"register service: "+serviceInfo.toString());
+                    //                Log.Debug(TAG,"register service: "+serviceInfo.toString());
                     //            }
-                    mNsdManager = (NsdManager)appContext.getApplicationContext().getSystemService(Context.NSD_SERVICE);
+                    mNsdManager = (NsdManager)appContext.ApplicationContext.GetSystemService(Context.NsdService);
 
-                    initializeNSDRegistrationListener();
+                    InitializeNSDRegistrationListener();
 
-                    mNsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
+                    mNsdManager.RegisterService(serviceInfo, NsdProtocol.DnsSd, mRegistrationListener);
                     //            mNsdManager.resolveService(serviceInfo, mResolveListener);
                 }
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 throw new UnknownHostException(e.Message);
 
@@ -894,7 +902,7 @@ namespace midi {
         //                // Save the service name.  Android may have changed it in order to
         //                // resolve a conflict, so update the name you initially requested
         //                // with the name Android actually used.
-        //                Log.d(TAG,"Service Registered "+NsdServiceInfo.toString());
+        //                Log.Debug(TAG,"Service Registered "+NsdServiceInfo.toString());
         //                if(NsdServiceInfo.getServiceName() != null && bonjourName != NsdServiceInfo.getServiceName()) {
         //                    bonjourName = NsdServiceInfo.getServiceName();
         //                    serviceInfo.setServiceName(bonjourName);
@@ -932,31 +940,45 @@ namespace midi {
         //        };
         //    }
 
-        //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        //    private void initializeResolveListener() {
-        //        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-        //            mResolveListener = new NsdManager.ResolveListener() {
 
-        //                @Override
-        //                public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-        //                    // Called when the resolve fails.  Use the error code to debug.
-        //                    Log.e(TAG, "Resolve failed" + errorCode);
-        //                }
+        public class MIDIResolveListener : NsdManager.IResolveListener
+        {
+            public IntPtr Handle => throw new NotImplementedException();
 
-        //                @Override
-        //                public void onServiceResolved(NsdServiceInfo serviceInfo) {
-        //                    Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
+            public void Dispose()
+            {
+            }
 
-        //                }
-        //            };
-        //        }
-        //    }
+            public void OnResolveFailed(NsdServiceInfo serviceInfo, int errorCode)
+            {
+                // Called when the resolve fails.  Use the error code to debug.
+                Log.Error(TAG, "Resolve failed" + errorCode);
+            }
 
-        private void shutdownNSDListener() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            public void OnResolveFailed(NsdServiceInfo serviceInfo, [GeneratedEnum] NsdFailure errorCode)
+            {
+                Log.Error(TAG, "Resolve failed" + errorCode);
+            }
+
+            public void OnServiceResolved(NsdServiceInfo serviceInfo)
+            {
+                Log.Error(TAG, "Resolve Succeeded. " + serviceInfo);
+
+            }
+        }
+
+            //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+        private void InitializeResolveListener() {
+                if(Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
+                mResolveListener = new MIDIResolveListener();
+                }
+        }
+
+        private void ShutdownNSDListener() {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
                 try {
                     if (mNsdManager != null) {
-                        mNsdManager.unregisterService(mRegistrationListener);
+                        mNsdManager.UnregisterService(mRegistrationListener);
                     }
                     //            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
                 } catch (IllegalArgumentException e) {
@@ -966,12 +988,12 @@ namespace midi {
 
         }
 
-        public String version() {
-            return BuildConfig.VERSION_NAME;
+        public String Version() {
+            return new String(BuildConfig.VersionName);
         }
 
         // TODO : make this actually work...
-        boolean isHostConnectionAllowed(Bundle rinfo) {
+        public bool IsHostConnectionAllowed(Bundle rinfo) {
             return true;
         }
 
@@ -990,7 +1012,7 @@ namespace midi {
         //                try {
         //                    midiAddressBook = db.openOrCreateHash("midiAddressBook");
         //                    if (midiAddressBook != null && midiAddressBook.getAllKeys() != null) {
-        //                        Log.d(TAG, "setupWaspDB - count " + midiAddressBook.getAllKeys().size());
+        //                        Log.Debug(TAG, "setupWaspDB - count " + midiAddressBook.getAllKeys().size());
         //                        EventBus.getDefault().post(new AddressBookReadyEvent());
         //                    }
         //                } catch (KryoException e) {
@@ -998,7 +1020,7 @@ namespace midi {
         //                    Log.e(TAG,"remove and recreate midiAddressBook");
         //                    db.removeHash("midiAddressBook");
         //                    midiAddressBook = db.openOrCreateHash("midiAddressBook");
-        //                    Log.d(TAG, "setupWaspDB - count " + midiAddressBook.getAllKeys().size());
+        //                    Log.Debug(TAG, "setupWaspDB - count " + midiAddressBook.getAllKeys().size());
         //                    EventBus.getDefault().post(new AddressBookReadyEvent());
         //                }
         //            }
@@ -1008,47 +1030,47 @@ namespace midi {
         ////            db = WaspFactory.openOrCreateDatabase(path, databaseName, password, new WaspListener<WaspDb>() {
         ////                        @Override
         ////                        public void onDone(WaspDb waspDb) {
-        ////                            Log.d("WaspFactoryINIT","on done?");
+        ////                            Log.Debug("WaspFactoryINIT","on done?");
         ////                        }
         ////                    });
         //    }
 
 
-        public Bundle getEntryFromAddressBook(String key) {
+        public Bundle GetEntryFromAddressBook(String key) {
             MIDIAddressBookEntry abe = midiAddressBook.get(key);
             return abe.rinfo();
         }
 
-        public boolean addToAddressBook(Bundle rinfo) {
+        public bool AddToAddressBook(Bundle rinfo) {
             String key = rinfoToKey(rinfo);
 
-            Log.d(TAG, "addToAddressBook : " + key + " " + rinfo.toString());
+            Log.Debug(TAG, "addToAddressBook : " + key + " " + rinfo.ToString());
             //        if(!rinfo.getBoolean(RINFO_RECON, false)) {
             //            // reinforce false (in case RECON isn't in bundle) - I guess I could
             //            // iterate over keySet - honestly, I don't know why I'm bothering to do this
-            //            Log.d(TAG,"reinforce false?");
+            //            Log.Debug(TAG,"reinforce false?");
             //            rinfo.putBoolean(RINFO_RECON,false);
             //        }
 
             if (midiAddressBook.get(rinfoToKey(rinfo)) == null) {
-                boolean status = midiAddressBook.put(rinfoToKey(rinfo), new MIDIAddressBookEntry(rinfo));
+                bool status = midiAddressBook.Put(rinfoToKey(rinfo), new MIDIAddressBookEntry(rinfo));
                 if (status) {
-                    Log.d(TAG, "status is good");
+                    Log.Debug(TAG, "status is good");
                     EventBus.getDefault().post(new MIDIAddressBookEvent());
                 }
 
             } else {
-                Log.d(TAG, "already in addressbook");
+                Log.Debug(TAG, "already in addressbook");
                 MIDIAddressBookEntry e = midiAddressBook.get(rinfoToKey(rinfo));
                 e.setReconnect(rinfo.getBoolean(RINFO_RECON, e.getReconnect()));
 
                 boolean status = midiAddressBook.put(rinfoToKey(rinfo), e);
                 if (status) {
-                    Log.d(TAG, "status is good - updated entry");
+                    Log.Debug(TAG, "status is good - updated entry");
                     EventBus.getDefault().post(new MIDIAddressBookEvent());
                 }
             }
-            Log.d(TAG, "about to dump ab");
+            Log.Debug(TAG, "about to dump ab");
             dumpAddressBook();
             //        getAllAddressBook();
             return true;
@@ -1075,10 +1097,10 @@ namespace midi {
         }
 
         public ArrayList<MIDIAddressBookEntry> getAllAddressBook() {
-            Log.d(TAG, "getAllAddressBook");
+            Log.Debug(TAG, "getAllAddressBook");
             if (midiAddressBook != null) {
                 HashMap<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
-                Log.d(TAG, "value count: " + hm.values().size());
+                Log.Debug(TAG, "value count: " + hm.values().size());
                 Collection<MIDIAddressBookEntry> values = hm.values();
                 ArrayList<MIDIAddressBookEntry> list = new ArrayList<MIDIAddressBookEntry>(values);
 
@@ -1092,55 +1114,55 @@ namespace midi {
         //    private void checkAddressBookForReconnect(Bundle rinfo) {
         //        Bundle abentry = getEntryFromAddressBook(rinfoToKey(rinfo));
         //        if(abentry != null) {
-        //            Log.d(TAG,"checkAddressBookForReconnect : ");
+        //            Log.Debug(TAG,"checkAddressBookForReconnect : ");
         //            rinfo.putBoolean(RINFO_RECON,abentry.getBoolean(RINFO_RECON,false));
         //        }
         //    }
 
-        private void dumpAddressBook() {
+        private void DumpAddressBook() {
             if (midiAddressBook != null) {
-                HashMap<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
-                Log.d(TAG, "-----------------------------------------");
-                foreach (string key in hm.keySet()) {
-                    Log.d(TAG, " (" + key + ") : " + hm.get(key).getAddressPort());
+                Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
+                Log.Debug(TAG, "-----------------------------------------");
+                foreach (String key in hm.Keys) {
+                    Log.Debug(TAG, " (" + key + ") : " + hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).getAddressPort());
                 }
-                Log.d(TAG, "-----------------------------------------");
+                Log.Debug(TAG, "-----------------------------------------");
             } else {
-                Log.d(TAG, "-----------------MIDI Address Book null-------------");
+                Log.Debug(TAG, "-----------------MIDI Address Book null-------------");
 
             }
         }
 
-        public void checkAddressBookForReconnect() {
+        public void CheckAddressBookForReconnect() {
             if (midiAddressBook != null) {
-                HashMap<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
-                Log.d(TAG, "-----------------------------------------");
-                foreach (string key in hm.keySet()) {
-                    MIDIAddressBookEntry e = hm.get(key);
+                Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
+                Log.Debug(TAG, "-----------------------------------------");
+                foreach (String key in hm.Keys) {
+                    MIDIAddressBookEntry e = hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key);
 
-                    Log.d(TAG, " checking for reconnect - (" + key + ") : " + e.getAddressPort() + " " + (e.getReconnect() ? "YES" : "NO"));
+                    Log.Debug(TAG, " checking for reconnect - (" + key + ") : " + e.getAddressPort() + " " + (e.getReconnect() ? "YES" : "NO"));
                     if (e.getReconnect()) {
-                        connect(hm.get(key).rinfo());
-                        if (onSameNetwork(hm.get(key).getAddress())) {
-                            Log.d(TAG, " same network - (" + key + ") : " + hm.get(key).getAddressPort());
+                        Connect(hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).rinfo());
+                        if (OnSameNetwork(hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).getAddress())) {
+                            Log.Debug(TAG, " same network - (" + key + ") : " + hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).getAddressPort());
                         } else {
-                            Log.d(TAG, " different network -  (" + key + ") : " + hm.get(key).getAddressPort());
+                            Log.Debug(TAG, " different network -  (" + key + ") : " + hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).getAddressPort());
                         }
                     }
                 }
-                Log.d(TAG, "-----------------------------------------");
+                Log.Debug(TAG, "-----------------------------------------");
             } else {
-                Log.d(TAG, "-----------------MIDI Address Book null-------------");
+                Log.Debug(TAG, "-----------------MIDI Address Book null-------------");
 
             }
         }
 
-        public boolean onSameNetwork(String ip) {
+        public bool OnSameNetwork(String ip) {
             try {
-                byte[] a1 = InetAddress.getByName(ip).getAddress();
-                byte[] a2 = bonjourHost.getAddress();
-                byte[] m = netmask.getAddress();
-                for (int i = 0; i < a1.length; i++)
+                byte[] a1 = InetAddress.GetByName(ip).getAddress();
+                byte[] a2 = bonjourHost.GetAddress();
+                byte[] m = netmask.GetAddress();
+                for (int i = 0; i < a1.Length; i++)
                     if ((a1[i] & m[i]) != (a2[i] & m[i]))
                         return false;
 
@@ -1167,10 +1189,10 @@ namespace midi {
         //
         //    }
 
-        public boolean sameIP(InetAddress a1, InetAddress a2) {
-            byte[] b1 = a1.getAddress();
-            byte[] b2 = a2.getAddress();
-            for (int i = 0; i < b1.length; i++)
+        public bool SameIP(InetAddress a1, InetAddress a2) {
+            byte[] b1 = a1.GetAddress();
+            byte[] b2 = a2.GetAddress();
+            for (int i = 0; i < b1.Length; i++)
                 if (b1[i] != b2[i])
                     return false;
 
@@ -1178,31 +1200,37 @@ namespace midi {
         }
 
         private BroadcastReceiver wifiReceiver;
-        private boolean networkListenerRegistered = false;
+        private bool networkListenerRegistered = false;
 
         public class MidiBroadCastReceiver:BroadcastReceiver{
-			public override void onReceive(Context context, Intent intent)
+            MIDISession parent;
+            public MidiBroadCastReceiver(MIDISession parent)
+            {
+                this.parent = parent;
+            }
+
+            public override void OnReceive(Context context, Intent intent)
 			{
             // Do whatever you need it to do when it receives the broadcast
             // Example show a Toast message...
             //                showSuccessfulBroadcast();
-            Log.d(TAG, "wifiReceiver - " + intent.getAction());
+            Log.Debug(TAG, "wifiReceiver - " + intent.Action);
             //                checkAddressBookForReconnect();
-            if (isOnline())
+            if (parent.IsOnline())
             {
-                Log.d(TAG, "network is online");
-                if (shouldBeRunning && !isRunning)
+                Log.Debug(TAG, "network is online");
+                if (parent.shouldBeRunning && !(parent.isRunning))
                 {
-                    start();
+                        parent.Start();
                 }
             }
             else
             {
-                Log.d(TAG, "network not online");
-                if (isRunning)
+                Log.Debug(TAG, "network not online");
+                if (parent.isRunning)
                 {
-                    shouldBeRunning = true;
-                    stop();
+                        parent.shouldBeRunning = true;
+                        parent.Stop();
                 }
                 //                    shouldBeRunning = true;
                 //                    stop();
@@ -1212,43 +1240,42 @@ namespace midi {
         }
     }
 
-    public void setupNetworkListener() {
+    public void SetupNetworkListener() {
 
 //        if(this.wifiReceiver != null) {
 //            removeNetworkListener();
 //        }
         if(networkListenerRegistered) {
-            removeNetworkListener();
+            RemoveNetworkListener();
         }
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        this.wifiReceiver = new MidiBroadcastReceiver(); 
+        intentFilter.AddAction(ConnectivityManager.ConnectivityAction);
+        this.wifiReceiver = new MidiBroadCastReceiver(this); 
         if(appContext != null) {
-            appContext.registerReceiver(this.wifiReceiver, intentFilter);
+            appContext.RegisterReceiver(this.wifiReceiver, intentFilter);
         }
         networkListenerRegistered = true;
     }
 
-    public void removeNetworkListener() {
+    public void RemoveNetworkListener() {
         if(appContext != null && wifiReceiver != null) {
             try {
-                appContext.unregisterReceiver(wifiReceiver);
+                appContext.UnregisterReceiver(wifiReceiver);
                 networkListenerRegistered = false;
 
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                e.PrintStackTrace();
             }
         }
     }
 
-    public boolean isOnline() {
+    public bool IsOnline() {
         ConnectivityManager cm =
-                (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) appContext.GetSystemService(Context.ConnectivityService);
 
-        Log.d(TAG,"isOnline? "+((cm.getActiveNetworkInfo() != null &&
-                cm.getActiveNetworkInfo().isConnectedOrConnecting()) ? "ON" : "OFF"));
-        return cm.getActiveNetworkInfo() != null &&
-                cm.getActiveNetworkInfo().isConnectedOrConnecting();
+        Log.Debug(TAG,"isOnline? "+((cm.ActiveNetworkInfo != null &&
+                cm.ActiveNetworkInfo.IsConnectedOrConnecting) ? "ON" : "OFF"));
+        return cm.ActiveNetworkInfo != null &&  cm.ActiveNetworkInfo.IsConnectedOrConnecting;
     }
 
 }
