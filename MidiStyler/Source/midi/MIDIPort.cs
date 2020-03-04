@@ -22,7 +22,7 @@ namespace midi {
 //import java.util.Set;
 //import java.util.concurrent.ConcurrentLinkedQueue;
 
-class MIDIPort implements Runnable {
+class MIDIPort {
     private int port;
 
     private Selector selector;
@@ -33,15 +33,16 @@ class MIDIPort implements Runnable {
 
     private boolean isListening = false;
 
-    private static final int BUFFER_SIZE = 1536;
-    private static final String TAG = "MIDIPort";
+    private static int BUFFER_SIZE = 1536;
+    private static string TAG = "MIDIPort";
 //    private static final boolean DEBUG = false;
 
-    private final Thread thread = new Thread(this);
+    private Thread thread = new Thread(this);
 
-    static MIDIPort newUsing(int port) {
+    static MIDIPort NewUsing(int port) {
         return new MIDIPort(port);
     }
+   
 
     private MIDIPort(int port) {
         this.port = port;
@@ -59,7 +60,10 @@ class MIDIPort implements Runnable {
 //            channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, new UDPBuffer());
 
-        } catch (IOException e) {
+            Thread newThread = new Thread(new ThreadStart(Run));
+            newThread.Start();
+
+            } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -82,9 +86,8 @@ class MIDIPort implements Runnable {
             throwable.printStackTrace();
         }
     }
-
-    @Override
-    public void run() {
+        
+    public void Run() {
         while(isListening) {
             try {
                 selector.select();

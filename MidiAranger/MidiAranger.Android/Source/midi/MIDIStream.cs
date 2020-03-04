@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using midi.events;
 using midi.internal_events;
+using Xamarin.Forms;
 
 namespace midi { 
 
@@ -48,10 +49,10 @@ namespace midi {
             connection lost, reconnect timeout
             connection lost
    --------------------------------------------------------- */
-class MIDIStream {
+public class MIDIStream {
 
-    int initiator_token = 0;
-    int ssrc = 0;
+    public int initiator_token = 0;
+    public int ssrc = 0;
 
     private Bundle rinfo1 = null;
     private Bundle rinfo2 = null;
@@ -100,7 +101,7 @@ class MIDIStream {
     private int syncServicePrimaryFrequency = SYNC_PRIMARY_FREQUENCY_DEFAULT;
     private int syncServiceFrequency = SYNC_FREQUENCY_DEFAULT;
 
-    MIDIStream() {
+    public MIDIStream() {
         this.isConnected = false;
         this.isInitiator = false;
         int lastSentSequenceNr = (new Random(0xffff)).Next();
@@ -112,7 +113,7 @@ class MIDIStream {
         primarySyncComplete = false;
     }
 
-    public void finalize() {
+    ~MIDIStream() {
         cancelConnectFuture();
         cancelSyncFuture();
         cancelCheckConnectionFuture();
@@ -125,15 +126,7 @@ class MIDIStream {
         if(!checkConnectionService.isShutdown()) {
             checkConnectionService.shutdownNow();
         }
-
-        try
-        {
-            base.finalize();
-        }
-        catch (Throwable throwable)
-        {
-            throwable.printStackTrace();
-        }
+    
     }
 
     public bool connectionMatch(Bundle r) {
@@ -382,8 +375,8 @@ class MIDIStream {
         return rinfo1;
     }
 
-    private void sendInvitation(Bundle rinfo) {
-//        Log.d("MIDIStream","sendInvitation "+rinfo.getString(RINFO_ADDR)+":"+rinfo.getInt(RINFO_PORT));
+    public void SendInvitation(Bundle rinfo) {
+        Log.Debug("MIDIStream","sendInvitation "+rinfo.GetString(MIDIConstants.RINFO_ADDR)+":"+rinfo.GetInt(MIDIConstants.RINFO_PORT));
         MIDIControl invite = new MIDIControl();
         invite.createInvitation(initiator_token, MIDISession.getInstance().ssrc, MIDISession.getInstance().bonjourName);
 //        invite.dumppacket();

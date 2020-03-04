@@ -1,22 +1,22 @@
-package com.disappointedpig.midi;
+namespace midi { 
 
-import android.util.Log;
+//import android.util.Log;
 
-import com.disappointedpig.midi.internal_events.PacketEvent;
-import com.disappointedpig.midi.utility.DataBuffer;
-import com.disappointedpig.midi.utility.DataBufferReader;
-import com.disappointedpig.midi.utility.OutDataBuffer;
+//import com.disappointedpig.midi.internal_events.PacketEvent;
+//import com.disappointedpig.midi.utility.DataBuffer;
+//import com.disappointedpig.midi.utility.DataBufferReader;
+//import com.disappointedpig.midi.utility.OutDataBuffer;
 
-import java.util.HashMap;
-import java.util.Map;
+//import java.util.HashMap;
+//import java.util.Map;
 
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.BITRATE_RECEIVE_LIMIT;
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.END;
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.INVITATION;
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.INVITATION_ACCEPTED;
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.INVITATION_REJECTED;
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.RECEIVER_FEEDBACK;
-import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.SYNCHRONIZATION;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.BITRATE_RECEIVE_LIMIT;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.END;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.INVITATION;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.INVITATION_ACCEPTED;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.INVITATION_REJECTED;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.RECEIVER_FEEDBACK;
+//import static com.disappointedpig.midi.MIDIControl.AppleMIDICommand.SYNCHRONIZATION;
 
 public class MIDIControl {
 
@@ -38,8 +38,8 @@ public class MIDIControl {
 
     public boolean parse(PacketEvent packet) {
         this.valid = false;
-        final DataBuffer rawInput = new DataBuffer(packet.getData(),packet.getLength());
-        final DataBufferReader reader = new DataBufferReader();
+        DataBuffer rawInput = new DataBuffer(packet.getData(),packet.getLength());
+        DataBufferReader reader = new DataBufferReader();
         int protocol = reader.read16(rawInput);
         if(protocol == 0xffff) {
             command = commandMap.get(reader.read16(rawInput));
@@ -170,8 +170,9 @@ public class MIDIControl {
         return buffer.toByteArray();
     }
 
-    private static final Map<Integer, AppleMIDICommand> commandMap = new HashMap<Integer, AppleMIDICommand>();
-    static {
+    private static Map<Integer, AppleMIDICommand> commandMap = new HashMap<Integer, AppleMIDICommand>();
+
+    static MIDIControl(){
         commandMap.put(0x494E, INVITATION);
         commandMap.put(0x4F4B, INVITATION_ACCEPTED);
         commandMap.put(0x4E4F, INVITATION_REJECTED);
@@ -182,7 +183,7 @@ public class MIDIControl {
     }
 
     private Integer getCommandKey(AppleMIDICommand c){
-        for(Integer key : commandMap.keySet()){
+        foreach(int key in commandMap.keySet()){
             if(commandMap.get(key).equals(c)){
                 return key; //return the first found
             }
@@ -253,3 +254,4 @@ public class MIDIControl {
 
 
 
+}
