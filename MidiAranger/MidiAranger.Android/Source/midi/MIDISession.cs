@@ -390,7 +390,7 @@ namespace midi {
             }
         }
 
-        public void sendUDPMessage(MIDIMessage m, Bundle rinfo) {
+        public void SendUDPMessage(MIDIMessage m, Bundle rinfo) {
             Log.Debug("MIDISession", "sendUDPMessage:message " + rinfo.ToString());
             if (m != null && rinfo != null) {
                 if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0) {
@@ -421,7 +421,7 @@ namespace midi {
             }
         }
 
-        public void sendMessage(int note, int velocity) {
+        public void SendMessage(int note, int velocity) {
             if (published_bonjour && streams.size() > 0) {
                 //            Log.d("MIDISession", "note:" + note + " velocity:" + velocity);
 

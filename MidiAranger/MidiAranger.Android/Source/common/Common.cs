@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -20,4 +20,20 @@ namespace MidiAranger.Droid.Source.common
             return (long)(DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
         }
     }
+
+    public class Schedule
+    {
+        Timer timer=null;
+        public Schedule(TimerCallback callback, int delay,int period)
+        {
+            timer = 
+        }
+    }
+
+    public class Scheduller
+    {
+
+    }
+
+
 }
