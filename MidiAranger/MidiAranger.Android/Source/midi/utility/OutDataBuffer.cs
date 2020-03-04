@@ -1,3 +1,8 @@
+using Java.IO;
+using Java.Lang;
+using Java.Nio.Charset;
+using Integer = Java.Lang.Integer;
+
 namespace midi.utility {
 
     public class OutDataBuffer {
@@ -12,7 +17,7 @@ namespace midi.utility {
 
         public OutDataBuffer() {
             this.stream = new ByteArrayOutputStream();
-            this.charset = Charset.defaultCharset();
+            this.charset = Charset.DefaultCharset();
             this.charByte = new byte[1];
             this.shortBytes = new byte[2];
             this.mediumBytes = new byte[3];
@@ -20,63 +25,63 @@ namespace midi.utility {
             this.longintBytes = new byte[8];
         }
 
-        private void alignStream() {
-            int alignmentOverlap = stream.size() % 4;
+        private void AlignStream() {
+            int alignmentOverlap = stream.Size() % 4;
             int padLen = (4 - alignmentOverlap) % 4;
             for (int pci = 0; pci < padLen; pci++) {
-                stream.write(0);
+                stream.Write(0);
             }
         }
 
-        public void write(int anInt) {
-            writeInteger32ToByteArray(anInt);
+        public void Write(int anInt) {
+            WriteInteger32ToByteArray(anInt);
         }
 
-        public void write(Float aFloat) {
-            writeInteger32ToByteArray(Float.floatToIntBits(aFloat));
+        public void Write(Float aFloat) {
+            WriteInteger32ToByteArray(Float.FloatToIntBits(aFloat.FloatValue()));
         }
 
-        public void write(Double aDouble) {
-            writeInteger64ToByteArray(Double.doubleToRawLongBits(aDouble));
+        public void Write(Double aDouble) {
+            WriteInteger64ToByteArray(Double.DoubleToRawLongBits(aDouble.DoubleValue()));
         }
 
-        public void write(Integer anInt) {
-            writeInteger32ToByteArray(anInt);
+        public void Write(Integer anInt) {
+            WriteInteger32ToByteArray(anInt.IntValue());
         }
 
-        public void write16(Integer anInt) {
-            writeInteger16ToByteArray(anInt);
+        public void Write16(Integer anInt) {
+            WriteInteger16ToByteArray(anInt.IntValue());
         }
 
-        public void write8(Integer anInt) {
-            writeInteger8ToByteArray(anInt);
+        public void Write8(Integer anInt) {
+            WriteInteger8ToByteArray(anInt.IntValue());
         }
 
-        public void write24(Integer anInt) {
-            writeInteger24ToByteArray(anInt);
+        public void Write24(Integer anInt) {
+            WriteInteger24ToByteArray(anInt.IntValue());
         }
 
-        public void write32(Integer anInt) {
-            writeInteger32ToByteArray(anInt);
+        public void Write32(Integer anInt) {
+            WriteInteger32ToByteArray(anInt.IntValue());
         }
 
-        public void write64(Long aLong) {
-            writeInteger64ToByteArray(aLong);
+        public void Write64(Long aLong) {
+            WriteInteger64ToByteArray(aLong.LongValue());
         }
 
-        public void write(String aString) {
+        public void Write(String aString) {
             //        final byte[] stringBytes = aString.getBytes(charset);
-            byte[] stringBytes = aString.getBytes();
-            writeUnderHandler(stringBytes);
-            stream.write(0);
-            alignStream();
+            byte[] stringBytes = aString.GetBytes();
+            WriteUnderHandler(stringBytes);
+            stream.Write(0);
+            AlignStream();
         }
 
 
-        private void writeUnderHandler(byte[] bytes) {
+        private void WriteUnderHandler(byte[] bytes) {
 
             try {
-                stream.write(bytes);
+                stream.Write(bytes);
             } catch (IOException ex) {
                 throw new RuntimeException("You're screwed:"
                         + " IOException writing to a ByteArrayOutputStream", ex);
@@ -88,7 +93,7 @@ namespace midi.utility {
          *
          * @param value a 32 bit integer.
          */
-        private void writeInteger32ToByteArray(int value) {
+        private void WriteInteger32ToByteArray(int value) {
             //byte[] intBytes = new byte[4];
             //I allocated the this buffer globally so the GC has less work
 
@@ -100,10 +105,10 @@ namespace midi.utility {
             value >>= 8;
             intBytes[0] = (byte)value;
 
-            writeUnderHandler(intBytes);
+            WriteUnderHandler(intBytes);
         }
 
-        private void writeInteger16ToByteArray(int value) {
+        private void WriteInteger16ToByteArray(int value) {
             //        Log.d("converter","("+Integer.toBinaryString(value)+") "+ String.format("%02x",value & 0x000000FF) +" "+String.format("%02x",(value>>>8 & 0x000000FF)));
             shortBytes[1] = (byte)((value & 0x000000FF));
             //        Log.d("-----1","("+Integer.toBinaryString(shortBytes[1])+") "+ String.format("%02x", shortBytes[1]));
@@ -111,20 +116,20 @@ namespace midi.utility {
             shortBytes[0] = (byte)(value >> 8 & 0x000000FF);
             //        Log.d("-----0","("+Integer.toBinaryString(shortBytes[0])+") "+ String.format("%02x", shortBytes[0]));
             //        Log.d("-----:"," "+ (shortBytes.length));
-            writeUnderHandler(shortBytes);
+            WriteUnderHandler(shortBytes);
         }
 
 
-        private void writeInteger8ToByteArray(int value) {
+        private void WriteInteger8ToByteArray(int value) {
             charByte[0] = (byte)((value & 0x000000FF));
-            writeUnderHandler(charByte);
+            WriteUnderHandler(charByte);
         }
 
-        private void writeInteger24ToByteArray(int value) {
+        private void WriteInteger24ToByteArray(int value) {
             mediumBytes[2] = (byte)((value & 0x000000FF));
             mediumBytes[1] = (byte)(value >> 8 & 0x000000FF);
             mediumBytes[0] = (byte)(value >> 8 & 0x000000FF);
-            writeUnderHandler(mediumBytes);
+            WriteUnderHandler(mediumBytes);
         }
 
         /**
@@ -132,7 +137,7 @@ namespace midi.utility {
          *
          * @param value a 64 bit integer.
          */
-        private void writeInteger64ToByteArray(long value) {
+        private void WriteInteger64ToByteArray(long value) {
             longintBytes[7] = (byte)value;
             value >>= 8;
             longintBytes[6] = (byte)value;
@@ -149,11 +154,11 @@ namespace midi.utility {
             value >>= 8;
             longintBytes[0] = (byte)value;
 
-            writeUnderHandler(longintBytes);
+            WriteUnderHandler(longintBytes);
         }
 
-        public byte[] toByteArray() {
-            return stream.toByteArray();
+        public byte[] ToByteArray() {
+            return stream.ToByteArray();
         }
 
     }

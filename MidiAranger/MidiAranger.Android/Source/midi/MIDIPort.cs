@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Xamarin.Forms;
+using ThreadPriority = System.Threading.ThreadPriority;
 
 namespace midi { 
 
@@ -157,13 +158,13 @@ public class MIDIPort {
     }
 
 
-    void sendMidi(MIDIControl control, Bundle rinfo) {
+    void SendMidi(MIDIControl control, Bundle rinfo) {
 //        Log.d("MIDIPort2","sendMidi(control)");
         if (!isListening) {
             Log.Debug(TAG,"not listening...");
             return;
         }
-        addToOutboundQueue(control.generateBuffer(),rinfo);
+        AddToOutboundQueue(control.GenerateBuffer(),rinfo);
     }
 
     void sendMidi(MIDIMessage message, Bundle rinfo) {
@@ -172,15 +173,16 @@ public class MIDIPort {
             Log.Debug(TAG,"not listening...");
             return;
         }
-        addToOutboundQueue(message.generateBuffer(),rinfo);
+        AddToOutboundQueue(message.generateBuffer(),rinfo);
     }
 
-    private void addToOutboundQueue(byte[] data, Bundle rinfo) {
+    private void AddToOutboundQueue(byte[] data, Bundle rinfo) {
         try {
-            outboundQueue.add(new DatagramPacket(data, data.length, InetAddress.getByName(rinfo.getString(com.disappointedpig.midi.MIDIConstants.RINFO_ADDR)), rinfo.getInt(com.disappointedpig.midi.MIDIConstants.RINFO_PORT)));
-            selector.wakeup();
+            outboundQueue.Enqueue(new DatagramPacket(data, data.Length, 
+                InetAddress.GetByName(rinfo.GetString(midi.MIDIConstants.RINFO_ADDR)),rinfo.GetInt(midi.MIDIConstants.RINFO_PORT)));
+            selector.Wakeup();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            throw new UnknownHostException(e.StackTrace);
         }
     }
 

@@ -118,7 +118,7 @@ namespace midi {
             Subscribe();
         }
 
-        public static MIDISession getInstance() {
+        public static MIDISession GetInstance() {
             if (midiSessionInstance == null) {
                 midiSessionInstance = new MIDISession();
             }
