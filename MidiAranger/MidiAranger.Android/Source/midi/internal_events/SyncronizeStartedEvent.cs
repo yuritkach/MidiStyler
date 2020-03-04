@@ -1,3 +1,5 @@
+using Android.OS;
+
 namespace midi.internal_events {
 
     public class SyncronizeStartedEvent {

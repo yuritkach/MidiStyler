@@ -13,7 +13,7 @@ namespace midi
         int csrcCount = 0;
         bool marker = false;
         int payloadType = 0x61;
-        int sequenceNumber = 0;
+        public int SequenceNumber = 0;
         int timestamp = 0;
         public int ssrc = 0;
         protected byte[] payload;
@@ -36,7 +36,7 @@ namespace midi
             this.marker = (secondByte & 0x80) == 0x80;
             this.payloadType = secondByte & 0x7f;
 
-            this.sequenceNumber = reader.Read16(rawInput);
+            this.SequenceNumber = reader.Read16(rawInput);
             this.timestamp = reader.ReadInteger(rawInput);
             this.ssrc = reader.ReadInteger(rawInput);
 
@@ -65,7 +65,7 @@ namespace midi
             int secondByte = this.payloadType | (this.marker ? 0x80 : 0);
             buffer.Write8(new Integer(firstByte));
             buffer.Write8(new Integer(secondByte));
-            buffer.Write16(new Integer(sequenceNumber));
+            buffer.Write16(new Integer(SequenceNumber));
             long t = MIDISession.GetInstance().getNow();
             //        Log.e("RTPMessage","t:"+t+" t8:"+(t >>> 8)+" t16:"+(t >>>16)+" tint:"+(int)t);
             //        timestamp = (int)t >>> 8;

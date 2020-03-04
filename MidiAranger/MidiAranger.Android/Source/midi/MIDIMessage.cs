@@ -81,7 +81,7 @@ namespace midi {
             return valid;
         }
 
-        public byte[] generateBuffer() {
+        public byte[] GenerateBuffer() {
             OutDataBuffer buffer = GeneratePayload();
     // TODO : this doesn't handle channel_status or channel correctly
     //        buffer.write8(0x00);
