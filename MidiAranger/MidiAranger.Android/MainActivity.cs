@@ -24,16 +24,22 @@ namespace MidiAranger.Droid
             LoadApplication(new App());
 
             MIDISession.GetInstance().Init(this);
+            MIDISession.GetInstance().Start();
 
             Bundle rinfo = new Bundle();
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.56.1");
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
+            for (int i = 0; i < 10000; i++)
+            {
+                SendTestMIDI();
+                
+            }
         }
 
 
-        public void sendTestMIDI()
+        public void SendTestMIDI()
         {
             Log.Debug("Main", "sendTestMidi 41,127");
             Bundle testMessage = new Bundle();

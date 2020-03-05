@@ -1,5 +1,6 @@
 using Android.Annotation;
 using Android.Content;
+using Android.Content.PM;
 using Android.Net;
 using Android.Net.Nsd;
 using Android.Net.Wifi;
@@ -58,7 +59,7 @@ namespace midi {
 
         private MIDISession() {
             this.rate = 10000;
-            this.port = 5004;
+            this.port = 5008;
             System.Random rand = new System.Random();
             this.ssrc = (int)Math.Round(rand.NextDouble() * Java.Lang.Math.Pow(2, 8 * 4));
             this.startTime = (Common.CurrentTimeMillis() / 1000L) * (long)this.rate;
@@ -657,7 +658,12 @@ namespace midi {
                 IEnumeration nis = NetworkInterface.NetworkInterfaces;
                 while (nis.HasMoreElements) {
                     NetworkInterface ni = (NetworkInterface) nis.NextElement();
-                    List<InterfaceAddress> intAs = (List<InterfaceAddress>)ni.InterfaceAddresses;
+                    List<InterfaceAddress> intAs = new List<InterfaceAddress>();
+                    foreach (var item in ni.InterfaceAddresses)
+                    {
+                        intAs.Add(item);
+                    }
+                    
                     foreach (InterfaceAddress ia in intAs) {
                         Log.Debug(TAG, " ia: " + ia.Address.HostAddress);
                         if (SameIP(ia.Address, InetAddress.GetByAddress(ipbytearray))) {
