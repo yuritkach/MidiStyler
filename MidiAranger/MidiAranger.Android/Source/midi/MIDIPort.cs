@@ -132,12 +132,19 @@ public class MIDIPort {
     private void HandleRead(SelectionKey key) {
 //        Log.d("MIDIPort2","handleRead");
         DatagramChannel c = (DatagramChannel) key.Channel();
-        UDPBuffer b = (UDPBuffer) key.Attachment();
+            UDPBuffer b = new UDPBuffer();
+            var atta = key.Attachment();
         try {
+                разбираться почему буффер пустой
+
             b.buffer.Clear();
             b.socketAddress = c.Receive(b.buffer);
                 //EventBus.getDefault().post(new PacketEvent(new DatagramPacket(b.buffer.array(),b.buffer.capacity(),b.socketAddress)));
-            MessagingCenter.Send<PacketEvent>(new PacketEvent(new Java.Net.DatagramPacket(b.buffer.ToArray<byte>(), b.buffer.Capacity(), b.socketAddress)), "PacketEvent");
+                var buff = new byte[b.buffer.Remaining()];
+                b.buffer.Get(buff);
+                var a = new Java.Net.DatagramPacket(buff, buff.Length, b.socketAddress);
+                var d = new PacketEvent(a);
+            MessagingCenter.Send<PacketEvent>(d, "PacketEvent");
         } catch (IOException e) {
             throw new IOException(e.StackTrace);
         }

@@ -830,7 +830,7 @@ namespace midi {
                     InitializeNSDRegistrationListener();
 
                     mNsdManager.RegisterService(serviceInfo, NsdProtocol.DnsSd, mRegistrationListener);
-                    //            mNsdManager.resolveService(serviceInfo, mResolveListener);
+                    mNsdManager.ResolveService(serviceInfo, mResolveListener);
                 }
             }
             catch (System.Exception e)
@@ -867,6 +867,7 @@ namespace midi {
                      parent.bonjourName = serviceInfo.ServiceName;
                      serviceInfo.ServiceName= parent.bonjourName;
 
+
                 ////                    mNsdManager.resolveService(serviceInfo, mResolveListener);
 
                 }
@@ -899,6 +900,13 @@ namespace midi {
 
         public class MIDIResolveListener :Java.Lang.Object, NsdManager.IResolveListener
         {
+            private readonly MIDISession parent=null;
+
+            public MIDIResolveListener(MIDISession parent)
+            {
+                this.parent = parent;
+            }
+
             public void OnResolveFailed(NsdServiceInfo serviceInfo, int errorCode)
             {
                 // Called when the resolve fails.  Use the error code to debug.
@@ -913,14 +921,16 @@ namespace midi {
             public void OnServiceResolved(NsdServiceInfo serviceInfo)
             {
                 Log.Error(TAG, "Resolve Succeeded. " + serviceInfo);
-
+                parent.bonjourName = serviceInfo.ServiceName;
+                parent.port = serviceInfo.Port;
+                parent.bonjourHost = serviceInfo.Host;
             }
         }
 
             //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         private void InitializeResolveListener() {
                 if(Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
-                mResolveListener = new MIDIResolveListener();
+                mResolveListener = new MIDIResolveListener(this);
                 }
         }
 

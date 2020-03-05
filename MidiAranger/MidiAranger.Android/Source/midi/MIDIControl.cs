@@ -172,7 +172,7 @@ namespace midi {
 
         private Integer GetCommandKey(AppleMIDICommand c){
             foreach(Integer key in commandMap.Keys){
-                if(key.Equals(c)){
+                if(commandMap.GetValueOrDefault<Integer,AppleMIDICommand>(key).Equals(c)){
                     return key; //return the first found
                 }
             }
