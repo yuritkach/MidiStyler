@@ -282,8 +282,8 @@ namespace midi {
                     Log.Debug(TAG, "opening connection to " + rinfo);
                     MIDIStream stream = new MIDIStream();
 
-                    if (failedConnections.ContainsKey(rinfoToKey(rinfo))) {
-                        Bundle reconnectRinfo = failedConnections.GetValueOrDefault(rinfoToKey(rinfo));
+                    if (failedConnections.ContainsKey(new String(RinfoToKey(rinfo)))) {
+                        Bundle reconnectRinfo = failedConnections.GetValueOrDefault(new String(RinfoToKey(rinfo)));
                         if (reconnectRinfo.GetInt(MIDIConstants.RINFO_FAIL, 0) > 3) {
                             Log.Debug(TAG, "failed more than 3 times...");
                             return;
@@ -624,7 +624,7 @@ namespace midi {
             }
             pendingStreams.Delete(e.initiator_code);
 
-            String key = rinfoToKey(e.rinfo);
+            String key = new String(RinfoToKey(e.rinfo));
             if (failedConnections.ContainsKey(key)) {
                 Bundle r = failedConnections.GetValueOrDefault<String,Bundle>(key);
                 int fail = r.GetInt(MIDIConstants.RINFO_FAIL, 0);
@@ -1052,7 +1052,7 @@ namespace midi {
         }
 
         public bool AddToAddressBook(Bundle rinfo) {
-            String key = rinfoToKey(rinfo);
+            String key = new String(RinfoToKey(rinfo));
 
             Log.Debug(TAG, "addToAddressBook : " + key + " " + rinfo.ToString());
             //        if(!rinfo.getBoolean(RINFO_RECON, false)) {
@@ -1062,8 +1062,8 @@ namespace midi {
             //            rinfo.putBoolean(RINFO_RECON,false);
             //        }
 
-            if (midiAddressBook.get(rinfoToKey(rinfo)) == null) {
-                bool status = midiAddressBook.Put(rinfoToKey(rinfo), new MIDIAddressBookEntry(rinfo));
+            if (midiAddressBook.get(RinfoToKey(rinfo)) == null) {
+                bool status = midiAddressBook.Put(RinfoToKey(rinfo), new MIDIAddressBookEntry(rinfo));
                 if (status) {
                     Log.Debug(TAG, "status is good");
                     EventBus.getDefault().post(new MIDIAddressBookEvent());
@@ -1071,48 +1071,48 @@ namespace midi {
 
             } else {
                 Log.Debug(TAG, "already in addressbook");
-                MIDIAddressBookEntry e = midiAddressBook.get(rinfoToKey(rinfo));
-                e.setReconnect(rinfo.getBoolean(RINFO_RECON, e.getReconnect()));
+                MIDIAddressBookEntry e = midiAddressBook.get(RinfoToKey(rinfo));
+                e.SetReconnect(rinfo.GetBoolean(MIDIConstants.RINFO_RECON, e.GetReconnect()));
 
-                boolean status = midiAddressBook.put(rinfoToKey(rinfo), e);
+                bool status = midiAddressBook.Put(RinfoToKey(rinfo), e);
                 if (status) {
                     Log.Debug(TAG, "status is good - updated entry");
                     EventBus.getDefault().post(new MIDIAddressBookEvent());
                 }
             }
             Log.Debug(TAG, "about to dump ab");
-            dumpAddressBook();
+            DumpAddressBook();
             //        getAllAddressBook();
             return true;
         }
 
-        private String rinfoToKey(Bundle rinfo) {
-            return String.format(Locale.ENGLISH, "%1$s:%2$d", rinfo.getString(RINFO_ADDR), rinfo.getInt(RINFO_PORT, 1234));
+        private string RinfoToKey(Bundle rinfo) {
+            return string.Format(Locale.English.ToString(), "%1$s:%2$d", rinfo.GetString(MIDIConstants.RINFO_ADDR), rinfo.GetInt(MIDIConstants.RINFO_PORT, 1234));
         }
 
-        public boolean addToAddressBook(MIDIAddressBookEntry m) {
+        public bool AddToAddressBook(MIDIAddressBookEntry m) {
             if (midiAddressBook != null) {
-                return midiAddressBook.put(rinfoToKey(m.rinfo()), new MIDIAddressBookEntry(m.rinfo()));
+                return midiAddressBook.Put(RinfoToKey(m.rinfo()), new MIDIAddressBookEntry(m.rinfo()));
             }
             return false;
         }
 
-        public boolean deleteFromAddressBook(MIDIAddressBookEntry m) {
-            return midiAddressBook.remove(rinfoToKey(m.rinfo()));
+        public bool DeleteFromAddressBook(MIDIAddressBookEntry m) {
+            return midiAddressBook.Remove(RinfoToKey(m.rinfo()));
 
         }
 
-        public boolean addressBookIsEmpty() {
+        public bool AddressBookIsEmpty() {
             return midiAddressBook == null;
         }
 
-        public ArrayList<MIDIAddressBookEntry> getAllAddressBook() {
+        public List<MIDIAddressBookEntry> GetAllAddressBook() {
             Log.Debug(TAG, "getAllAddressBook");
             if (midiAddressBook != null) {
-                HashMap<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
-                Log.Debug(TAG, "value count: " + hm.values().size());
-                Collection<MIDIAddressBookEntry> values = hm.values();
-                ArrayList<MIDIAddressBookEntry> list = new ArrayList<MIDIAddressBookEntry>(values);
+                Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.GetAllData();
+                Log.Debug(TAG, "value count: " + hm.Values.Count);
+                List<MIDIAddressBookEntry> values = hm.values();
+                List<MIDIAddressBookEntry> list = new List<MIDIAddressBookEntry>(values);
 
                 return list;
             }
@@ -1134,7 +1134,7 @@ namespace midi {
                 Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
                 Log.Debug(TAG, "-----------------------------------------");
                 foreach (String key in hm.Keys) {
-                    Log.Debug(TAG, " (" + key + ") : " + hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).getAddressPort());
+                    Log.Debug(TAG, " (" + key + ") : " + hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).GetAddressPort());
                 }
                 Log.Debug(TAG, "-----------------------------------------");
             } else {
@@ -1150,10 +1150,10 @@ namespace midi {
                 foreach (String key in hm.Keys) {
                     MIDIAddressBookEntry e = hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key);
 
-                    Log.Debug(TAG, " checking for reconnect - (" + key + ") : " + e.getAddressPort() + " " + (e.getReconnect() ? "YES" : "NO"));
-                    if (e.getReconnect()) {
+                    Log.Debug(TAG, " checking for reconnect - (" + key + ") : " + e.GetAddressPort() + " " + (e.GetReconnect() ? "YES" : "NO"));
+                    if (e.GetReconnect()) {
                         Connect(hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).rinfo());
-                        if (OnSameNetwork(hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).getAddress())) {
+                        if (OnSameNetwork(new String(hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).GetAddress()))) {
                             Log.Debug(TAG, " same network - (" + key + ") : " + hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).getAddressPort());
                         } else {
                             Log.Debug(TAG, " different network -  (" + key + ") : " + hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).getAddressPort());
@@ -1169,7 +1169,7 @@ namespace midi {
 
         public bool OnSameNetwork(String ip) {
             try {
-                byte[] a1 = InetAddress.GetByName(ip).getAddress();
+                byte[] a1 = InetAddress.GetByName(ip.ToString()).GetAddress();
                 byte[] a2 = bonjourHost.GetAddress();
                 byte[] m = netmask.GetAddress();
                 for (int i = 0; i < a1.Length; i++)

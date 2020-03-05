@@ -21,19 +21,6 @@ namespace MidiAranger.Droid.Source.common
         }
     }
 
-    public class Schedule
-    {
-        Timer timer=null;
-        public Schedule(TimerCallback callback, int delay,int period)
-        {
-            timer = 
-        }
-    }
-
-    public class Scheduller
-    {
-
-    }
-
+   
 
 }
