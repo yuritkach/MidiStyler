@@ -57,28 +57,28 @@ public class MIDIStream {
 
     private static IScheduledExecutorService connectService, syncService, checkConnectionService;
     private static Timer connectFuture, syncFuture, checkConnectionFuture;
-    static int connectTaskCount = 0, syncTaskCount=0;
-    static int syncFailCount = 0;
+    public static int connectTaskCount = 0, syncTaskCount=0;
+    public static int syncFailCount = 0;
 
-    static int reconnectFailCount = 0;
+    public static readonly int reconnectFailCount = 0;
 
-    static bool receivedSyncResponse = true;
+    public static bool receivedSyncResponse = true;
 
-    private static int STREAM_CONNECTED_TIMEOUT_DEFAULT = 60000;
-    private static int SYNC_PRIMARY_FREQUENCY_DEFAULT = 2000;
-    private static int SYNC_FREQUENCY_DEFAULT = 30000;
-    private static int CONNECT_COUNT_DEFAULT = 12;
-    private static int PRIMARY_SYNC_COUNT_DEFAULT = 10;
-    private static int SYNC_FAIL_COUNT_DEFAULT = 10;
-    private static string TAG = "MIDIStream";
+    private static readonly int STREAM_CONNECTED_TIMEOUT_DEFAULT = 60000;
+    private static readonly int SYNC_PRIMARY_FREQUENCY_DEFAULT = 2000;
+    private static readonly int SYNC_FREQUENCY_DEFAULT = 30000;
+    private static readonly int CONNECT_COUNT_DEFAULT = 12;
+    private static readonly int PRIMARY_SYNC_COUNT_DEFAULT = 10;
+    private static readonly int SYNC_FAIL_COUNT_DEFAULT = 10;
+    private static readonly string TAG = "MIDIStream";
     private static bool DEBUG = false;
 
-    private static int connectionTimeoutMax = STREAM_CONNECTED_TIMEOUT_DEFAULT;
-    private static int connectCountMax = CONNECT_COUNT_DEFAULT;
-    private static int primarySyncCountMax = PRIMARY_SYNC_COUNT_DEFAULT;
-    private static int syncFailCountMax = SYNC_FAIL_COUNT_DEFAULT;
-    private static int syncServicePrimaryFrequency = SYNC_PRIMARY_FREQUENCY_DEFAULT;
-    private static int syncServiceFrequency = SYNC_FREQUENCY_DEFAULT;
+    private static readonly int connectionTimeoutMax = STREAM_CONNECTED_TIMEOUT_DEFAULT;
+    private static readonly int connectCountMax = CONNECT_COUNT_DEFAULT;
+    private static readonly int primarySyncCountMax = PRIMARY_SYNC_COUNT_DEFAULT;
+    private static readonly int syncFailCountMax = SYNC_FAIL_COUNT_DEFAULT;
+    private static readonly int syncServicePrimaryFrequency = SYNC_PRIMARY_FREQUENCY_DEFAULT;
+    private static readonly int syncServiceFrequency = SYNC_FREQUENCY_DEFAULT;
 
     public MIDIStream() {
         isConnected = false;

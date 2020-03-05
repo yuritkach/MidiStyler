@@ -5,8 +5,8 @@ using Android.Net.Nsd;
 using Android.Net.Wifi;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.Compat;
 using Android.Util;
+using Com.Xamarin.Formsviewgroup;
 using Java.Lang;
 using Java.Math;
 using Java.Net;
@@ -835,16 +835,14 @@ namespace midi {
 
         }
 
-        public class MIDIRegistrationListener : NsdManager.IRegistrationListener
+        public class MIDIRegistrationListener :Java.Lang.Object, NsdManager.IRegistrationListener
         {
-            public IntPtr Handle => throw new NotImplementedException();
-
+        
             public MIDISession parent=null;
             public MIDIRegistrationListener(MIDISession parent)
             {
                 this.parent = parent;
             }
-            public void Dispose(){}
 
             public void OnRegistrationFailed(NsdServiceInfo serviceInfo, [GeneratedEnum] NsdFailure errorCode)
             {
@@ -888,19 +886,13 @@ namespace midi {
             }
         }
         
-        [TargetApi(Value = 16)]  // JELLY_BEAN
+        //[TargetApi(Value = 16)]  // JELLY_BEAN
         private void InitializeNSDRegistrationListener() {
             mRegistrationListener = new MIDIRegistrationListener(this);
         }
 
-        public class MIDIResolveListener : NsdManager.IResolveListener
+        public class MIDIResolveListener :Java.Lang.Object, NsdManager.IResolveListener
         {
-            public IntPtr Handle => throw new NotImplementedException();
-
-            public void Dispose()
-            {
-            }
-
             public void OnResolveFailed(NsdServiceInfo serviceInfo, int errorCode)
             {
                 // Called when the resolve fails.  Use the error code to debug.

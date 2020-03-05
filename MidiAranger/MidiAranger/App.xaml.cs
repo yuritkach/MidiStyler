@@ -9,7 +9,14 @@ namespace MidiAranger
     {
         public App()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.StackTrace);
+            }
 
             MainPage = new MainPage();
         }
