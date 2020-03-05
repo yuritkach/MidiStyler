@@ -33,8 +33,8 @@ public class MIDIStream {
     public int initiator_token = 0;
     public int ssrc = 0;
 
-    private Android.OS.Bundle rinfo1 = null;
-    private Android.OS.Bundle rinfo2 = null;
+    public Bundle rinfo1 = null;
+    public Bundle rinfo2 = null;
 
     private string name = "";
     int lastSentSequenceNr;
@@ -283,7 +283,7 @@ public class MIDIStream {
             return (int) Math.Round(rnd.NextDouble() * Math.Pow(2, 8 * octets));
     }
 
-    void HandleControlMessage(MIDIControl control, Bundle rinfo) {
+    public void HandleControlMessage(MIDIControl control, Bundle rinfo) {
 
         lastPacketReceivedTime = Common.CurrentTimeMillis();
 
@@ -583,7 +583,7 @@ public class MIDIStream {
     }
 
     public void SendSynchronization(MIDIControl inboundSyncMessage) {
-        long now = MIDISession.GetInstance().getNow();
+        long now = MIDISession.GetInstance().GetNow();
         MIDIControl outboundSyncMessage;
         int count = (inboundSyncMessage != null) ? inboundSyncMessage.count : -1;
         if(count == 3) { count = -1; }

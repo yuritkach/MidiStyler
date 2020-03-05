@@ -47,7 +47,7 @@ namespace midi
             bool pflag = ((block3 >> 4 & 1) & 0x1) != 0;
             int command_length = block3 & 0x7;
 
-            this.payload = rawInput.slice(rawInput.GetStreamPosition());
+            this.payload = rawInput.Slice(rawInput.GetStreamPosition());
             this.payload_length = rawInput.GetBytesLength() - rawInput.GetStreamPosition();
             return true;
         }
@@ -66,7 +66,7 @@ namespace midi
             buffer.Write8(new Integer(firstByte));
             buffer.Write8(new Integer(secondByte));
             buffer.Write16(new Integer(SequenceNumber));
-            long t = MIDISession.GetInstance().getNow();
+            long t = MIDISession.GetInstance().GetNow();
             //        Log.e("RTPMessage","t:"+t+" t8:"+(t >>> 8)+" t16:"+(t >>>16)+" tint:"+(int)t);
             //        timestamp = (int)t >>> 8;
             timestamp = (int)t;

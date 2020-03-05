@@ -1,3 +1,4 @@
+using Android.Annotation;
 using Android.Content;
 using Android.Net;
 using Android.Net.Nsd;
@@ -9,6 +10,7 @@ using Android.Util;
 using Java.Lang;
 using Java.Math;
 using Java.Net;
+using Java.Util;
 using midi.events;
 using midi.internal_events;
 using MidiAranger.Droid.Source.common;
@@ -115,7 +117,7 @@ namespace midi {
         private MIDISession() {
             this.rate = 10000;
             this.port = 5004;
-            Random rand = new Random();
+            System.Random rand = new System.Random();
             this.ssrc = (int)Math.Round(rand.NextDouble() * Java.Lang.Math.Pow(2, 8 * 4));
             this.startTime = (Common.CurrentTimeMillis() / 1000L) * (long)this.rate;
             this.startTimeHR = System.DateTime.Now.Millisecond;// nanoTime();
@@ -215,7 +217,7 @@ namespace midi {
             //
             //            this.bonjourHost = getWifiAddressNew();
             //        } else {
-            this.bonjourHost = getWifiAddress();
+            this.bonjourHost = GetWifiAddress();
             //        }
             this.bonjourPort = this.port;
             controlChannel = MIDIPort.NewUsing(this.port);
@@ -480,14 +482,13 @@ namespace midi {
 
         public void OnSyncronizeStartedEvent(SyncronizeStartedEvent e) {
             //        Log.Debug("MIDISession","SyncronizeStartedEvent");
-
-            EventBus.getDefault().post(new MIDISyncronizationStartEvent(e.rinfo));
+            MessagingCenter.Send<MIDISyncronizationStartEvent>(new MIDISyncronizationStartEvent(e.rinfo), "MIDISyncronizationStartEvent");
         }
 
 
         public void OnSyncronizeStoppedEvent(SyncronizeStoppedEvent e) {
             //        Log.Debug("MIDISession","SyncronizeStoppedEvent");
-            EventBus.getDefault().post(new MIDISyncronizationCompleteEvent(e.rinfo));
+            MessagingCenter.Send<MIDISyncronizationCompleteEvent>(new MIDISyncronizationCompleteEvent(e.rinfo), "MIDISyncronizationCompleteEvent");
         }
 
 
@@ -495,38 +496,38 @@ namespace midi {
             if (DEBUG) {
                 Log.Debug("MIDISession", "ConnectionEstablishedEvent");
             }
-            EventBus.getDefault().post(new MIDIConnectionEstablishedEvent(e.rinfo));
+            MessagingCenter.Send<MIDIConnectionEstablishedEvent>(new MIDIConnectionEstablishedEvent(e.rinfo), "MIDIConnectionEstablishedEvent");
             AddToAddressBook(e.rinfo);
 
         }
 
 
         public void OnPacketEvent(PacketEvent e) {
-            Log.Debug("MIDISession", "PacketEvent packet from " + e.getAddress().getHostAddress() + ":" + e.getPort());
+            Log.Debug("MIDISession", "PacketEvent packet from " + e.GetAddress().HostAddress + ":" + e.GetPort());
 
             // try control first
             MIDIControl applecontrol = new MIDIControl();
             MIDIMessage message = new MIDIMessage();
 
-            if (applecontrol.parse(e)) {
+            if (applecontrol.Parse(e)) {
                 if (DEBUG) {
                     Log.Debug("MIDISession", "- parsed as apple control packet");
                 }
-                if (applecontrol.isValid()) {
+                if (applecontrol.IsValid()) {
                     //                applecontrol.dumppacket();
 
                     if (applecontrol.initiator_token != 0) {
-                        MIDIStream pending = pendingStreams.get(applecontrol.initiator_token);
+                        MIDIStream pending = pendingStreams.Get(applecontrol.initiator_token);
                         if (pending != null) {
                             if (DEBUG) {
                                 Log.Debug("MIDISession", " - got pending stream by token");
                             }
-                            pending.handleControlMessage(applecontrol, e.getRInfo());
+                            pending.HandleControlMessage(applecontrol, e.GetRInfo());
                             return;
                         }
                     }
                     // check if this applecontrol.ssrc is known stream
-                    MIDIStream stream = streams.get(applecontrol.ssrc);
+                    MIDIStream stream = streams.Get(applecontrol.ssrc);
 
                     if (stream == null) {
                         // else, check if this is an invitation
@@ -535,7 +536,7 @@ namespace midi {
                             Log.Debug("MIDISession", "- create new stream " + applecontrol.ssrc);
                         }
                         stream = new MIDIStream();
-                        streams.put(applecontrol.ssrc, stream);
+                        streams.Put(applecontrol.ssrc, stream);
                     } else {
                         if (DEBUG) {
                             Log.Debug("MIDISession", " - got existing stream by ssrc " + applecontrol.ssrc);
@@ -546,14 +547,14 @@ namespace midi {
                         Log.Debug("MIDISession", "- pass control packet to stream");
                     }
 
-                    stream.handleControlMessage(applecontrol, e.getRInfo());
+                    stream.HandleControlMessage(applecontrol, e.GetRInfo());
                 }
                 // control packet
             } else {
                 //            Log.Debug("MIDISession","message?");
-                message.parseMessage(e);
-                if (message.isValid()) {
-                    EventBus.getDefault().post(new MIDIReceivedEvent(message.toBundle()));
+                message.ParseMessage(e);
+                if (message.IsValid()) {
+                    MessagingCenter.Send<MIDIReceivedEvent>(new MIDIReceivedEvent(message.ToBundle()), "MIDIReceivedEvent");
                 }
             }
         }
@@ -561,14 +562,14 @@ namespace midi {
 
         public void OnStreamDisconnectEvent(StreamDisconnectEvent e) {
             if (DEBUG) {
-                Log.Debug(TAG, "onStreamDisconnectEvent - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.size() + " #pendstreams:" + pendingStreams.size());
+                Log.Debug(TAG, "onStreamDisconnectEvent - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.Size() + " #pendstreams:" + pendingStreams.Size());
             }
             MIDIStream a = streams.Get(e.stream_ssrc, null);
 
             if (a == null) {
                 Log.Debug(TAG, "can't find stream with ssrc " + e.stream_ssrc);
             } else {
-                Bundle rinfo = (Bundle)a.rinfo1.clone();
+                Bundle rinfo = (Bundle)a.rinfo1.Clone();
                 a.Shutdown();
                 streams.Delete(e.stream_ssrc);
                 CheckAddressBookForReconnect();
@@ -584,20 +585,20 @@ namespace midi {
                 //            }
             }
             if (e.initiator_token != 0) {
-                MIDIStream p = pendingStreams.get(e.initiator_token, null);
+                MIDIStream p = pendingStreams.Get(e.initiator_token, null);
                 if (p == null) {
                     Log.Debug(TAG, "can't find pending stream with IT " + e.initiator_token);
                 } else {
-                    p.shutdown();
-                    pendingStreams.delete(e.initiator_token);
+                    p.Shutdown();
+                    pendingStreams.Delete(e.initiator_token);
                 }
             }
             if (e.rinfo != null) {
-                EventBus.getDefault().post(new MIDIConnectionEndEvent((Bundle)e.rinfo.clone()));
+                MessagingCenter.Send<MIDIConnectionEndEvent>(new MIDIConnectionEndEvent((Bundle)e.rinfo.Clone()), "MIDIConnectionEndEvent");
             }
 
             if (DEBUG) {
-                Log.Debug(TAG, "                     - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.size() + " #pendstreams:" + pendingStreams.size());
+                Log.Debug(TAG, "                     - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.Size() + " #pendstreams:" + pendingStreams.Size());
             }
         }
 
@@ -605,16 +606,16 @@ namespace midi {
         public void OnConnectionFailedEvent(ConnectionFailedEvent e) {
             Log.Debug(TAG, "onConnectionFailedEvent");
             switch (e.code) {
-                case REJECTED_INVITATION:
+                case MIDIFailCode.REJECTED_INVITATION:
                     Log.Debug(TAG, "...REJECTED_INVITATION initiator_code " + e.initiator_code);
                     break;
-                case SYNC_FAILURE:
+                case MIDIFailCode.SYNC_FAILURE:
                     Log.Debug(TAG, "...SYNC_FAILURE initiator_code " + e.initiator_code);
                     break;
-                case UNABLE_TO_CONNECT:
+                case MIDIFailCode.UNABLE_TO_CONNECT:
                     Log.Debug(TAG, "...UNABLE_TO_CONNECT initiator_code " + e.initiator_code);
                     break;
-                case CONNECTION_LOST:
+                case MIDIFailCode.CONNECTION_LOST:
                     Log.Debug(TAG, "...CONNECTION_LOST initiator_code " + e.initiator_code);
                     break;
                 default:
@@ -625,15 +626,15 @@ namespace midi {
 
             String key = rinfoToKey(e.rinfo);
             if (failedConnections.ContainsKey(key)) {
-                Bundle r = failedConnections.Get(key);
-                int fail = r.GetInt(RINFO_FAIL, 0);
-                r.PutInt(RINFO_FAIL, fail + 1);
-                failedConnections.put(key, r);
-                Log.Debug(TAG, " rinfo: " + r.toString());
+                Bundle r = failedConnections.GetValueOrDefault<String,Bundle>(key);
+                int fail = r.GetInt(MIDIConstants.RINFO_FAIL, 0);
+                r.PutInt(MIDIConstants.RINFO_FAIL, fail + 1);
+                failedConnections.Add(key, r);
+                Log.Debug(TAG, " rinfo: " + r.ToString());
             } else {
-                e.rinfo.PutInt(RINFO_FAIL, 1);
-                failedConnections.Put(key, e.rinfo);
-                Log.Debug(TAG, " rinfo: " + e.rinfo.toString());
+                e.rinfo.PutInt(MIDIConstants.RINFO_FAIL, 1);
+                failedConnections.Add(key, e.rinfo);
+                Log.Debug(TAG, " rinfo: " + e.rinfo.ToString());
 
             }
             CheckAddressBookForReconnect();
@@ -678,7 +679,7 @@ namespace midi {
         //
         //    }
 
-        public InetAddress getWifiAddress() {
+        public InetAddress GetWifiAddress() {
             try {
                 if (appContext == null) {
                     return InetAddress.GetByName("127.0.0.1");
@@ -688,14 +689,14 @@ namespace midi {
 
                 dhcpInfo = wm.DhcpInfo;
 
-                Log.Debug(TAG, "DNS 1: " + intToIp(dhcpInfo.Dns1));
-                Log.Debug(TAG, "DNS 2: " + intToIp(dhcpInfo.Dns2));
-                Log.Debug(TAG, "Gateway: " + intToIp(dhcpInfo.Gateway));
-                Log.Debug(TAG, "ip Address: " + intToIp(dhcpInfo.IpAddress));
-                Log.Debug(TAG, "lease time: " + intToIp(dhcpInfo.LeaseDuration));
+                Log.Debug(TAG, "DNS 1: " + IntToIp(dhcpInfo.Dns1));
+                Log.Debug(TAG, "DNS 2: " + IntToIp(dhcpInfo.Dns2));
+                Log.Debug(TAG, "Gateway: " + IntToIp(dhcpInfo.Gateway));
+                Log.Debug(TAG, "ip Address: " + IntToIp(dhcpInfo.IpAddress));
+                Log.Debug(TAG, "lease time: " + IntToIp(dhcpInfo.LeaseDuration));
                 Log.Debug(TAG, "mask: " + dhcpInfo.Netmask);
 
-                Log.Debug(TAG, "server ip: " + intToIp(dhcpInfo.ServerAddress));
+                Log.Debug(TAG, "server ip: " + IntToIp(dhcpInfo.ServerAddress));
 
 
                 //
@@ -706,22 +707,21 @@ namespace midi {
 
 
                 byte[] ipbytearray = BigInteger.ValueOf(wm.ConnectionInfo.IpAddress).ToByteArray();
-                reverseByteArray(ipbytearray);
+                ReverseByteArray(ipbytearray);
                 if (ipbytearray.Length != 4) {
                     return InetAddress.GetByName("127.0.0.1");
                 }
 
-                Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
-                while (nis.hasMoreElements()) {
-                    NetworkInterface ni = nis.nextElement();
-                    Iterator<InterfaceAddress> intAs = ni.getInterfaceAddresses().iterator();
-                    while (intAs.hasNext()) {
-                        InterfaceAddress ia = intAs.next();
-                        Log.Debug(TAG, " ia: " + ia.getAddress().getHostAddress());
-                        if (sameIP(ia.getAddress(), InetAddress.getByAddress(ipbytearray))) {
-                            Log.Debug(TAG, "same!!! " + ia.getAddress().getHostAddress() + "/" + ia.getNetworkPrefixLength());
-                            Log.Debug(TAG, "netmask: " + intToIp(prefixLengthToNetmaskInt(ia.getNetworkPrefixLength())));
-                            netmask = InetAddress.getByName(intToIp(prefixLengthToNetmaskInt(ia.getNetworkPrefixLength())));
+                IEnumeration nis = NetworkInterface.NetworkInterfaces;
+                while (nis.HasMoreElements) {
+                    NetworkInterface ni = (NetworkInterface) nis.NextElement();
+                    List<InterfaceAddress> intAs = (List<InterfaceAddress>)ni.InterfaceAddresses;
+                    foreach (InterfaceAddress ia in intAs) {
+                        Log.Debug(TAG, " ia: " + ia.Address.HostAddress);
+                        if (SameIP(ia.Address, InetAddress.GetByAddress(ipbytearray))) {
+                            Log.Debug(TAG, "same!!! " + ia.Address.HostAddress + "/" + ia.NetworkPrefixLength);
+                            Log.Debug(TAG, "netmask: " + IntToIp(PrefixLengthToNetmaskInt(ia.NetworkPrefixLength)));
+                            netmask = InetAddress.GetByName((IntToIp(PrefixLengthToNetmaskInt(ia.NetworkPrefixLength))).ToString());
                         }
                     }
 
@@ -748,14 +748,14 @@ namespace midi {
                 //                Log.Debug(TAG, "new netmask: " + intToIp(prefixLengthToNetmaskInt(getNetmask(InetAddress.getByAddress(ipbytearray)))));
                 //            }
 
-                return InetAddress.getByAddress(ipbytearray);
+                return InetAddress.GetByAddress(ipbytearray);
             } catch (UnknownHostException e) {
                 return null;
             } catch (SocketException e) {
-                e.printStackTrace();
+                e.PrintStackTrace();
                 return null;
             } catch (NullPointerException e) {
-                e.printStackTrace();
+                e.PrintStackTrace();
                 return null;
             }
         }
@@ -789,7 +789,7 @@ namespace midi {
         //        return null;
         //    }
 
-        public int prefixLengthToNetmaskInt(int prefixLength)
+        public int PrefixLengthToNetmaskInt(int prefixLength)
         {
             try
             {
@@ -800,11 +800,11 @@ namespace midi {
                     return 0;
 
                 }
-                int value = 0xffffffff << (32 - prefixLength);
-                return Integer.reverseBytes(value);
+                int value =(int) (0xffffffff << (32 - prefixLength));
+                return Integer.ReverseBytes(value);
             }
 
-            catch (Exception e)
+            catch (Java.Lang.Exception e)
             {
                 throw new IllegalArgumentException(e.Message);
             }
@@ -813,34 +813,34 @@ namespace midi {
 
         public int getNetmask(InetAddress addr) {
             try {
-                NetworkInterface networkInterface = NetworkInterface.getByInetAddress(addr);
-                Log.Debug(TAG, "    interface: " + addr.getHostAddress());
-                foreach (InterfaceAddress address in networkInterface.getInterfaceAddresses()) {
-                    Log.Debug(TAG, "    " + address.getAddress().getHostAddress() + "/" + address.getNetworkPrefixLength());
+                NetworkInterface networkInterface = NetworkInterface.GetByInetAddress(addr);
+                Log.Debug(TAG, "    interface: " + addr.HostAddress);
+                foreach (InterfaceAddress address in networkInterface.InterfaceAddresses) {
+                    Log.Debug(TAG, "    " + address.Address.HostAddress + "/" + address.NetworkPrefixLength);
 
-                    int netPrefix = address.getNetworkPrefixLength();
+                    int netPrefix = address.NetworkPrefixLength;
                     return netPrefix;
                 }
             } catch (SocketException e) {
-                e.printStackTrace();
+                e.PrintStackTrace();
             }
             return 0;
         }
 
-        public String intToIp(int i) {
-            i = Integer.reverseBytes(i);
-            return ((i >> 24) & 0xFF) + "." +
+        public String IntToIp(int i) {
+            i = Integer.ReverseBytes(i);
+            return new String(((i >> 24) & 0xFF) + "." +
                     ((i >> 16) & 0xFF) + "." +
                     ((i >> 8) & 0xFF) + "." +
-                    (i & 0xFF);
+                    (i & 0xFF));
         }
 
-        private static void reverseByteArray(byte[] array) {
+        private static void ReverseByteArray(byte[] array) {
             if (array == null) {
                 return;
             }
             int i = 0;
-            int j = array.length - 1;
+            int j = array.Length - 1;
             byte tmp;
             while (j > i) {
                 tmp = array[j];
@@ -893,53 +893,63 @@ namespace midi {
 
         }
 
-        //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        //    private void initializeNSDRegistrationListener() {
-        //        mRegistrationListener = new NsdManager.RegistrationListener() {
+        public class MIDIRegistrationListener : NsdManager.IRegistrationListener
+        {
+            public IntPtr Handle => throw new NotImplementedException();
 
-        //            @Override
-        //            public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
-        //                // Save the service name.  Android may have changed it in order to
-        //                // resolve a conflict, so update the name you initially requested
-        //                // with the name Android actually used.
-        //                Log.Debug(TAG,"Service Registered "+NsdServiceInfo.toString());
-        //                if(NsdServiceInfo.getServiceName() != null && bonjourName != NsdServiceInfo.getServiceName()) {
-        //                    bonjourName = NsdServiceInfo.getServiceName();
-        //                    serviceInfo.setServiceName(bonjourName);
+            public MIDISession parent=null;
+            public MIDIRegistrationListener(MIDISession parent)
+            {
+                this.parent = parent;
+            }
+            public void Dispose(){}
 
-        ////                    mNsdManager.resolveService(serviceInfo, mResolveListener);
+            public void OnRegistrationFailed(NsdServiceInfo serviceInfo, [GeneratedEnum] NsdFailure errorCode)
+            {
+                Console.WriteLine("onRegistrationFailed \n"+serviceInfo.ToString()+"\nerror code: "+errorCode);
+                parent.published_bonjour = false;
+            }
 
-        //                }
-        ////                mNsdManager.resolveService(serviceInfo, mResolveListener);
+            public void OnServiceRegistered(NsdServiceInfo serviceInfo)
+            {
+                // Save the service name.  Android may have changed it in order to
+                //                // resolve a conflict, so update the name you initially requested
+                //                // with the name Android actually used.
+                Log.Debug(TAG,"Service Registered "+serviceInfo.ToString());
+                if(serviceInfo.ServiceName != null && parent.bonjourName != serviceInfo.ServiceName)
+                {
+                     parent.bonjourName = serviceInfo.ServiceName;
+                     serviceInfo.ServiceName= parent.bonjourName;
 
-        //                published_bonjour = true;
-        //                EventBus.getDefault().post(new MIDISessionNameRegisteredEvent());
-        //            }
+                ////                    mNsdManager.resolveService(serviceInfo, mResolveListener);
 
-        //            @Override
-        //            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
-        //                // Registration failed!  Put debugging code here to determine why.
-        //                System.out.print("onRegistrationFailed \n"+serviceInfo.toString()+"\nerror code: "+errorCode);
-        //                published_bonjour = false;
-        //            }
+                }
+                ////                mNsdManager.resolveService(serviceInfo, mResolveListener);
 
-        //            @Override
-        //            public void onServiceUnregistered(NsdServiceInfo arg0) {
-        //                // Service has been unregistered.  This only happens when you call
-        //                // NsdManager.unregisterService() and pass in this listener.
-        //                System.out.print("onServiceUnregistered ");
-        //                published_bonjour = false;
-        //            }
+                parent.published_bonjour = true;
+                MessagingCenter.Send<MIDISessionNameRegisteredEvent>(new MIDISessionNameRegisteredEvent(), "MIDISessionNameRegisteredEvent");
+            }
 
-        //            @Override
-        //            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
-        //                // Unregistration failed.  Put debugging code here to determine why.
-        //                System.out.print("onUnregistrationFailed ");
-        //                published_bonjour = false;
-        //            }
-        //        };
-        //    }
+            public void OnServiceUnregistered(NsdServiceInfo serviceInfo)
+            {
+                //                // Service has been unregistered.  This only happens when you call
+                //                // NsdManager.unregisterService() and pass in this listener.
+                Console.WriteLine("onServiceUnregistered ");
+                parent.published_bonjour = false;
+            }
 
+            public void OnUnregistrationFailed(NsdServiceInfo serviceInfo, [GeneratedEnum] NsdFailure errorCode)
+            {
+                // Unregistration failed.  Put debugging code here to determine why.
+                Console.WriteLine("onUnregistrationFailed ");
+                parent.published_bonjour = false;
+            }
+        }
+        
+        [TargetApi(Value = 16)]  // JELLY_BEAN
+        private void InitializeNSDRegistrationListener() {
+            mRegistrationListener = new MIDIRegistrationListener(this);
+        }
 
         public class MIDIResolveListener : NsdManager.IResolveListener
         {
