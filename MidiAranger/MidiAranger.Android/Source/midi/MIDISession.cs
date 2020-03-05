@@ -20,74 +20,14 @@ using Xamarin.Forms;
 using Math = Java.Lang.Math;
 using String = Java.Lang.String;
 
+//using net.rehacktive.waspdb.WaspDb;
+//using net.rehacktive.waspdb.WaspFactory;
+//using net.rehacktive.waspdb.WaspHash;
+//using net.rehacktive.waspdb.WaspListener;
+//using net.rehacktive.waspdb.WaspObserver;
+
+
 namespace midi {
-
-    //import android.annotation.TargetApi;
-    //import android.content.BroadcastReceiver;
-    //import android.content.Context;
-    //import android.content.Intent;
-    //import android.content.IntentFilter;
-    //import android.net.ConnectivityManager;
-    //import android.net.DhcpInfo;
-
-    //import android.net.nsd.NsdManager;
-    //import android.net.nsd.NsdServiceInfo;
-    //import android.net.wifi.WifiManager;
-    //import android.os.Build;
-    //import android.os.Bundle;
-    //import android.support.v4.util.ArrayMap;
-    //import android.util.Log;
-    //import android.util.SparseArray;
-
-    //import com.disappointedpig.midi.events.MIDIAddressBookEvent;
-    //import com.disappointedpig.midi.events.MIDIConnectionEndEvent;
-    //import com.disappointedpig.midi.events.MIDIConnectionEstablishedEvent;
-    //import com.disappointedpig.midi.events.MIDIReceivedEvent;
-    //import com.disappointedpig.midi.events.MIDISessionNameRegisteredEvent;
-    //import com.disappointedpig.midi.events.MIDISessionStartEvent;
-    //import com.disappointedpig.midi.events.MIDISessionStopEvent;
-    //import com.disappointedpig.midi.events.MIDISyncronizationCompleteEvent;
-    //import com.disappointedpig.midi.events.MIDISyncronizationStartEvent;
-    //import com.disappointedpig.midi.internal_events.AddressBookReadyEvent;
-    //import com.disappointedpig.midi.internal_events.ConnectionEstablishedEvent;
-    //import com.disappointedpig.midi.internal_events.ConnectionFailedEvent;
-    //import com.disappointedpig.midi.internal_events.ListeningEvent;
-    //import com.disappointedpig.midi.internal_events.PacketEvent;
-    //import com.disappointedpig.midi.internal_events.StreamConnectedEvent;
-    //import com.disappointedpig.midi.internal_events.StreamDisconnectEvent;
-    //import com.disappointedpig.midi.internal_events.SyncronizeStartedEvent;
-    //import com.disappointedpig.midi.internal_events.SyncronizeStoppedEvent;
-    //import com.esotericsoftware.kryo.KryoException;
-
-    //import net.rehacktive.waspdb.WaspDb;
-    //import net.rehacktive.waspdb.WaspFactory;
-    //import net.rehacktive.waspdb.WaspHash;
-    //import net.rehacktive.waspdb.WaspListener;
-    //import net.rehacktive.waspdb.WaspObserver;
-
-    //import org.greenrobot.eventbus.EventBus;
-    //import org.greenrobot.eventbus.Subscribe;
-    //import org.greenrobot.eventbus.ThreadMode;
-
-    //import java.math.BigInteger;
-    //import java.net.InetAddress;
-    //import java.net.InterfaceAddress;
-    //import java.net.NetworkInterface;
-    //import java.net.SocketException;
-    //import java.net.UnknownHostException;
-    //import java.util.ArrayList;
-    //import java.util.Collection;
-    //import java.util.Enumeration;
-    //import java.util.HashMap;
-    //import java.util.Iterator;
-    //import java.util.Locale;
-    //import java.util.Random;
-
-    //import static android.content.Context.WIFI_SERVICE;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_ADDR;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_FAIL;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_PORT;
-    //import static com.disappointedpig.midi.MIDIConstants.RINFO_RECON;
 
     public class MIDISession {
 
@@ -97,9 +37,11 @@ namespace midi {
         private static string BONJOUR_SEPARATOR = ".";
         private static bool DEBUG = true;
 
-        //        private WaspDb db;
-        //        private WaspHash midiAddressBook;
-        //        private WaspObserver observer;
+        // private WaspDb db;
+        // private WaspHash midiAddressBook;
+        // private WaspObserver observer;
+        Dictionary<String, MIDIAddressBookEntry> midiAddressBook;
+
 
         private void Subscribe()
         {
@@ -1007,6 +949,12 @@ namespace midi {
             return true;
         }
 
+        public void SetupLocalDB()
+        {
+            midiAddressBook = new Dictionary<String, MIDIAddressBookEntry>();
+
+        }
+
 
         // -------------------------------------------------
 
@@ -1047,7 +995,7 @@ namespace midi {
 
 
         public Bundle GetEntryFromAddressBook(String key) {
-            MIDIAddressBookEntry abe = midiAddressBook.get(key);
+            MIDIAddressBookEntry abe = midiAddressBook.GetValueOrDefault(key);
             return abe.rinfo();
         }
 
@@ -1062,22 +1010,22 @@ namespace midi {
             //            rinfo.putBoolean(RINFO_RECON,false);
             //        }
 
-            if (midiAddressBook.get(RinfoToKey(rinfo)) == null) {
-                bool status = midiAddressBook.Put(RinfoToKey(rinfo), new MIDIAddressBookEntry(rinfo));
+            if (midiAddressBook.GetValueOrDefault<String,MIDIAddressBookEntry>(new String(RinfoToKey(rinfo))) == null) {
+                bool status = midiAddressBook.TryAdd(new String(RinfoToKey(rinfo)), new MIDIAddressBookEntry(rinfo));
                 if (status) {
                     Log.Debug(TAG, "status is good");
-                    EventBus.getDefault().post(new MIDIAddressBookEvent());
+                    MessagingCenter.Send<MIDIAddressBookEvent>(new MIDIAddressBookEvent(), "MIDIAddressBookEvent");
                 }
 
             } else {
                 Log.Debug(TAG, "already in addressbook");
-                MIDIAddressBookEntry e = midiAddressBook.get(RinfoToKey(rinfo));
+                MIDIAddressBookEntry e = midiAddressBook.GetValueOrDefault<String,MIDIAddressBookEntry>(new String(RinfoToKey(rinfo)));
                 e.SetReconnect(rinfo.GetBoolean(MIDIConstants.RINFO_RECON, e.GetReconnect()));
 
-                bool status = midiAddressBook.Put(RinfoToKey(rinfo), e);
+                bool status = midiAddressBook.TryAdd(new String(RinfoToKey(rinfo)), e);
                 if (status) {
                     Log.Debug(TAG, "status is good - updated entry");
-                    EventBus.getDefault().post(new MIDIAddressBookEvent());
+                    MessagingCenter.Send<MIDIAddressBookEvent>(new MIDIAddressBookEvent(), "MIDIAddressBookEvent");
                 }
             }
             Log.Debug(TAG, "about to dump ab");
@@ -1092,13 +1040,13 @@ namespace midi {
 
         public bool AddToAddressBook(MIDIAddressBookEntry m) {
             if (midiAddressBook != null) {
-                return midiAddressBook.Put(RinfoToKey(m.rinfo()), new MIDIAddressBookEntry(m.rinfo()));
+                return midiAddressBook.TryAdd(new String(RinfoToKey(m.rinfo())), new MIDIAddressBookEntry(m.rinfo()));
             }
             return false;
         }
 
         public bool DeleteFromAddressBook(MIDIAddressBookEntry m) {
-            return midiAddressBook.Remove(RinfoToKey(m.rinfo()));
+            return midiAddressBook.Remove(new String(RinfoToKey(m.rinfo())));
 
         }
 
@@ -1109,11 +1057,11 @@ namespace midi {
         public List<MIDIAddressBookEntry> GetAllAddressBook() {
             Log.Debug(TAG, "getAllAddressBook");
             if (midiAddressBook != null) {
-                Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.GetAllData();
-                Log.Debug(TAG, "value count: " + hm.Values.Count);
-                List<MIDIAddressBookEntry> values = hm.values();
-                List<MIDIAddressBookEntry> list = new List<MIDIAddressBookEntry>(values);
-
+                Log.Debug(TAG, "value count: " + midiAddressBook.Values.Count);
+                List<MIDIAddressBookEntry> list = new List<MIDIAddressBookEntry>();
+                foreach (MIDIAddressBookEntry value in midiAddressBook.Values) {
+                    list.Add(value);
+                }
                 return list;
             }
             return null;
@@ -1131,10 +1079,9 @@ namespace midi {
 
         private void DumpAddressBook() {
             if (midiAddressBook != null) {
-                Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
                 Log.Debug(TAG, "-----------------------------------------");
-                foreach (String key in hm.Keys) {
-                    Log.Debug(TAG, " (" + key + ") : " + hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).GetAddressPort());
+                foreach (String key in midiAddressBook.Keys) {
+                    Log.Debug(TAG, " (" + key + ") : " + midiAddressBook.GetValueOrDefault<String,MIDIAddressBookEntry>(key).GetAddressPort());
                 }
                 Log.Debug(TAG, "-----------------------------------------");
             } else {
@@ -1145,18 +1092,17 @@ namespace midi {
 
         public void CheckAddressBookForReconnect() {
             if (midiAddressBook != null) {
-                Dictionary<String, MIDIAddressBookEntry> hm = midiAddressBook.getAllData();
                 Log.Debug(TAG, "-----------------------------------------");
-                foreach (String key in hm.Keys) {
-                    MIDIAddressBookEntry e = hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key);
+                foreach (String key in midiAddressBook.Keys) {
+                    MIDIAddressBookEntry e = midiAddressBook.GetValueOrDefault<String, MIDIAddressBookEntry>(key);
 
                     Log.Debug(TAG, " checking for reconnect - (" + key + ") : " + e.GetAddressPort() + " " + (e.GetReconnect() ? "YES" : "NO"));
                     if (e.GetReconnect()) {
-                        Connect(hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).rinfo());
-                        if (OnSameNetwork(new String(hm.GetValueOrDefault<String,MIDIAddressBookEntry>(key).GetAddress()))) {
-                            Log.Debug(TAG, " same network - (" + key + ") : " + hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).getAddressPort());
+                        Connect(midiAddressBook.GetValueOrDefault<String, MIDIAddressBookEntry>(key).rinfo());
+                        if (OnSameNetwork(new String(midiAddressBook.GetValueOrDefault<String,MIDIAddressBookEntry>(key).GetAddress()))) {
+                            Log.Debug(TAG, " same network - (" + key + ") : " + midiAddressBook.GetValueOrDefault<String, MIDIAddressBookEntry>(key).GetAddressPort());
                         } else {
-                            Log.Debug(TAG, " different network -  (" + key + ") : " + hm.GetValueOrDefault<String, MIDIAddressBookEntry>(key).getAddressPort());
+                            Log.Debug(TAG, " different network -  (" + key + ") : " + midiAddressBook.GetValueOrDefault<String, MIDIAddressBookEntry>(key).GetAddressPort());
                         }
                     }
                 }
