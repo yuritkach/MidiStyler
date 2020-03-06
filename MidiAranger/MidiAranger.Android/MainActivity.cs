@@ -28,11 +28,15 @@ namespace MidiAranger.Droid
 
             Bundle rinfo = new Bundle();
             rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.56.1");
-            rinfo.PutInt(MIDIConstants.RINFO_PORT, 5004);
+            rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
-        
-            for(;;) SendTestMIDI();
+
+            for (; ; )
+            {
+                SendTestMIDI();
+                System.Threading.Thread.Sleep(100);
+            }
                 
             
         }

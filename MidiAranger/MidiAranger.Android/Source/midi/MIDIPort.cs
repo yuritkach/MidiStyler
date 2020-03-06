@@ -132,10 +132,9 @@ public class MIDIPort {
     private void HandleRead(SelectionKey key) {
 //        Log.d("MIDIPort2","handleRead");
         DatagramChannel c = (DatagramChannel) key.Channel();
-            UDPBuffer b = new UDPBuffer();
-            var atta = key.Attachment();
+        UDPBuffer b = (UDPBuffer) key.Attachment();
         try {
-                разбираться почему буффер пустой
+              //  разбираться почему буффер пустой
 
             b.buffer.Clear();
             b.socketAddress = c.Receive(b.buffer);
