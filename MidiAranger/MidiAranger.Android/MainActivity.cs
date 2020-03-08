@@ -31,10 +31,11 @@ namespace MidiAranger.Droid
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
-
+            
             for (; ; )
             {
-                SendTestMIDI();
+                if (MIDISession.GetInstance().IsOnline())
+                    SendTestMIDI();
                 System.Threading.Thread.Sleep(100);
             }
                 
