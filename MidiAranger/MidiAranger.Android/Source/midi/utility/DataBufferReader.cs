@@ -21,7 +21,11 @@ namespace midi.utility {
          */
         public int LengthOfCurrentString(DataBuffer rawInput) {
             int len = 0;
-            while (rawInput.GetBytes()[rawInput.GetStreamPosition() + len] != 0) {
+            int pos = rawInput.GetStreamPosition();
+            int ln = rawInput.GetBytesLength();
+
+
+            while ((pos<=ln)&&(rawInput.GetBytes()[pos-1 + len] != 0))  {
                 len++;
             }
             return len;
