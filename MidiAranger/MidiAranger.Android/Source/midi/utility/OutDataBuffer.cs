@@ -45,24 +45,21 @@ namespace midi.utility {
             WriteInteger64ToByteArray(Double.DoubleToRawLongBits(aDouble.DoubleValue()));
         }
 
-        public void Write(Integer anInt) {
-            WriteInteger32ToByteArray(anInt.IntValue());
+
+        public void Write16(int anInt) {
+            WriteInteger16ToByteArray(anInt);
         }
 
-        public void Write16(Integer anInt) {
-            WriteInteger16ToByteArray(anInt.IntValue());
+        public void Write8(int anInt) {
+            WriteInteger8ToByteArray(anInt);
         }
 
-        public void Write8(Integer anInt) {
-            WriteInteger8ToByteArray(anInt.IntValue());
+        public void Write24(int anInt) {
+            WriteInteger24ToByteArray(anInt);
         }
 
-        public void Write24(Integer anInt) {
-            WriteInteger24ToByteArray(anInt.IntValue());
-        }
-
-        public void Write32(Integer anInt) {
-            WriteInteger32ToByteArray(anInt.IntValue());
+        public void Write32(int anInt) {
+            WriteInteger32ToByteArray(anInt);
         }
 
         public void Write64(Long aLong) {

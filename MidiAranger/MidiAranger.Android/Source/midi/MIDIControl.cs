@@ -30,7 +30,7 @@ namespace midi {
             DataBufferReader reader = new DataBufferReader();
             int protocol = reader.Read16(rawInput);
             if(protocol == 0xffff) {
-                command = commandMap.GetValueOrDefault<Integer,AppleMIDICommand>(new Integer(reader.Read16(rawInput)));
+                command = commandMap.GetValueOrDefault<int,AppleMIDICommand>(reader.Read16(rawInput));
                 switch (command) {
                     case AppleMIDICommand.INVITATION:
                     case AppleMIDICommand.INVITATION_ACCEPTED:
@@ -129,7 +129,7 @@ namespace midi {
                 case AppleMIDICommand.INVITATION_ACCEPTED:
                 case AppleMIDICommand.INVITATION_REJECTED:
                 case AppleMIDICommand.END:
-                    buffer.Write16(new Integer(0xFFFF));
+                    buffer.Write16(0xFFFF);
                     buffer.Write16(GetCommandKey(this.command));
                     buffer.Write(this.protocol_version);
                     buffer.Write(this.initiator_token);
@@ -137,17 +137,17 @@ namespace midi {
                     buffer.Write(new String(name));
                     break;
                 case AppleMIDICommand.SYNCHRONIZATION:
-                    buffer.Write16(new Integer(0xFFFF));
+                    buffer.Write16(0xFFFF);
                     buffer.Write16(GetCommandKey(this.command));
                     buffer.Write(this.ssrc);
-                    buffer.Write8(new Integer(this.count));
-                    buffer.Write24(new Integer(this.padding));
+                    buffer.Write8(this.count);
+                    buffer.Write24(this.padding);
                     buffer.Write64(new Long(this.timestamp1));
                     buffer.Write64(new Long(this.timestamp2));
                     buffer.Write64(new Long(this.timestamp3));
                     break;
                 case AppleMIDICommand.RECEIVER_FEEDBACK:
-                    buffer.Write16(new Integer(0xFFFF));
+                    buffer.Write16(0xFFFF);
                     buffer.Write16(GetCommandKey(this.command));
                     buffer.Write(this.ssrc);
                     buffer.Write(this.sequenceNumber);
@@ -158,25 +158,25 @@ namespace midi {
             return buffer.ToByteArray();
         }
 
-        private static Dictionary<Integer, AppleMIDICommand> commandMap = new Dictionary<Integer, AppleMIDICommand>();
+        private static Dictionary<int, AppleMIDICommand> commandMap = new Dictionary<int, AppleMIDICommand>();
 
         static MIDIControl(){
-            commandMap.Add(new Integer(0x494E), AppleMIDICommand.INVITATION);
-            commandMap.Add(new Integer(0x4F4B), AppleMIDICommand.INVITATION_ACCEPTED);
-            commandMap.Add(new Integer(0x4E4F), AppleMIDICommand.INVITATION_REJECTED);
-            commandMap.Add(new Integer(0x4259), AppleMIDICommand.END);
-            commandMap.Add(new Integer(0x434B), AppleMIDICommand.SYNCHRONIZATION);
-            commandMap.Add(new Integer(0x5253), AppleMIDICommand.RECEIVER_FEEDBACK);
-            commandMap.Add(new Integer(0x524C), AppleMIDICommand.BITRATE_RECEIVE_LIMIT);
+            commandMap.Add(0x494E, AppleMIDICommand.INVITATION);
+            commandMap.Add(0x4F4B, AppleMIDICommand.INVITATION_ACCEPTED);
+            commandMap.Add(0x4E4F, AppleMIDICommand.INVITATION_REJECTED);
+            commandMap.Add(0x4259, AppleMIDICommand.END);
+            commandMap.Add(0x434B, AppleMIDICommand.SYNCHRONIZATION);
+            commandMap.Add(0x5253, AppleMIDICommand.RECEIVER_FEEDBACK);
+            commandMap.Add(0x524C, AppleMIDICommand.BITRATE_RECEIVE_LIMIT);
         }
 
-        private Integer GetCommandKey(AppleMIDICommand c){
-            foreach(Integer key in commandMap.Keys){
-                if(commandMap.GetValueOrDefault<Integer,AppleMIDICommand>(key).Equals(c)){
+        private int GetCommandKey(AppleMIDICommand c){
+            foreach(int key in commandMap.Keys){
+                if(commandMap.GetValueOrDefault<int,AppleMIDICommand>(key).Equals(c)){
                     return key; //return the first found
                 }
             }
-            return null;
+            return -1;
         }
 
         public enum AppleMIDICommand {

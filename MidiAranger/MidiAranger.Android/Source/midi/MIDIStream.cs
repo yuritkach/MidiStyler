@@ -348,7 +348,7 @@ public class MIDIStream {
         if(MIDISession.GetInstance().IsHostConnectionAllowed(rinfo)) {
             this.SendInvitationAccepted(rinfo);
         } else {
-            this.sendInvitationRejected(rinfo);
+            this.SendInvitationRejected(rinfo);
         }
     }
 
@@ -542,7 +542,7 @@ public class MIDIStream {
 
     }
 
-    private void sendInvitationRejected(Bundle rinfo) {
+    private void SendInvitationRejected(Bundle rinfo) {
         MIDIControl message = new MIDIControl();
         message.CreateInvitationRejected(this.initiator_token, MIDISession.GetInstance().ssrc, MIDISession.GetInstance().bonjourName);
         MIDISession.GetInstance().SendUDPMessage(message, rinfo);

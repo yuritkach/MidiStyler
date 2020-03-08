@@ -63,15 +63,15 @@ namespace midi
             //        firstByte |= (this.csrcs.length > 15 ? 15 : this.csrcs.length);
 
             int secondByte = this.payloadType | (this.marker ? 0x80 : 0);
-            buffer.Write8(new Integer(firstByte));
-            buffer.Write8(new Integer(secondByte));
-            buffer.Write16(new Integer(SequenceNumber));
+            buffer.Write8(firstByte);
+            buffer.Write8(secondByte);
+            buffer.Write16(SequenceNumber);
             long t = MIDISession.GetInstance().GetNow();
             //        Log.e("RTPMessage","t:"+t+" t8:"+(t >>> 8)+" t16:"+(t >>>16)+" tint:"+(int)t);
             //        timestamp = (int)t >>> 8;
             timestamp = (int)t;
-            buffer.Write32(new Integer(timestamp << 0));
-            buffer.Write32(new Integer(ssrc));
+            buffer.Write32(timestamp << 0);
+            buffer.Write32(ssrc);
             return buffer;
         }
     }

@@ -4,6 +4,7 @@ using Java.Net;
 using Java.Nio;
 using Java.Nio.Channels;
 using midi.internal_events;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -130,24 +131,35 @@ public class MIDIPort {
     }
 
     private void HandleRead(SelectionKey key) {
-//        Log.d("MIDIPort2","handleRead");
-        DatagramChannel c = (DatagramChannel) key.Channel();
-        UDPBuffer b = (UDPBuffer) key.Attachment();
-        try {
-              //  разбираться почему буффер пустой
 
-            b.buffer.Clear();
-            b.socketAddress = c.Receive(b.buffer);
+            //        Log.d("MIDIPort2","handleRead");
+            DatagramChannel c = (DatagramChannel)key.Channel();
+            UDPBuffer b = (UDPBuffer)key.Attachment();
+            try
+            {
+                //  разбираться почему буффер пустой
+
+                b.buffer.Clear();
+                b.socketAddress = c.Receive(b.buffer);
                 //EventBus.getDefault().post(new PacketEvent(new DatagramPacket(b.buffer.array(),b.buffer.capacity(),b.socketAddress)));
-                var buff = new byte[b.buffer.Remaining()];
-                b.buffer.Get(buff);
-                var a = new Java.Net.DatagramPacket(buff, buff.Length, b.socketAddress);
+                
+                b.buffer.Flip();
+                var buff = new byte[b.buffer.Limit()];
+                b.buffer.Get(buff,0, b.buffer.Limit());
+           
+
+                //                var a = new Java.Net.DatagramPacket( buff, buff.Length, b.socketAddress, 5008);
+                InetAddress ia = InetAddress.GetByName("192.168.56.1");
+                var a = new Java.Net.DatagramPacket(buff, buff.Length, ia, 5008);
+
                 var d = new PacketEvent(a);
-            MessagingCenter.Send<PacketEvent>(d, "PacketEvent");
-        } catch (IOException e) {
-            throw new IOException(e.StackTrace);
+                MessagingCenter.Send<PacketEvent>(d, "PacketEvent");
+            }
+            catch (Exception e)
+            {
+                throw new IOException(e.StackTrace);
+            }
         }
-    }
 
     private void HandleWrite(SelectionKey key) {
         if(!(outboundQueue.Count==0)) {

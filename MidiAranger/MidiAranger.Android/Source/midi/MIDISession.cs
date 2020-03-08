@@ -828,9 +828,9 @@ namespace midi {
                     mNsdManager = (NsdManager)appContext.ApplicationContext.GetSystemService(Context.NsdService);
 
                     InitializeNSDRegistrationListener();
-
+                    
                     mNsdManager.RegisterService(serviceInfo, NsdProtocol.DnsSd, mRegistrationListener);
-                    mNsdManager.ResolveService(serviceInfo, mResolveListener);
+                //    mNsdManager.ResolveService(serviceInfo, mResolveListener);
                 }
             }
             catch (System.Exception e)
@@ -871,7 +871,7 @@ namespace midi {
                 ////                    mNsdManager.resolveService(serviceInfo, mResolveListener);
 
                 }
-                ////                mNsdManager.resolveService(serviceInfo, mResolveListener);
+                ////parent.mNsdManager.ResolveService(serviceInfo, parent.mResolveListener);
 
                 parent.published_bonjour = true;
                 MessagingCenter.Send<MIDISessionNameRegisteredEvent>(new MIDISessionNameRegisteredEvent(), "MIDISessionNameRegisteredEvent");
@@ -921,7 +921,7 @@ namespace midi {
             public void OnServiceResolved(NsdServiceInfo serviceInfo)
             {
                 Log.Error(TAG, "Resolve Succeeded. " + serviceInfo);
-                parent.bonjourName = serviceInfo.ServiceName;
+               // parent.bonjourName = serviceInfo.ServiceName;
                 parent.port = serviceInfo.Port;
                 parent.bonjourHost = serviceInfo.Host;
             }

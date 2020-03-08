@@ -85,9 +85,9 @@ namespace midi {
             OutDataBuffer buffer = GeneratePayload();
     // TODO : this doesn't handle channel_status or channel correctly
     //        buffer.write8(0x00);
-            buffer.Write16(new Integer(0x0390));
-            buffer.Write8(new Integer(note));
-            buffer.Write8(new Integer(velocity));
+            buffer.Write16(0x0390);
+            buffer.Write8(note);
+            buffer.Write8(velocity);
             return buffer.ToByteArray();
         }
     }

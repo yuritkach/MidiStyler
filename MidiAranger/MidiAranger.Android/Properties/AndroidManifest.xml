@@ -3,5 +3,20 @@
 	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="28" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+	<uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+	<uses-permission android:name="android.permission.BIND_CARRIER_MESSAGING_SERVICE" />
+	<uses-permission android:name="android.permission.BIND_CARRIER_SERVICES" />
+	<uses-permission android:name="android.permission.BIND_INCALL_SERVICE" />
+	<uses-permission android:name="android.permission.BIND_MIDI_DEVICE_SERVICE" />
+	<uses-permission android:name="android.permission.BIND_NFC_SERVICE" />
+	<uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
+	<uses-permission android:name="android.permission.BROADCAST_PACKAGE_REMOVED" />
+	<uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.NFC" />
+	<uses-permission android:name="android.permission.NFC_TRANSACTION_EVENT" />
 	<application android:label="MidiAranger.Android"></application>
 </manifest>
