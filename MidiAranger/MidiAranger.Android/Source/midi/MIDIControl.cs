@@ -52,9 +52,9 @@ namespace midi {
                         ssrc = reader.ReadInteger(rawInput);
                         count = reader.Read8(rawInput);
                         padding = reader.Read24(rawInput);
-                        timestamp1 = reader.readUnsignedInteger64(rawInput);
-                        timestamp2 = reader.readUnsignedInteger64(rawInput);
-                        timestamp3 = reader.readUnsignedInteger64(rawInput);
+                        timestamp1 = reader.ReadUnsignedInteger64(rawInput);
+                        timestamp2 = reader.ReadUnsignedInteger64(rawInput);
+                        timestamp3 = reader.ReadUnsignedInteger64(rawInput);
     //                    this.ssrc = buffer.readUInt32BE(4, 8);
     //                    this.count = buffer.readUInt8(8);
     //                    this.padding = (buffer.readUInt8(9) << 0xF0) + buffer.readUInt16BE(10);

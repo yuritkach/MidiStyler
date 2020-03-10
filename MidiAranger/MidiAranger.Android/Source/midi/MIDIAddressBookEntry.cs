@@ -20,7 +20,7 @@ namespace midi {
             reconnect = rinfo.GetBoolean(MIDIConstants.RINFO_RECON, false);
         }
 
-        public Bundle rinfo() {
+        public Bundle Rinfo() {
             Bundle rinfo = new Bundle();
             rinfo.PutString(MIDIConstants.RINFO_NAME, name);
             rinfo.PutString(MIDIConstants.RINFO_ADDR, address);

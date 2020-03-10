@@ -49,6 +49,7 @@ namespace midi {
                 if ((block4 & 0x80) == 0x80)
                 {
                     // common messages
+                    this.valid = true;
                     return true;
                 }
                 else

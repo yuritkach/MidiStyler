@@ -164,8 +164,8 @@ public class MIDIPort {
             try {
                 DatagramChannel c = (DatagramChannel) key.Channel();
                 DatagramPacket d = outboundQueue.Dequeue();
-
-                c.Send(ByteBuffer.Wrap(d.GetData()),d.SocketAddress);
+                if (d!=null)
+                    c.Send(ByteBuffer.Wrap(d.GetData()),d.SocketAddress);
             } catch (IOException e) {
                 throw new IOException(e.StackTrace);
             }

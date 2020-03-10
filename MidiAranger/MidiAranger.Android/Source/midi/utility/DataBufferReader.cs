@@ -93,7 +93,7 @@ namespace midi.utility {
                     & 0xFFFFFFFFL;
         }
 
-        public long readUnsignedInteger64(DataBuffer rawInput) {
+        public long ReadUnsignedInteger64(DataBuffer rawInput) {
 
             long highword = ReadUnsignedInteger(rawInput);
             long lowword = ReadUnsignedInteger(rawInput);
