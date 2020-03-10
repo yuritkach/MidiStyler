@@ -334,13 +334,18 @@ public class MIDIStream {
             this.ssrc = control.ssrc;
             rinfo1.PutString(midi.MIDIConstants.RINFO_NAME, control.name);
             MessagingCenter.Send<MIDIConnectionRequestReceivedEvent>(new MIDIConnectionRequestReceivedEvent(rinfo1), "MIDIConnectionRequestReceivedEvent");
-            } else if(rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) == rinfo1.GetInt(midi.MIDIConstants.RINFO_PORT)) {
+            }
+        else 
+        if(rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) == rinfo1.GetInt(midi.MIDIConstants.RINFO_PORT)) {
             return;
-        } else if(rinfo2 == null) {
+        }
+        else 
+        if(rinfo2 == null) {
             rinfo2 = (Bundle) rinfo.Clone();
             this.isConnected = true;
 
-        } else {
+        }
+        else {
             return;
         }
 
@@ -553,7 +558,7 @@ public class MIDIStream {
     public void SendMessage(MIDIMessage m) {
         this.lastSentSequenceNr = (this.lastSentSequenceNr + 1) % 0x10000;
         m.SequenceNumber = this.lastSentSequenceNr;
-        MIDISession.GetInstance().SendUDPMessage(m, rinfo2); //rinfo2
+        MIDISession.GetInstance().SendUDPMessage(m, rinfo1??rinfo2); //rinfo2
         }
 
     public void SendEnd() {

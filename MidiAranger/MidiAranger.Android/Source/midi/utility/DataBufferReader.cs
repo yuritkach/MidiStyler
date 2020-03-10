@@ -25,7 +25,7 @@ namespace midi.utility {
             int ln = rawInput.GetBytesLength();
 
 
-            while ((pos<=ln)&&(rawInput.GetBytes()[pos-1 + len] != 0))  {
+            while ((pos<ln)&&(rawInput.GetBytes()[pos-1 + len] != 0))  {
                 len++;
             }
             return len;

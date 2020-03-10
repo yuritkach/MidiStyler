@@ -344,6 +344,8 @@ namespace midi {
         }
 
         public void SendUDPMessage(MIDIMessage m, Bundle rinfo) {
+            if (rinfo == null)
+                throw new System.Exception("ddd");
             Log.Debug("MIDISession", "sendUDPMessage:message " + rinfo.ToString());
             if (m != null && rinfo != null) {
                 if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0) {
@@ -1018,7 +1020,10 @@ namespace midi {
             //            rinfo.putBoolean(RINFO_RECON,false);
             //        }
 
-            if (midiAddressBook.GetValueOrDefault<String,MIDIAddressBookEntry>(new String(RinfoToKey(rinfo))) == null) {
+            String s = new String(RinfoToKey(rinfo));
+            var a = midiAddressBook.GetValueOrDefault<String, MIDIAddressBookEntry>(s);
+
+            if ( a == null) {
                 bool status = midiAddressBook.TryAdd(new String(RinfoToKey(rinfo)), new MIDIAddressBookEntry(rinfo));
                 if (status) {
                     Log.Debug(TAG, "status is good");

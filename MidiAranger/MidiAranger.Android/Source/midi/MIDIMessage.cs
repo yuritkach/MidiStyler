@@ -43,18 +43,31 @@ namespace midi {
             DataBuffer rawPayload = new DataBuffer(payload, payload_length);
 
             // payload should contain command + journal
-            int block4 = reader.Read8(rawPayload);
-            channel_status = block4 >> 4;
-            channel = block4 & 0xf;
-            int block5 = reader.Read8(rawPayload);
-            note = block5 & 0x7f;
-            int block6 = reader.Read8(rawPayload);
-            velocity = block6 & 0x7f;
+            if (payload_length > 0)
+            {
+                int block4 = reader.Read8(rawPayload);
+                if ((block4 & 0x80) == 0x80)
+                {
+                    // common messages
+                    return true;
+                }
+                else
+                {
+                    // channel messages
+                    channel_status = block4 >> 4;
+                    channel = block4 & 0xf;
+                    int block5 = reader.Read8(rawPayload);
+                    note = block5 & 0x7f;
+                    int block6 = reader.Read8(rawPayload);
+                    velocity = block6 & 0x7f;
 
-            this.valid = true;
+                    this.valid = true;
 
-            Log.Debug("MIDIMessage", "cs:" + channel_status + " c:" + channel + " n:" + note + " v" + velocity);
-            return true;
+                    Log.Debug("MIDIMessage", "cs:" + channel_status + " c:" + channel + " n:" + note + " v" + velocity);
+                    return true;
+                }
+            }
+            else return false;
         }
 
         public Bundle ToBundle() {
