@@ -5,9 +5,9 @@ using Android.OS;
 namespace midi.internal_events {
     public class PacketEvent {
         private Java.Net.InetAddress address;
-        private int port;
-        private byte[] data;
-        private int length;
+        private readonly int port;
+        private readonly byte[] data;
+        private readonly int length;
         public PacketEvent(DatagramPacket packet) {
             address = packet.Address;
             port = packet.Port;
@@ -36,7 +36,7 @@ namespace midi.internal_events {
         }
 
         public int GetLength() {
-            return data.Length;
+            return length;
         }
     }
 }

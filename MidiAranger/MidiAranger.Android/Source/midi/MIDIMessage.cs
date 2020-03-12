@@ -8,12 +8,14 @@ using Java.Lang;
 namespace midi { 
 
     public class MIDIMessage:RTPMessage {
+        private readonly static bool DEBUG = false;
 
         private bool valid;
         private int channel_status;
         private int channel;
         private int note;
         private int velocity;
+        private byte[] message;
 
         public static MIDIMessage NewUsing(int cs, int c, int n, int v) {
             MIDIMessage m = new MIDIMessage();
@@ -41,6 +43,7 @@ namespace midi {
             // payload should contain command + journal
             if (payload_length > 0)
             {
+                message = rawPayload.GetBytes();
                 int block4 = reader.Read8(rawPayload);
                 if ((block4 & 0x80) == 0x80)
                 {
@@ -59,8 +62,8 @@ namespace midi {
                     velocity = block6 & 0x7f;
 
                     this.valid = true;
-
-                    Log.Debug("MIDIMessage", "cs:" + channel_status + " c:" + channel + " n:" + note + " v" + velocity);
+                    if (DEBUG)
+                        Log.Debug("MIDIMessage", "cs:" + channel_status + " c:" + channel + " n:" + note + " v" + velocity);
                     return true;
                 }
             }
@@ -74,6 +77,10 @@ namespace midi {
             midi.PutInt(MIDIConstants.MSG_NOTE, this.note);
             midi.PutInt(MIDIConstants.MSG_VELOCITY, this.velocity);
             return midi;
+        }
+
+        public byte[] ToByteArray() {
+            return message;
         }
 
         public void CreateNote(int channel_status, int channel, int note, int velocity) {

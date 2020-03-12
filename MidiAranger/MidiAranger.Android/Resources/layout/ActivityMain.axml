@@ -8,4 +8,21 @@
 		android:layout_height="wrap_content"
 	    android:text="SendMidi" 
 	    android:id="@+id/SendMidiButton" />
+	<TextView 
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+	    android:text="" 
+	    android:id="@+id/miditext" />
+	<TextView 
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+	    android:text="" 
+	    android:id="@+id/midiClockCount" />
+	<TextView 
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+	    android:text="" 
+	    android:id="@+id/midiTempo" />
+
+
 </LinearLayout>

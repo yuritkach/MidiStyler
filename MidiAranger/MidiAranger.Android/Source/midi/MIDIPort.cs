@@ -25,6 +25,11 @@ public class MIDIPort {
     private bool isListening = false;
 
     private readonly static int BUFFER_SIZE = 1536;
+    private readonly byte[] buff = new byte[BUFFER_SIZE];
+    private DatagramChannel c = null;
+    private UDPBuffer b = null;
+
+
     private readonly static string TAG = "MIDIPort";
         //    private static final boolean DEBUG = false;
 
@@ -48,7 +53,6 @@ public class MIDIPort {
             channel.ConfigureBlocking(false);
             channel.Socket().Bind(address);
 
-//            channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             channel.Register(selector, Operations.Read | Operations.Write, new UDPBuffer());
 
             Thread newThread = new Thread(new ThreadStart(Run));
@@ -131,24 +135,15 @@ public class MIDIPort {
     }
 
     private void HandleRead(SelectionKey key) {
-
-            //        Log.d("MIDIPort2","handleRead");
-            DatagramChannel c = (DatagramChannel)key.Channel();
-            UDPBuffer b = (UDPBuffer)key.Attachment();
             try
             {
-                //  разбираться почему буффер пустой
-
+                c = (DatagramChannel)key.Channel();
+                b = (UDPBuffer)key.Attachment();
                 b.buffer.Clear();
                 b.socketAddress = c.Receive(b.buffer);
-                //EventBus.getDefault().post(new PacketEvent(new DatagramPacket(b.buffer.array(),b.buffer.capacity(),b.socketAddress)));
-                
                 b.buffer.Flip();
-                var buff = new byte[b.buffer.Limit()];
                 b.buffer.Get(buff,0, b.buffer.Limit());
-                var a = new Java.Net.DatagramPacket(buff, buff.Length,b.socketAddress);
-                var d = new PacketEvent(a);
-                MessagingCenter.Send<PacketEvent>(d, "PacketEvent");
+                MessagingCenter.Send<PacketEvent>(new PacketEvent(new Java.Net.DatagramPacket(buff, b.buffer.Limit(), b.socketAddress)), "PacketEvent");
             }
             catch (Exception e)
             {

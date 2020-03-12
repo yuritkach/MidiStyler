@@ -8,12 +8,17 @@ using Android.Widget;
 using Android.OS;
 using Android.Util;
 using midi;
+using Xamarin.Forms;
+using midi.events;
+using System.Threading;
 
 namespace MidiAranger.Droid
 {
     [Activity(Label = "MidiAranger", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public partial class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
+        private byte[] message;
+        private int midiClockCount;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -25,21 +30,28 @@ namespace MidiAranger.Droid
             MIDISession.GetInstance().Start();
 
             Bundle rinfo = new Bundle();
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
 
-            FindViewById<Button>(Resource.Id.SendMidiButton).Click += (object sender, EventArgs e) => {
+            FindViewById<Android.Widget.Button>(Resource.Id.SendMidiButton).Click += (object sender, EventArgs e) => {
                 SendTestMIDI();
             };
 
+            Subscribe();
 
+            var timer = new Timer(SetUIValues, null, 50, 50);
+
+                ;
         }
 
-        
+        private void Subscribe()
+        {
+            MessagingCenter.Subscribe<MIDIReceivedEvent>(this, "MIDIReceivedEvent", OnMIDIReceivedEvent);
+        }
 
-        public bool SendTestMIDI()
+            public bool SendTestMIDI()
         {
             Log.Debug("Main", "sendTestMidi 41,127");
             Bundle testMessage = new Bundle();
@@ -57,11 +69,34 @@ namespace MidiAranger.Droid
             return true;
         }
 
-        protected void OnSendMidiButtonClicked(object sender, EventArgs args)
+        protected void OnMIDIReceivedEvent(MIDIReceivedEvent _event) {
+            ParseMidiMessage(_event.message);
+        }
+
+
+        protected void SetUIValues(object state)
         {
+            midiClockCount = 0;
+            if (message == null)
+                message = new byte[0];
+            RunOnUiThread(() => {
+                string s = BitConverter.ToString(message).Replace("-", "");
+                FindViewById<TextView>(Resource.Id.miditext).Text = s;
+                FindViewById<TextView>(Resource.Id.midiClockCount).Text = midiClockCount.ToString();
+            });
             
         }
 
-        
+        protected void ParseMidiMessage(byte[] mes) {
+            if (mes[0] == 248)
+            {
+                midiClockCount++;
+
+            }
+            message = mes;
+            
+        }
+
+
     }
 }
