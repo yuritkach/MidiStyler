@@ -19,6 +19,7 @@ namespace MidiAranger.Droid
     {
         private byte[] message;
         private int midiClockCount;
+        private int timeInterval = 1000;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -40,8 +41,8 @@ namespace MidiAranger.Droid
             };
 
             Subscribe();
-
-            var timer = new Timer(SetUIValues, null, 50, 50);
+            
+            var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
 
                 ;
         }
@@ -76,13 +77,15 @@ namespace MidiAranger.Droid
 
         protected void SetUIValues(object state)
         {
-            midiClockCount = 0;
-            if (message == null)
-                message = new byte[0];
+         
+            
             RunOnUiThread(() => {
+                if (message == null)
+                    message = new byte[0];
                 string s = BitConverter.ToString(message).Replace("-", "");
                 FindViewById<TextView>(Resource.Id.miditext).Text = s;
-                FindViewById<TextView>(Resource.Id.midiClockCount).Text = midiClockCount.ToString();
+                FindViewById<TextView>(Resource.Id.midiClockCount).Text = (midiClockCount*(60000/timeInterval)/24).ToString();
+                midiClockCount = 0;
             });
             
         }
@@ -93,8 +96,10 @@ namespace MidiAranger.Droid
                 midiClockCount++;
 
             }
-            message = mes;
-            
+            else
+            {
+                message = mes;
+            }
         }
 
 
