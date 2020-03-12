@@ -25,7 +25,7 @@ namespace MidiAranger.Droid
             MIDISession.GetInstance().Start();
 
             Bundle rinfo = new Bundle();
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.56.1");
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);

@@ -553,7 +553,7 @@ public class MIDIStream {
     public void SendMessage(MIDIMessage m) {
         this.lastSentSequenceNr = (this.lastSentSequenceNr + 1) % 0x10000;
         m.SequenceNumber = this.lastSentSequenceNr;
-        MIDISession.GetInstance().SendUDPMessage(m, rinfo1??rinfo2); //rinfo2
+        MIDISession.GetInstance().SendUDPMessage(m, rinfo2); //rinfo2
         }
 
     public void SendEnd() {
