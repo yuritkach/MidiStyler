@@ -9,7 +9,6 @@ namespace midi {
     public class MIDIControl {
 
         private bool valid;
-        private DataBuffer m;
         public AppleMIDICommand command;
 
         public int protocol_version;

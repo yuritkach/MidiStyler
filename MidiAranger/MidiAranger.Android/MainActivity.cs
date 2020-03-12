@@ -12,16 +12,14 @@ using midi;
 namespace MidiAranger.Droid
 {
     [Activity(Label = "MidiAranger", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public partial class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
-
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App());
+            SetContentView(Resource.Layout.ActivityMain);
+            
 
             MIDISession.GetInstance().Init(this);
             MIDISession.GetInstance().Start();
@@ -31,19 +29,17 @@ namespace MidiAranger.Droid
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
-            
-            for (; ; )
-            {
-                if (MIDISession.GetInstance().IsOnline())
-                    SendTestMIDI();
-                System.Threading.Thread.Sleep(100);
-            }
-                
-            
+
+            FindViewById<Button>(Resource.Id.SendMidiButton).Click += (object sender, EventArgs e) => {
+                SendTestMIDI();
+            };
+
+
         }
 
+        
 
-        public void SendTestMIDI()
+        public bool SendTestMIDI()
         {
             Log.Debug("Main", "sendTestMidi 41,127");
             Bundle testMessage = new Bundle();
@@ -58,7 +54,14 @@ namespace MidiAranger.Droid
             //        if(message != null) {
             //            MIDISession.getInstance().sendNote(41,127);
             //        }
+            return true;
         }
 
+        protected void OnSendMidiButtonClicked(object sender, EventArgs args)
+        {
+            
+        }
+
+        
     }
 }

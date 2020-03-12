@@ -30,13 +30,12 @@ using String = Java.Lang.String;
 
 namespace midi {
 
-    public class MIDISession {
-
+    public class MIDISession
+    {
         private static MIDISession midiSessionInstance;
-        private static string TAG = typeof(MIDISession).Name;
-        private static string BONJOUR_TYPE = "_apple-midi._udp";
-        private static string BONJOUR_SEPARATOR = ".";
-        private static bool DEBUG = true;
+        private readonly static string TAG = typeof(MIDISession).Name;
+        private readonly static string BONJOUR_TYPE = "_apple-midi._udp";
+        private readonly static bool DEBUG = true;
 
         // private WaspDb db;
         // private WaspHash midiAddressBook;
@@ -57,7 +56,8 @@ namespace midi {
             MessagingCenter.Subscribe<ConnectionFailedEvent>(this, "ConnectionFailedEvent", OnConnectionFailedEvent);
         }
 
-        private MIDISession() {
+        private MIDISession()
+        {
             this.rate = 10000;
             this.port = 5008;
             System.Random rand = new System.Random();
@@ -69,13 +69,15 @@ namespace midi {
             this.autoReconnect = false;
 
             SetupLocalDB();
-            
+
 
             Subscribe();
         }
 
-        public static MIDISession GetInstance() {
-            if (midiSessionInstance == null) {
+        public static MIDISession GetInstance()
+        {
+            if (midiSessionInstance == null)
+            {
                 midiSessionInstance = new MIDISession();
             }
             return midiSessionInstance;
@@ -96,67 +98,76 @@ namespace midi {
 
         public int port;
         public int ssrc;
-        private int readyState;
         private bool registered_eb = false;
         private bool published_bonjour = false;
         private bool initialized = false;
-        private bool started = false;
-
-        private int lastMessageTime;
-        private int rate;
-        private long startTime;
-        private long startTimeHR;
+        private readonly bool started = false;
+        
+        private readonly int rate;
+        private readonly long startTime;
+        private readonly long startTimeHR;
 
         private MIDIPort controlChannel;
         private MIDIPort messageChannel;
 
         private NsdManager mNsdManager;
         private NsdManager.IResolveListener mResolveListener;
-        private NsdManager.IDiscoveryListener mDiscoveryListener;
         private NsdManager.IRegistrationListener mRegistrationListener;
-        private NsdServiceInfo serviceInfo;
+        private NsdServiceInfo serviceInfo = new NsdServiceInfo();
 
         private bool autoReconnect = false;
 
-        public void Init(Context context) {
-            if (started) {
+        public void Init(Context context)
+        {
+            if (started)
+            {
                 return;
             }
             this.appContext = context;
-            if (!registered_eb) {
+            if (!registered_eb)
+            {
                 // EventBus.getDefault().register(this); TYV
                 registered_eb = true;
             }
-            if (!initialized) {
+            if (!initialized)
+            {
                 //setupWaspDB();   TYV
 
                 initialized = true;
             }
         }
 
-        public void Start(Context context) {
+        public void Start(Context context)
+        {
             Init(context);
             Start();
         }
 
-        public void Start() {
+        public void Start()
+        {
             SetupNetworkListener();
-            if (!IsOnline()) {
+            if (!IsOnline())
+            {
                 Log.Debug(TAG, "MIDI Start : not online");
                 shouldBeRunning = true;
                 return;
             }
-            if (this.appContext == null) {
+            if (this.appContext == null)
+            {
                 Log.Debug(TAG, "MIDI Start : ctx is null");
                 return;
             }
-            if (!registered_eb) {
+            if (!registered_eb)
+            {
                 //EventBus.getDefault().register(this); TYV
                 registered_eb = true;
             }
-            try {
+            try
+            {
                 this.bonjourHost = InetAddress.GetByName("127.0.0.1");
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException e)
+            {
                 e.PrintStackTrace();
             }
             //        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -174,7 +185,8 @@ namespace midi {
             this.streams = new SparseArray<midi.MIDIStream>(2);
             this.pendingStreams = new SparseArray<midi.MIDIStream>(2);
             this.failedConnections = new Dictionary<String, Bundle>(2);
-            try {
+            try
+            {
                 InitializeResolveListener();
                 RegisterService();
                 isRunning = true;
@@ -183,28 +195,37 @@ namespace midi {
                 //EventBus.getDefault().post(new MIDISessionStartEvent());
                 MessagingCenter.Send<MIDISessionStartEvent>(new MIDISessionStartEvent(), "MIDISessionStartEvent");
                 CheckAddressBookForReconnect();
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException e)
+            {
                 e.PrintStackTrace();
             }
         }
 
 
-        public void Stop() {
-            if (streams != null) {
-                for (int i = 0; i < streams.Size(); i++) {
+        public void Stop()
+        {
+            if (streams != null)
+            {
+                for (int i = 0; i < streams.Size(); i++)
+                {
                     streams.Get(streams.KeyAt(i)).SendEnd();
                 }
             }
-            if (pendingStreams != null) {
-                for (int i = 0; i < pendingStreams.Size(); i++) {
+            if (pendingStreams != null)
+            {
+                for (int i = 0; i < pendingStreams.Size(); i++)
+                {
                     pendingStreams.Get(pendingStreams.KeyAt(i)).SendEnd();
                 }
             }
 
-            if (controlChannel != null) {
+            if (controlChannel != null)
+            {
                 controlChannel.Stop();
             }
-            if (messageChannel != null) {
+            if (messageChannel != null)
+            {
                 messageChannel.Stop();
             }
             isRunning = false;
@@ -215,53 +236,71 @@ namespace midi {
         }
 
 
-        ~MIDISession() {
+        ~MIDISession()
+        {
             Stop();
             RemoveNetworkListener();
             registered_eb = false;
             //EventBus.getDefault().unregister(this); TYV
         }
 
-        public void Connect(Bundle rinfo) {
-            if (isRunning) {
-                if (!IsAlreadyConnected(rinfo)) {
+        public void Connect(Bundle rinfo)
+        {
+            if (isRunning)
+            {
+                if (!IsAlreadyConnected(rinfo))
+                {
                     Log.Debug(TAG, "opening connection to " + rinfo);
                     MIDIStream stream = new MIDIStream();
 
-                    if (failedConnections.ContainsKey(new String(RinfoToKey(rinfo)))) {
+                    if (failedConnections.ContainsKey(new String(RinfoToKey(rinfo))))
+                    {
                         Bundle reconnectRinfo = failedConnections.GetValueOrDefault(new String(RinfoToKey(rinfo)));
-                        if (reconnectRinfo.GetInt(MIDIConstants.RINFO_FAIL, 0) > 3) {
+                        if (reconnectRinfo.GetInt(MIDIConstants.RINFO_FAIL, 0) > 3)
+                        {
                             Log.Debug(TAG, "failed more than 3 times...");
                             return;
                         }
 
                         stream.Connect(reconnectRinfo);
-                    } else {
+                    }
+                    else
+                    {
                         stream.Connect(rinfo);
                     }
                     Log.Debug(TAG, "put " + stream.initiator_token.ToString() + " in pendingStreams");
                     pendingStreams.Put(stream.initiator_token, stream);
-                } else {
+                }
+                else
+                {
                     Log.Error(TAG, "already have open session to " + rinfo.ToString());
                 }
-            } else {
+            }
+            else
+            {
                 Log.Error(TAG, "MIDI not running");
             }
         }
 
-        public void Disconnect(Bundle rinfo) {
+        public void Disconnect(Bundle rinfo)
+        {
             Log.Debug(TAG, "disconnect " + rinfo);
             MIDIStream s = GetStream(rinfo);
-            if (s != null) {
+            if (s != null)
+            {
                 Log.Debug(TAG, "stream to disconnect : " + s.ssrc);
                 s.SendEnd();
-            } else {
+            }
+            else
+            {
                 Log.Error(TAG, "didn't find stream");
             }
         }
 
-        public void Disconnect(int remote_ssrc) {
-            if (remote_ssrc != 0) {
+        public void Disconnect(int remote_ssrc)
+        {
+            if (remote_ssrc != 0)
+            {
                 streams.Get(remote_ssrc).Disconnect();
                 streams.Get(remote_ssrc).Shutdown();
                 streams.Remove(remote_ssrc);
@@ -269,45 +308,59 @@ namespace midi {
 
         }
 
-        private MIDIStream GetStream(Bundle rinfo) {
-            for (int i = 0; i < streams.Size(); i++) {
+        private MIDIStream GetStream(Bundle rinfo)
+        {
+            for (int i = 0; i < streams.Size(); i++)
+            {
                 MIDIStream s = streams.Get(streams.KeyAt(i));
-                if (s.ConnectionMatch(rinfo)) {
+                if (s.ConnectionMatch(rinfo))
+                {
                     return s;
                 }
             }
             return null;
         }
 
-        public void SetAutoReconnect(bool b) {
+        public void SetAutoReconnect(bool b)
+        {
             autoReconnect = b;
         }
 
-        public bool GetAutoReconnect() {
+        public bool GetAutoReconnect()
+        {
             return autoReconnect;
         }
 
-        private bool IsAlreadyConnected(Bundle rinfo) {
+        private bool IsAlreadyConnected(Bundle rinfo)
+        {
             Log.Debug(TAG, "isAlreadyConnected " + pendingStreams.Size() + " " + streams.Size());
             bool existsInPendingStreams = false;
             bool existsInStreams = false;
             Log.Error(TAG, "checking pendingStreams... (" + pendingStreams.Size() + ") " + rinfo.ToString());
-            for (int i = 0; i < pendingStreams.Size(); i++) {
+            for (int i = 0; i < pendingStreams.Size(); i++)
+            {
                 MIDIStream ps = pendingStreams.Get(pendingStreams.KeyAt(i));
-                if ((ps != null) && ps.ConnectionMatch(rinfo)) {
+                if ((ps != null) && ps.ConnectionMatch(rinfo))
+                {
                     existsInPendingStreams = true;
                     break;
                 }
             }
 
-            if (!existsInPendingStreams) {
-                for (int i = 0; i < streams.Size(); i++) {
+            if (!existsInPendingStreams)
+            {
+                for (int i = 0; i < streams.Size(); i++)
+                {
                     MIDIStream s = streams.Get(streams.KeyAt(i));
-                    if (s == null) {
+                    if (s == null)
+                    {
                         Log.Error(TAG, "error in isAlreadyConnected " + i + " rinfo " + rinfo.ToString());
-                    } else {
+                    }
+                    else
+                    {
                         Log.Error(TAG, "checking streams...");
-                        if (streams.Get(streams.KeyAt(i)).ConnectionMatch(rinfo)) {
+                        if (streams.Get(streams.KeyAt(i)).ConnectionMatch(rinfo))
+                        {
                             existsInStreams = true;
                         }
                     }
@@ -328,42 +381,56 @@ namespace midi {
             //        return false;
         }
 
-        public void SendUDPMessage(MIDIControl control, Bundle rinfo) {
-            if (control != null && rinfo != null) {
+        public void SendUDPMessage(MIDIControl control, Bundle rinfo)
+        {
+            if (control != null && rinfo != null)
+            {
                 Log.Debug("MIDISession", "sendUDPMessage:control " + rinfo.ToString());
 
-                if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0) {
+                if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0)
+                {
                     Log.Debug("MIDISession", "sendUDPMessage control 5004 rinfo:" + rinfo.ToString());
                     //            controlChannel.sendMidi(control, rinfo);
                     controlChannel.SendMidi(control, rinfo);
-                } else {
+                }
+                else
+                {
                     Log.Debug("MIDISession", "sendUDPMessage control 5005 rinfo:" + rinfo.ToString());
                     //            messageChannel.sendMidi(control, rinfo);
                     messageChannel.SendMidi(control, rinfo);
                 }
-            } else {
+            }
+            else
+            {
                 Log.Error(TAG, "rinfo or control was null...");
             }
         }
 
-        public void SendUDPMessage(MIDIMessage m, Bundle rinfo) {
+        public void SendUDPMessage(MIDIMessage m, Bundle rinfo)
+        {
             if (rinfo == null)
                 throw new System.Exception("ddd");
             Log.Debug("MIDISession", "sendUDPMessage:message " + rinfo.ToString());
-            if (m != null && rinfo != null) {
-                if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0) {
+            if (m != null && rinfo != null)
+            {
+                if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0)
+                {
                     Log.Debug("MIDISession", "sendUDPMessage message 5004 rinfo:" + rinfo.ToString());
                     controlChannel.SendMidi(m, rinfo);
-                } else {
+                }
+                else
+                {
                     Log.Debug("MIDISession", "sendUDPMessage message 5004 rinfo:" + rinfo.ToString());
                     messageChannel.SendMidi(m, rinfo);
                 }
             }
         }
 
-        public void SendMessage(Bundle m) {
-            if (published_bonjour && streams.Size() > 0) {
-                //            Log.Debug("MIDISession", "sendMessage c:"+m.getInt("command",0x09)+" ch:"+m.getInt("channel",0)+" n:"+m.getInt("note",0)+" v:"+m.getInt("velocity",0));
+        public void SendMessage(Bundle m)
+        {
+            if (published_bonjour && streams.Size() > 0)
+            {
+                Log.Debug("MIDISession", "sendMessage c:" + m.GetInt("command", 0x09) + " ch:" + m.GetInt("channel", 0) + " n:" + m.GetInt("note", 0) + " v:" + m.GetInt("velocity", 0));
 
                 MIDIMessage message = new MIDIMessage();
                 message.CreateNote(
@@ -373,21 +440,25 @@ namespace midi {
                         m.GetInt(midi.MIDIConstants.MSG_VELOCITY, 0));
                 message.ssrc = this.ssrc;
 
-                for (int i = 0; i < streams.Size(); i++) {
+                for (int i = 0; i < streams.Size(); i++)
+                {
                     streams.Get(streams.KeyAt(i)).SendMessage(message);
                 }
             }
         }
 
-        public void SendMessage(int note, int velocity) {
-            if (published_bonjour && streams.Size() > 0) {
+        public void SendMessage(int note, int velocity)
+        {
+            if (published_bonjour && streams.Size() > 0)
+            {
                 //            Log.Debug("MIDISession", "note:" + note + " velocity:" + velocity);
 
                 MIDIMessage message = new MIDIMessage();
                 message.CreateNote(note, velocity);
                 message.ssrc = this.ssrc;
 
-                for (int i = 0; i < streams.Size(); i++) {
+                for (int i = 0; i < streams.Size(); i++)
+                {
                     streams.Get(streams.KeyAt(i)).SendMessage(message);
                 }
             }
@@ -395,25 +466,29 @@ namespace midi {
 
         // TODO : figure out what this is supposed to return... becuase I don't think this is right
         // getNow returns a unix (long)timestamp
-        public long GetNow() {
+        public long GetNow()
+        {
             long hrtime = System.DateTime.Now.Millisecond - this.startTimeHR;
             long result = Math.Round((hrtime / 1000L / 1000L / 1000L) * this.rate);
             return result;
         }
 
-        public void OnAddressBookReadyEvent(AddressBookReadyEvent _event) {
+        public void OnAddressBookReadyEvent(AddressBookReadyEvent _event)
+        {
             Log.Debug(TAG, "Addressbook ready");
             CheckAddressBookForReconnect();
             DumpAddressBook();
         }
 
         // streamConnectedEvent is called when client initiates connection... ...
-        public void OnStreamConnected(StreamConnectedEvent e) {
+        public void OnStreamConnected(StreamConnectedEvent e)
+        {
             Log.Debug("MIDISession", "StreamConnectedEvent");
             Log.Debug(TAG, "get " + e.initiator_token + " from pendingStreams");
             MIDIStream stream = pendingStreams.Get(e.initiator_token);
 
-            if (stream != null) {
+            if (stream != null)
+            {
                 Log.Debug(TAG, "put " + e.initiator_token + " in  streams");
                 streams.Put(stream.ssrc, stream);
             }
@@ -424,24 +499,29 @@ namespace midi {
         }
 
 
-        public void OnMIDI2ListeningEvent(ListeningEvent e) {
+        public void OnMIDI2ListeningEvent(ListeningEvent e)
+        {
 
         }
 
-        public void OnSyncronizeStartedEvent(SyncronizeStartedEvent e) {
+        public void OnSyncronizeStartedEvent(SyncronizeStartedEvent e)
+        {
             //        Log.Debug("MIDISession","SyncronizeStartedEvent");
             MessagingCenter.Send<MIDISyncronizationStartEvent>(new MIDISyncronizationStartEvent(e.rinfo), "MIDISyncronizationStartEvent");
         }
 
 
-        public void OnSyncronizeStoppedEvent(SyncronizeStoppedEvent e) {
+        public void OnSyncronizeStoppedEvent(SyncronizeStoppedEvent e)
+        {
             //        Log.Debug("MIDISession","SyncronizeStoppedEvent");
             MessagingCenter.Send<MIDISyncronizationCompleteEvent>(new MIDISyncronizationCompleteEvent(e.rinfo), "MIDISyncronizationCompleteEvent");
         }
 
 
-        public void OnConnectionEstablishedEvent(ConnectionEstablishedEvent e) {
-            if (DEBUG) {
+        public void OnConnectionEstablishedEvent(ConnectionEstablishedEvent e)
+        {
+            if (DEBUG)
+            {
                 Log.Debug("MIDISession", "ConnectionEstablishedEvent");
             }
             MessagingCenter.Send<MIDIConnectionEstablishedEvent>(new MIDIConnectionEstablishedEvent(e.rinfo), "MIDIConnectionEstablishedEvent");
@@ -450,24 +530,31 @@ namespace midi {
         }
 
 
-        public void OnPacketEvent(PacketEvent e) {
+        public void OnPacketEvent(PacketEvent e)
+        {
             Log.Debug("MIDISession", "PacketEvent packet from " + e.GetAddress().HostAddress + ":" + e.GetPort());
 
             // try control first
             MIDIControl applecontrol = new MIDIControl();
             MIDIMessage message = new MIDIMessage();
 
-            if (applecontrol.Parse(e)) {
-                if (DEBUG) {
+            if (applecontrol.Parse(e))
+            {
+                if (DEBUG)
+                {
                     Log.Debug("MIDISession", "- parsed as apple control packet");
                 }
-                if (applecontrol.IsValid()) {
+                if (applecontrol.IsValid())
+                {
                     //                applecontrol.dumppacket();
 
-                    if (applecontrol.initiator_token != 0) {
+                    if (applecontrol.initiator_token != 0)
+                    {
                         MIDIStream pending = pendingStreams.Get(applecontrol.initiator_token);
-                        if (pending != null) {
-                            if (DEBUG) {
+                        if (pending != null)
+                        {
+                            if (DEBUG)
+                            {
                                 Log.Debug("MIDISession", " - got pending stream by token");
                             }
                             pending.HandleControlMessage(applecontrol, e.GetRInfo());
@@ -477,46 +564,60 @@ namespace midi {
                     // check if this applecontrol.ssrc is known stream
                     MIDIStream stream = streams.Get(applecontrol.ssrc);
 
-                    if (stream == null) {
+                    if (stream == null)
+                    {
                         // else, check if this is an invitation
                         //       create stream and tell stream to handle invite
-                        if (DEBUG) {
+                        if (DEBUG)
+                        {
                             Log.Debug("MIDISession", "- create new stream " + applecontrol.ssrc);
                         }
                         stream = new MIDIStream();
                         streams.Put(applecontrol.ssrc, stream);
-                    } else {
-                        if (DEBUG) {
+                    }
+                    else
+                    {
+                        if (DEBUG)
+                        {
                             Log.Debug("MIDISession", " - got existing stream by ssrc " + applecontrol.ssrc);
                         }
 
                     }
-                    if (DEBUG) {
+                    if (DEBUG)
+                    {
                         Log.Debug("MIDISession", "- pass control packet to stream");
                     }
 
                     stream.HandleControlMessage(applecontrol, e.GetRInfo());
                 }
                 // control packet
-            } else {
+            }
+            else
+            {
                 //            Log.Debug("MIDISession","message?");
                 message.ParseMessage(e);
-                if (message.IsValid()) {
+                if (message.IsValid())
+                {
                     MessagingCenter.Send<MIDIReceivedEvent>(new MIDIReceivedEvent(message.ToBundle()), "MIDIReceivedEvent");
                 }
             }
         }
 
 
-        public void OnStreamDisconnectEvent(StreamDisconnectEvent e) {
-            if (DEBUG) {
+        public void OnStreamDisconnectEvent(StreamDisconnectEvent e)
+        {
+            if (DEBUG)
+            {
                 Log.Debug(TAG, "onStreamDisconnectEvent - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.Size() + " #pendstreams:" + pendingStreams.Size());
             }
             MIDIStream a = streams.Get(e.stream_ssrc, null);
 
-            if (a == null) {
+            if (a == null)
+            {
                 Log.Debug(TAG, "can't find stream with ssrc " + e.stream_ssrc);
-            } else {
+            }
+            else
+            {
                 Bundle rinfo = (Bundle)a.rinfo1.Clone();
                 a.Shutdown();
                 streams.Delete(e.stream_ssrc);
@@ -532,28 +633,36 @@ namespace midi {
                 //                connect(rinfo);
                 //            }
             }
-            if (e.initiator_token != 0) {
+            if (e.initiator_token != 0)
+            {
                 MIDIStream p = pendingStreams.Get(e.initiator_token, null);
-                if (p == null) {
+                if (p == null)
+                {
                     Log.Debug(TAG, "can't find pending stream with IT " + e.initiator_token);
-                } else {
+                }
+                else
+                {
                     p.Shutdown();
                     pendingStreams.Delete(e.initiator_token);
                 }
             }
-            if (e.rinfo != null) {
+            if (e.rinfo != null)
+            {
                 MessagingCenter.Send<MIDIConnectionEndEvent>(new MIDIConnectionEndEvent((Bundle)e.rinfo.Clone()), "MIDIConnectionEndEvent");
             }
 
-            if (DEBUG) {
+            if (DEBUG)
+            {
                 Log.Debug(TAG, "                     - ssrc:" + e.stream_ssrc + " it:" + e.initiator_token + " #streams:" + streams.Size() + " #pendstreams:" + pendingStreams.Size());
             }
         }
 
 
-        public void OnConnectionFailedEvent(ConnectionFailedEvent e) {
+        public void OnConnectionFailedEvent(ConnectionFailedEvent e)
+        {
             Log.Debug(TAG, "onConnectionFailedEvent");
-            switch (e.code) {
+            switch (e.code)
+            {
                 case MIDIFailCode.REJECTED_INVITATION:
                     Log.Debug(TAG, "...REJECTED_INVITATION initiator_code " + e.initiator_code);
                     break;
@@ -573,13 +682,16 @@ namespace midi {
             pendingStreams.Delete(e.initiator_code);
 
             String key = new String(RinfoToKey(e.rinfo));
-            if (failedConnections.ContainsKey(key)) {
-                Bundle r = failedConnections.GetValueOrDefault<String,Bundle>(key);
+            if (failedConnections.ContainsKey(key))
+            {
+                Bundle r = failedConnections.GetValueOrDefault<String, Bundle>(key);
                 int fail = r.GetInt(MIDIConstants.RINFO_FAIL, 0);
                 r.PutInt(MIDIConstants.RINFO_FAIL, fail + 1);
                 failedConnections.Add(key, r);
                 Log.Debug(TAG, " rinfo: " + r.ToString());
-            } else {
+            }
+            else
+            {
                 e.rinfo.PutInt(MIDIConstants.RINFO_FAIL, 1);
                 failedConnections.Add(key, e.rinfo);
                 Log.Debug(TAG, " rinfo: " + e.rinfo.ToString());
@@ -627,9 +739,12 @@ namespace midi {
         //
         //    }
 
-        public InetAddress GetWifiAddress() {
-            try {
-                if (appContext == null) {
+        public InetAddress GetWifiAddress()
+        {
+            try
+            {
+                if (appContext == null)
+                {
                     return InetAddress.GetByName("127.0.0.1");
                 }
                 DhcpInfo dhcpInfo;
@@ -656,22 +771,26 @@ namespace midi {
 
                 byte[] ipbytearray = BigInteger.ValueOf(wm.ConnectionInfo.IpAddress).ToByteArray();
                 ReverseByteArray(ipbytearray);
-                if (ipbytearray.Length != 4) {
+                if (ipbytearray.Length != 4)
+                {
                     return InetAddress.GetByName("127.0.0.1");
                 }
 
                 IEnumeration nis = NetworkInterface.NetworkInterfaces;
-                while (nis.HasMoreElements) {
-                    NetworkInterface ni = (NetworkInterface) nis.NextElement();
+                while (nis.HasMoreElements)
+                {
+                    NetworkInterface ni = (NetworkInterface)nis.NextElement();
                     List<InterfaceAddress> intAs = new List<InterfaceAddress>();
                     foreach (var item in ni.InterfaceAddresses)
                     {
                         intAs.Add(item);
                     }
-                    
-                    foreach (InterfaceAddress ia in intAs) {
+
+                    foreach (InterfaceAddress ia in intAs)
+                    {
                         Log.Debug(TAG, " ia: " + ia.Address.HostAddress);
-                        if (SameIP(ia.Address, InetAddress.GetByAddress(ipbytearray))) {
+                        if (SameIP(ia.Address, InetAddress.GetByAddress(ipbytearray)))
+                        {
                             Log.Debug(TAG, "same!!! " + ia.Address.HostAddress + "/" + ia.NetworkPrefixLength);
                             Log.Debug(TAG, "netmask: " + IntToIp(PrefixLengthToNetmaskInt(ia.NetworkPrefixLength)));
                             netmask = InetAddress.GetByName((IntToIp(PrefixLengthToNetmaskInt(ia.NetworkPrefixLength))).ToString());
@@ -702,12 +821,18 @@ namespace midi {
                 //            }
 
                 return InetAddress.GetByAddress(ipbytearray);
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException)
+            {
                 return null;
-            } catch (SocketException e) {
+            }
+            catch (SocketException e)
+            {
                 e.PrintStackTrace();
                 return null;
-            } catch (NullPointerException e) {
+            }
+            catch (NullPointerException e)
+            {
                 e.PrintStackTrace();
                 return null;
             }
@@ -753,7 +878,7 @@ namespace midi {
                     return 0;
 
                 }
-                int value =(int) (0xffffffff << (32 - prefixLength));
+                int value = (int)(0xffffffff << (32 - prefixLength));
                 return Integer.ReverseBytes(value);
             }
 
@@ -764,23 +889,29 @@ namespace midi {
 
         }
 
-        public int getNetmask(InetAddress addr) {
-            try {
+        public int GetNetmask(InetAddress addr)
+        {
+            try
+            {
                 NetworkInterface networkInterface = NetworkInterface.GetByInetAddress(addr);
                 Log.Debug(TAG, "    interface: " + addr.HostAddress);
-                foreach (InterfaceAddress address in networkInterface.InterfaceAddresses) {
+                foreach (InterfaceAddress address in networkInterface.InterfaceAddresses)
+                {
                     Log.Debug(TAG, "    " + address.Address.HostAddress + "/" + address.NetworkPrefixLength);
 
                     int netPrefix = address.NetworkPrefixLength;
                     return netPrefix;
                 }
-            } catch (SocketException e) {
+            }
+            catch (SocketException e)
+            {
                 e.PrintStackTrace();
             }
             return 0;
         }
 
-        public String IntToIp(int i) {
+        public String IntToIp(int i)
+        {
             i = Integer.ReverseBytes(i);
             return new String(((i >> 24) & 0xFF) + "." +
                     ((i >> 16) & 0xFF) + "." +
@@ -788,14 +919,17 @@ namespace midi {
                     (i & 0xFF));
         }
 
-        private static void ReverseByteArray(byte[] array) {
-            if (array == null) {
+        private static void ReverseByteArray(byte[] array)
+        {
+            if (array == null)
+            {
                 return;
             }
             int i = 0;
             int j = array.Length - 1;
             byte tmp;
-            while (j > i) {
+            while (j > i)
+            {
                 tmp = array[j];
                 array[j] = array[i];
                 array[i] = tmp;
@@ -809,23 +943,25 @@ namespace midi {
         // bonjour stuff
         //
 
-        public void SetBonjourName(string name) {
+        public void SetBonjourName(string name)
+        {
             this.bonjourName = name;
         }
 
-        private void RegisterService() {
-            try {
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
+        private void RegisterService()
+        {
+            try
+            {
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean)
+                {
                     // Create the NsdServiceInfo object, and populate it.
-                    serviceInfo = new NsdServiceInfo();
-
                     // The name is subject to change based on conflicts
                     // with other services advertised on the same network.
 
-                    serviceInfo.ServiceName=this.bonjourName;
-                    serviceInfo.ServiceType=BONJOUR_TYPE;
-                    serviceInfo.Host=this.bonjourHost;
-                    serviceInfo.Port=this.bonjourPort;
+                    serviceInfo.ServiceName = this.bonjourName;
+                    serviceInfo.ServiceType = BONJOUR_TYPE;
+                    serviceInfo.Host = this.bonjourHost;
+                    serviceInfo.Port = this.bonjourPort;
 
                     //            if(DEBUG) {
                     //                Log.Debug(TAG,"register service: "+serviceInfo.toString());
@@ -833,9 +969,9 @@ namespace midi {
                     mNsdManager = (NsdManager)appContext.ApplicationContext.GetSystemService(Context.NsdService);
 
                     InitializeNSDRegistrationListener();
-                    
+
                     mNsdManager.RegisterService(serviceInfo, NsdProtocol.DnsSd, mRegistrationListener);
-                //    mNsdManager.ResolveService(serviceInfo, mResolveListener);
+                    //    mNsdManager.ResolveService(serviceInfo, mResolveListener);
                 }
             }
             catch (System.Exception e)
@@ -846,10 +982,10 @@ namespace midi {
 
         }
 
-        public class MIDIRegistrationListener :Java.Lang.Object, NsdManager.IRegistrationListener
+        public class MIDIRegistrationListener : Java.Lang.Object, NsdManager.IRegistrationListener
         {
-        
-            public MIDISession parent=null;
+
+            public MIDISession parent = null;
             public MIDIRegistrationListener(MIDISession parent)
             {
                 this.parent = parent;
@@ -857,7 +993,7 @@ namespace midi {
 
             public void OnRegistrationFailed(NsdServiceInfo serviceInfo, [GeneratedEnum] NsdFailure errorCode)
             {
-                Console.WriteLine("onRegistrationFailed \n"+serviceInfo.ToString()+"\nerror code: "+errorCode);
+                Console.WriteLine("onRegistrationFailed \n" + serviceInfo.ToString() + "\nerror code: " + errorCode);
                 parent.published_bonjour = false;
             }
 
@@ -866,14 +1002,14 @@ namespace midi {
                 // Save the service name.  Android may have changed it in order to
                 //                // resolve a conflict, so update the name you initially requested
                 //                // with the name Android actually used.
-                Log.Debug(TAG,"Service Registered "+serviceInfo.ToString());
-                if(serviceInfo.ServiceName != null && parent.bonjourName != serviceInfo.ServiceName)
+                Log.Debug(TAG, "Service Registered " + serviceInfo.ToString());
+                if (serviceInfo.ServiceName != null && parent.bonjourName != serviceInfo.ServiceName)
                 {
-                     parent.bonjourName = serviceInfo.ServiceName;
-                     serviceInfo.ServiceName= parent.bonjourName;
+                    parent.bonjourName = serviceInfo.ServiceName;
+                    serviceInfo.ServiceName = parent.bonjourName;
 
 
-                ////                    mNsdManager.resolveService(serviceInfo, mResolveListener);
+                    ////                    mNsdManager.resolveService(serviceInfo, mResolveListener);
 
                 }
                 ////parent.mNsdManager.ResolveService(serviceInfo, parent.mResolveListener);
@@ -897,15 +1033,16 @@ namespace midi {
                 parent.published_bonjour = false;
             }
         }
-        
+
         //[TargetApi(Value = 16)]  // JELLY_BEAN
-        private void InitializeNSDRegistrationListener() {
+        private void InitializeNSDRegistrationListener()
+        {
             mRegistrationListener = new MIDIRegistrationListener(this);
         }
 
-        public class MIDIResolveListener :Java.Lang.Object, NsdManager.IResolveListener
+        public class MIDIResolveListener : Java.Lang.Object, NsdManager.IResolveListener
         {
-            private readonly MIDISession parent=null;
+            private readonly MIDISession parent = null;
 
             public MIDIResolveListener(MIDISession parent)
             {
@@ -926,39 +1063,49 @@ namespace midi {
             public void OnServiceResolved(NsdServiceInfo serviceInfo)
             {
                 Log.Error(TAG, "Resolve Succeeded. " + serviceInfo);
-               // parent.bonjourName = serviceInfo.ServiceName;
+                // parent.bonjourName = serviceInfo.ServiceName;
                 parent.port = serviceInfo.Port;
                 parent.bonjourHost = serviceInfo.Host;
             }
         }
 
-            //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-        private void InitializeResolveListener() {
-                if(Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
+        //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+        private void InitializeResolveListener()
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean)
+            {
                 mResolveListener = new MIDIResolveListener(this);
-                }
+            }
         }
 
-        private void ShutdownNSDListener() {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean) {
-                try {
-                    if (mNsdManager != null) {
+        private void ShutdownNSDListener()
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.JellyBean)
+            {
+                try
+                {
+                    if (mNsdManager != null)
+                    {
                         mNsdManager.UnregisterService(mRegistrationListener);
                     }
                     //            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
-                } catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException)
+                {
                     // absorb stupid listener not registered exception...
                 }
             }
 
         }
 
-        public String Version() {
+        public String Version()
+        {
             return new String(BuildConfig.VersionName);
         }
 
         // TODO : make this actually work...
-        public bool IsHostConnectionAllowed(Bundle rinfo) {
+        public bool IsHostConnectionAllowed(Bundle rinfo)
+        {
             return true;
         }
 
@@ -1007,12 +1154,14 @@ namespace midi {
         //    }
 
 
-        public Bundle GetEntryFromAddressBook(string key) {
+        public Bundle GetEntryFromAddressBook(string key)
+        {
             MIDIAddressBookEntry abe = midiAddressBook.GetValueOrDefault(key);
             return abe.Rinfo();
         }
 
-        public bool AddToAddressBook(Bundle rinfo) {
+        public bool AddToAddressBook(Bundle rinfo)
+        {
             string key = RinfoToKey(rinfo);
 
             Log.Debug(TAG, "addToAddressBook : " + key + " " + rinfo.ToString());
@@ -1024,20 +1173,25 @@ namespace midi {
             //        }
             var a = midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key);
 
-            if ( a == null) {
+            if (a == null)
+            {
                 bool status = midiAddressBook.TryAdd(key, new MIDIAddressBookEntry(rinfo));
-                if (status) {
+                if (status)
+                {
                     Log.Debug(TAG, "status is good");
                     MessagingCenter.Send<MIDIAddressBookEvent>(new MIDIAddressBookEvent(), "MIDIAddressBookEvent");
                 }
 
-            } else {
+            }
+            else
+            {
                 Log.Debug(TAG, "already in addressbook");
-                MIDIAddressBookEntry e = midiAddressBook.GetValueOrDefault<string,MIDIAddressBookEntry>(RinfoToKey(rinfo));
+                MIDIAddressBookEntry e = midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(RinfoToKey(rinfo));
                 e.SetReconnect(rinfo.GetBoolean(MIDIConstants.RINFO_RECON, e.GetReconnect()));
 
                 bool status = midiAddressBook.TryAdd(RinfoToKey(rinfo), e);
-                if (status) {
+                if (status)
+                {
                     Log.Debug(TAG, "status is good - updated entry");
                     MessagingCenter.Send<MIDIAddressBookEvent>(new MIDIAddressBookEvent(), "MIDIAddressBookEvent");
                 }
@@ -1048,32 +1202,40 @@ namespace midi {
             return true;
         }
 
-        private string RinfoToKey(Bundle rinfo) {
+        private string RinfoToKey(Bundle rinfo)
+        {
             return string.Format(Locale.English.ToString(), "%1$s:%2$d", rinfo.GetString(MIDIConstants.RINFO_ADDR), rinfo.GetInt(MIDIConstants.RINFO_PORT, 1234));
         }
 
-        public bool AddToAddressBook(MIDIAddressBookEntry m) {
-            if (midiAddressBook != null) {
+        public bool AddToAddressBook(MIDIAddressBookEntry m)
+        {
+            if (midiAddressBook != null)
+            {
                 return midiAddressBook.TryAdd(RinfoToKey(m.Rinfo()), new MIDIAddressBookEntry(m.Rinfo()));
             }
             return false;
         }
 
-        public bool DeleteFromAddressBook(MIDIAddressBookEntry m) {
+        public bool DeleteFromAddressBook(MIDIAddressBookEntry m)
+        {
             return midiAddressBook.Remove(RinfoToKey(m.Rinfo()));
 
         }
 
-        public bool AddressBookIsEmpty() {
+        public bool AddressBookIsEmpty()
+        {
             return midiAddressBook == null;
         }
 
-        public List<MIDIAddressBookEntry> GetAllAddressBook() {
+        public List<MIDIAddressBookEntry> GetAllAddressBook()
+        {
             Log.Debug(TAG, "getAllAddressBook");
-            if (midiAddressBook != null) {
+            if (midiAddressBook != null)
+            {
                 Log.Debug(TAG, "value count: " + midiAddressBook.Values.Count);
                 List<MIDIAddressBookEntry> list = new List<MIDIAddressBookEntry>();
-                foreach (MIDIAddressBookEntry value in midiAddressBook.Values) {
+                foreach (MIDIAddressBookEntry value in midiAddressBook.Values)
+                {
                     list.Add(value);
                 }
                 return list;
@@ -1091,44 +1253,60 @@ namespace midi {
         //        }
         //    }
 
-        private void DumpAddressBook() {
-            if (midiAddressBook != null) {
+        private void DumpAddressBook()
+        {
+            if (midiAddressBook != null)
+            {
                 Log.Debug(TAG, "-----------------------------------------");
-                foreach (string key in midiAddressBook.Keys) {
-                    Log.Debug(TAG, " (" + key + ") : " + midiAddressBook.GetValueOrDefault<string,MIDIAddressBookEntry>(key).GetAddressPort());
+                foreach (string key in midiAddressBook.Keys)
+                {
+                    Log.Debug(TAG, " (" + key + ") : " + midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key).GetAddressPort());
                 }
                 Log.Debug(TAG, "-----------------------------------------");
-            } else {
+            }
+            else
+            {
                 Log.Debug(TAG, "-----------------MIDI Address Book null-------------");
 
             }
         }
 
-        public void CheckAddressBookForReconnect() {
-            if (midiAddressBook != null) {
+        public void CheckAddressBookForReconnect()
+        {
+            if (midiAddressBook != null)
+            {
                 Log.Debug(TAG, "-----------------------------------------");
-                foreach (string key in midiAddressBook.Keys) {
+                foreach (string key in midiAddressBook.Keys)
+                {
                     MIDIAddressBookEntry e = midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key);
 
                     Log.Debug(TAG, " checking for reconnect - (" + key + ") : " + e.GetAddressPort() + " " + (e.GetReconnect() ? "YES" : "NO"));
-                    if (e.GetReconnect()) {
+                    if (e.GetReconnect())
+                    {
                         Connect(midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key).Rinfo());
-                        if (OnSameNetwork(new String(midiAddressBook.GetValueOrDefault<string,MIDIAddressBookEntry>(key).GetAddress()))) {
+                        if (OnSameNetwork(new String(midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key).GetAddress())))
+                        {
                             Log.Debug(TAG, " same network - (" + key + ") : " + midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key).GetAddressPort());
-                        } else {
+                        }
+                        else
+                        {
                             Log.Debug(TAG, " different network -  (" + key + ") : " + midiAddressBook.GetValueOrDefault<string, MIDIAddressBookEntry>(key).GetAddressPort());
                         }
                     }
                 }
                 Log.Debug(TAG, "-----------------------------------------");
-            } else {
+            }
+            else
+            {
                 Log.Debug(TAG, "-----------------MIDI Address Book null-------------");
 
             }
         }
 
-        public bool OnSameNetwork(String ip) {
-            try {
+        public bool OnSameNetwork(String ip)
+        {
+            try
+            {
                 byte[] a1 = InetAddress.GetByName(ip.ToString()).GetAddress();
                 byte[] a2 = bonjourHost.GetAddress();
                 byte[] m = netmask.GetAddress();
@@ -1137,7 +1315,9 @@ namespace midi {
                         return false;
 
                 return true;
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException)
+            {
                 return false;
             }
         }
@@ -1159,7 +1339,8 @@ namespace midi {
         //
         //    }
 
-        public bool SameIP(InetAddress a1, InetAddress a2) {
+        public bool SameIP(InetAddress a1, InetAddress a2)
+        {
             byte[] b1 = a1.GetAddress();
             byte[] b2 = a2.GetAddress();
             for (int i = 0; i < b1.Length; i++)
@@ -1172,7 +1353,8 @@ namespace midi {
         private BroadcastReceiver wifiReceiver;
         private bool networkListenerRegistered = false;
 
-        public class MidiBroadCastReceiver:BroadcastReceiver{
+        public class MidiBroadCastReceiver : BroadcastReceiver
+        {
             MIDISession parent;
             public MidiBroadCastReceiver(MIDISession parent)
             {
@@ -1180,73 +1362,81 @@ namespace midi {
             }
 
             public override void OnReceive(Context context, Intent intent)
-			{
-            // Do whatever you need it to do when it receives the broadcast
-            // Example show a Toast message...
-            //                showSuccessfulBroadcast();
-            Log.Debug(TAG, "wifiReceiver - " + intent.Action);
-            //                checkAddressBookForReconnect();
-            if (parent.IsOnline())
             {
-                Log.Debug(TAG, "network is online");
-                if (parent.shouldBeRunning && !(parent.isRunning))
+                // Do whatever you need it to do when it receives the broadcast
+                // Example show a Toast message...
+                //                showSuccessfulBroadcast();
+                Log.Debug(TAG, "wifiReceiver - " + intent.Action);
+                //                checkAddressBookForReconnect();
+                if (parent.IsOnline())
                 {
+                    Log.Debug(TAG, "network is online");
+                    if (parent.shouldBeRunning && !(parent.isRunning))
+                    {
                         parent.Start();
+                    }
                 }
-            }
-            else
-            {
-                Log.Debug(TAG, "network not online");
-                if (parent.isRunning)
+                else
                 {
+                    Log.Debug(TAG, "network not online");
+                    if (parent.isRunning)
+                    {
                         parent.shouldBeRunning = true;
                         parent.Stop();
+                    }
+                    //                    shouldBeRunning = true;
+                    //                    stop();
+                    //
                 }
-                //                    shouldBeRunning = true;
-                //                    stop();
-                //
-            }
 
-        }
-    }
-
-    public void SetupNetworkListener() {
-
-//        if(this.wifiReceiver != null) {
-//            removeNetworkListener();
-//        }
-        if(networkListenerRegistered) {
-            RemoveNetworkListener();
-        }
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.AddAction(ConnectivityManager.ConnectivityAction);
-        this.wifiReceiver = new MidiBroadCastReceiver(this); 
-        if(appContext != null) {
-            appContext.RegisterReceiver(this.wifiReceiver, intentFilter);
-        }
-        networkListenerRegistered = true;
-    }
-
-    public void RemoveNetworkListener() {
-        if(appContext != null && wifiReceiver != null) {
-            try {
-                appContext.UnregisterReceiver(wifiReceiver);
-                networkListenerRegistered = false;
-
-            } catch (IllegalArgumentException e) {
-                e.PrintStackTrace();
             }
         }
-    }
 
-    public bool IsOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) appContext.GetSystemService(Context.ConnectivityService);
+        public void SetupNetworkListener()
+        {
 
-        Log.Debug(TAG,"isOnline? "+((cm.ActiveNetworkInfo != null &&
-                cm.ActiveNetworkInfo.IsConnectedOrConnecting) ? "ON" : "OFF"));
-        return cm.ActiveNetworkInfo != null &&  cm.ActiveNetworkInfo.IsConnectedOrConnecting;
-    }
+            //        if(this.wifiReceiver != null) {
+            //            removeNetworkListener();
+            //        }
+            if (networkListenerRegistered)
+            {
+                RemoveNetworkListener();
+            }
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.AddAction(ConnectivityManager.ConnectivityAction);
+            this.wifiReceiver = new MidiBroadCastReceiver(this);
+            if (appContext != null)
+            {
+                appContext.RegisterReceiver(this.wifiReceiver, intentFilter);
+            }
+            networkListenerRegistered = true;
+        }
 
-}
+        public void RemoveNetworkListener()
+        {
+            if (appContext != null && wifiReceiver != null)
+            {
+                try
+                {
+                    appContext.UnregisterReceiver(wifiReceiver);
+                    networkListenerRegistered = false;
+
+                }
+                catch (IllegalArgumentException e)
+                {
+                    e.PrintStackTrace();
+                }
+            }
+        }
+
+        public bool IsOnline()
+        {
+            ConnectivityManager cm =
+                    (ConnectivityManager)appContext.GetSystemService(Context.ConnectivityService);
+
+            Log.Debug(TAG, "isOnline? " + ((cm.ActiveNetworkInfo != null &&
+                    cm.ActiveNetworkInfo.IsConnected) ? "ON" : "OFF"));
+            return cm.ActiveNetworkInfo != null && cm.ActiveNetworkInfo.IsConnected;
+        }
+    } 
 }

@@ -10,10 +10,6 @@ namespace midi {
     public class MIDIMessage:RTPMessage {
 
         private bool valid;
-        private DataBuffer m;
-
-        private bool firstHasDeltaTime;
-
         private int channel_status;
         private int channel;
         private int note;

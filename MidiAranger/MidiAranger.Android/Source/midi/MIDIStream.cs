@@ -39,14 +39,11 @@ public class MIDIStream {
     private string name = "";
     int lastSentSequenceNr;
 
-    int firstReceivedSequenceNumber = -1;
-    int lastReceivedSequenceNumber = -1;
-    long latency = 0L;
+    public readonly int firstReceivedSequenceNumber = -1;
+    public readonly int lastReceivedSequenceNumber = -1;
+    public readonly long latency = 0L;
 
     private bool isConnected = false;
-
-    private long receiverFeedbackTimeout = 0L;
-    private long lastMessageTime = 0L;
     private long timeDifference = 0L;
     private bool isInitiator = false;
     private static bool syncStarted = false;
@@ -71,8 +68,6 @@ public class MIDIStream {
     private static readonly int PRIMARY_SYNC_COUNT_DEFAULT = 10;
     private static readonly int SYNC_FAIL_COUNT_DEFAULT = 10;
     private static readonly string TAG = "MIDIStream";
-    private static bool DEBUG = false;
-
     private static readonly int connectionTimeoutMax = STREAM_CONNECTED_TIMEOUT_DEFAULT;
     private static readonly int connectCountMax = CONNECT_COUNT_DEFAULT;
     private static readonly int primarySyncCountMax = PRIMARY_SYNC_COUNT_DEFAULT;
@@ -475,7 +470,7 @@ public class MIDIStream {
                     ResetSyncService(syncServiceFrequency);
                 }
             }
-            catch (Exception er)
+            catch 
             {
                 ShutdownSyncFuture();
             }

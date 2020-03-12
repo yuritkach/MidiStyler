@@ -14,7 +14,7 @@ using ThreadPriority = System.Threading.ThreadPriority;
 namespace midi { 
 
 public class MIDIPort {
-    private int port;
+    private readonly int port;
 
     private Selector selector;
     private DatagramChannel channel;
@@ -24,8 +24,8 @@ public class MIDIPort {
 
     private bool isListening = false;
 
-    private static int BUFFER_SIZE = 1536;
-    private static string TAG = "MIDIPort";
+    private readonly static int BUFFER_SIZE = 1536;
+    private readonly static string TAG = "MIDIPort";
         //    private static final boolean DEBUG = false;
 
     private Java.Lang.Thread thread = new Java.Lang.Thread();
@@ -146,8 +146,6 @@ public class MIDIPort {
                 b.buffer.Flip();
                 var buff = new byte[b.buffer.Limit()];
                 b.buffer.Get(buff,0, b.buffer.Limit());
-                if (buff.Length == 16)
-                    ;
                 var a = new Java.Net.DatagramPacket(buff, buff.Length,b.socketAddress);
                 var d = new PacketEvent(a);
                 MessagingCenter.Send<PacketEvent>(d, "PacketEvent");
