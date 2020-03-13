@@ -30,15 +30,14 @@ namespace MidiAranger.Droid.Source.midiplayer
     public class MIDITrack {
         public MIDITrackInfo info;
         public int bufferOffset;
-        public byte lastEvent;
+        public byte lastCommand;
         public uint absTime;
         public List<MIDIEvent> MidiEvents;
     }
 
     public struct MIDIEvent {
         public uint absTime;
-        public int bufferOffset;
-        public byte midievent;
+        public byte[] MidiMessage;
     }
 
     public class MIDIFile {
@@ -52,6 +51,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         public MIDITrackInfo midiTrackInfo;
         public List<MIDITrack> tracks;
         protected int currentOffset;
+        protected MIDITrack currentTrack;
         public MIDIFile() {
 
         }
@@ -81,17 +81,20 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected List<MIDITrack> ProcessMIDITracks() {
             List<MIDITrack> result = new List<MIDITrack>();
-            for (int i = 0; i < midiHeaderInfo.tracks; i++) 
-                result.Add(ProcessMIDITrack());
+            for (int i = 0; i < midiHeaderInfo.tracks; i++)
+            {
+                MIDITrack track = new MIDITrack();
+                currentTrack = track;
+                ProcessMIDITrack(track);
+                result.Add(track);
+            }
             return result;
         }
 
-        protected MIDITrack ProcessMIDITrack() {
-            MIDITrack result = new MIDITrack();
-            result.info = ProcessMidiTrackInfo();
-            result.MidiEvents = ProcessMidiEvents(result.info.length);
-            result.lastEvent = 0;
-            return result;
+        protected void ProcessMIDITrack(MIDITrack track) {
+            track.info = ProcessMidiTrackInfo();
+            track.MidiEvents = ProcessMidiEvents(track.info.length);
+            track.lastCommand = 0;
         }
 
         protected List<MIDIEvent> ProcessMidiEvents(uint length) {
@@ -105,33 +108,75 @@ namespace MidiAranger.Droid.Source.midiplayer
         protected MIDIEvent LoadMidiEvent(ref uint length) {
             MIDIEvent result = new MIDIEvent();
             uint timeOffset = GetVariableNumber(ref length);
-            byte command = GetByte();
-            length--;
-
-            if ((command & 0x80) == 0x80) // is command?
-            {
-                if ((command & 0xF0) == 0xF0) // common command
-                {
-                    // common command
-
-                }
-                else                          // channel command 
-                {
-                    // cnannel command
-                    
-                }
-            }
-            else
-            {
-                //data (00-7F - data)
-
-            }
-
-
+            result.MidiMessage = GetMidiMessage(ref length);
             return result;
         }
 
+        protected byte[] GetMidiMessage(ref uint length) {
+            byte command = GetByte();
+            byte[] data;
+            length--;
 
+            if (!((command & 0x80) == 0x80)) // is not command?
+            {
+                if (currentTrack.lastCommand == 0)
+                    throw new Exception("Bad midi file");
+                command = currentTrack.lastCommand;
+            }
+            data = GetMessageDataForCommand(command, ref length);
+            byte[] result = new byte[data.Length + 1];
+            result[0] = command;
+            for (int i = 0; i < data.Length; i++)
+                result[i + 1] = data[i];
+            return result;
+        }
+
+        protected byte[] GetMessageDataForCommand(byte command, ref uint length)
+        {
+            // Channel message
+            if (IsMasked(command, 0x80) || IsMasked(command, 0x90) || IsMasked(command, 0xA0) ||
+                IsMasked(command, 0xB0) || IsMasked(command, 0xE0))
+            {
+                length -= 2;
+                return new byte[2] { GetByte(), GetByte() };
+            }
+            if (IsMasked(command, 0xC0) || IsMasked(command, 0xD0))
+            {
+                length--;
+                return new byte[1] { GetByte() };
+            }
+            //Meta
+            if (command == 0xFF)
+            {
+                byte type = GetByte();
+                length--;
+                uint oldLength = length;
+                uint len = GetVariableNumber(ref length);
+                uint l = oldLength - length + 1 + len;
+                byte[] result = new byte[l];
+                result[0] = type;
+                for (int i = 0; i < l; i++)
+                {
+                    result[i + 1] = GetByte();
+                    length--;
+                }
+                return result;
+            }
+            //SysEx
+            if (command == 0xF0)
+            {
+
+            }
+            if (command == 0xF7)
+            {
+
+            }
+        }
+            protected bool IsMasked(byte b1, byte mask) {
+            return (b1 & mask) == mask;
+
+
+        }
 
         protected MIDITrackInfo ProcessMidiTrackInfo()
         {
