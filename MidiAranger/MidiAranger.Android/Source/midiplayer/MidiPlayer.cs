@@ -133,6 +133,38 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected byte[] GetMessageDataForCommand(byte command, ref uint length)
         {
+            //Meta
+            if (command == 0xFF)
+            {
+                
+                byte type = GetByte();
+                uint oldLength = length;
+                var oldOffset = currentOffset;
+                uint len = GetVariableNumber(ref length);
+                var lensize=currentOffset-oldOffset;
+                uint resultLength =(uint) (len + lensize + 1);
+                byte[] result = new byte[resultLength];
+                currentOffset = oldOffset;
+                result[0] = type;
+                for (int i = 0; i < (resultLength-1); i++)
+                {
+                    result[i+1] = GetByte();
+                }
+                length = length - resultLength;
+                return result;
+            }
+            else
+            //SysEx
+            if (command == 0xF0)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            if (command == 0xF7)
+            {
+                throw new NotImplementedException();
+            }
+
             // Channel message
             if (IsMasked(command, 0x80) || IsMasked(command, 0x90) || IsMasked(command, 0xA0) ||
                 IsMasked(command, 0xB0) || IsMasked(command, 0xE0))
@@ -145,32 +177,9 @@ namespace MidiAranger.Droid.Source.midiplayer
                 length--;
                 return new byte[1] { GetByte() };
             }
-            //Meta
-            if (command == 0xFF)
-            {
-                byte type = GetByte();
-                length--;
-                uint oldLength = length;
-                uint len = GetVariableNumber(ref length);
-                uint l = oldLength - length + 1 + len;
-                byte[] result = new byte[l];
-                result[0] = type;
-                for (int i = 0; i < l; i++)
-                {
-                    result[i + 1] = GetByte();
-                    length--;
-                }
-                return result;
-            }
-            //SysEx
-            if (command == 0xF0)
-            {
-
-            }
-            if (command == 0xF7)
-            {
-
-            }
+            
+            
+            return new byte[0];
         }
             protected bool IsMasked(byte b1, byte mask) {
             return (b1 & mask) == mask;
