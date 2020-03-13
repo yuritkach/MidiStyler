@@ -11,6 +11,7 @@ using midi;
 using Xamarin.Forms;
 using midi.events;
 using System.Threading;
+using MidiAranger.Droid.Source.midiplayer;
 
 namespace MidiAranger.Droid
 {
@@ -31,7 +32,7 @@ namespace MidiAranger.Droid
             MIDISession.GetInstance().Start();
 
             Bundle rinfo = new Bundle();
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
@@ -44,7 +45,8 @@ namespace MidiAranger.Droid
             
             var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
 
-                ;
+            MIDIFile midiFile = new MIDIFile();
+            midiFile.InitMidiFile("ddd");
         }
 
         private void Subscribe()

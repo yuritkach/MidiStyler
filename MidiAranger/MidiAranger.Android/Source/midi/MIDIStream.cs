@@ -260,7 +260,7 @@ public class MIDIStream {
 
     }
 
-    Bundle GetRinfo1() {
+    public Bundle GetRinfo1() {
         return rinfo1;
     }
 
