@@ -10,6 +10,10 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using System.IO;
+using Xamarin.Forms;
+using midi;
+using midi.events;
+using Android.Util;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
@@ -84,6 +88,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             for (int i = 0; i < midiHeaderInfo.tracks; i++)
             {
                 MIDITrack track = new MIDITrack();
+                track.absTime = 0;
                 currentTrack = track;
                 ProcessMIDITrack(track);
                 result.Add(track);
@@ -93,21 +98,24 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected void ProcessMIDITrack(MIDITrack track) {
             track.info = ProcessMidiTrackInfo();
-            track.MidiEvents = ProcessMidiEvents(track.info.length);
             track.lastCommand = 0;
+            track.MidiEvents = ProcessMidiEvents(track);
+            
         }
 
-        protected List<MIDIEvent> ProcessMidiEvents(uint length) {
+        protected List<MIDIEvent> ProcessMidiEvents(MIDITrack track) {
             List<MIDIEvent> result = new List<MIDIEvent>();
-            while (length>0) {
-                result.Add(LoadMidiEvent(ref length));
+            while (track.info.length>0) {
+                MIDIEvent _ev = LoadMidiEvent(ref track.info.length);
+
+                result.Add(_ev);
             }
             return result;
         }
 
         protected MIDIEvent LoadMidiEvent(ref uint length) {
             MIDIEvent result = new MIDIEvent();
-            uint timeOffset = GetVariableNumber(ref length);
+            result.absTime = GetVariableNumber(ref length);
             result.MidiMessage = GetMidiMessage(ref length);
             return result;
         }
@@ -122,7 +130,11 @@ namespace MidiAranger.Droid.Source.midiplayer
                 if (currentTrack.lastCommand == 0)
                     throw new Exception("Bad midi file");
                 command = currentTrack.lastCommand;
+                currentOffset--; // Command byte - its 1 first data dyte
             }
+            else
+                currentTrack.lastCommand = command;
+
             data = GetMessageDataForCommand(command, ref length);
             byte[] result = new byte[data.Length + 1];
             result[0] = command;
@@ -150,7 +162,7 @@ namespace MidiAranger.Droid.Source.midiplayer
                 {
                     result[i+1] = GetByte();
                 }
-                length = length - resultLength;
+                length = length - resultLength+1;
                 return result;
             }
             else
@@ -164,15 +176,15 @@ namespace MidiAranger.Droid.Source.midiplayer
             {
                 throw new NotImplementedException();
             }
-
+            else
             // Channel message
-            if (IsMasked(command, 0x80) || IsMasked(command, 0x90) || IsMasked(command, 0xA0) ||
-                IsMasked(command, 0xB0) || IsMasked(command, 0xE0))
+            if (IsMasked(command, 0x8) || IsMasked(command, 0x9) || IsMasked(command, 0xA) || IsMasked(command, 0xB) || IsMasked(command, 0xE))
             {
                 length -= 2;
                 return new byte[2] { GetByte(), GetByte() };
             }
-            if (IsMasked(command, 0xC0) || IsMasked(command, 0xD0))
+            else
+            if (IsMasked(command, 0xC) || IsMasked(command, 0xD))
             {
                 length--;
                 return new byte[1] { GetByte() };
@@ -182,9 +194,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             return new byte[0];
         }
             protected bool IsMasked(byte b1, byte mask) {
-            return (b1 & mask) == mask;
-
-
+            return (b1 >> 4) == mask;
         }
 
         protected MIDITrackInfo ProcessMidiTrackInfo()
@@ -231,7 +241,138 @@ namespace MidiAranger.Droid.Source.midiplayer
     }
 
 
-    class MidiPlayer
+    class MIDIPlayer
     {
+        private bool isPlaying = false;
+        public List<MIDITrack> Tracks { get; set; }
+        private byte[] message;
+        private int midiClockCount;
+        private Context context;
+
+        public MIDIPlayer(Context context) {
+            this.context = context;
+
+            MIDISession.GetInstance().Init(context);
+            MIDISession.GetInstance().Start();
+
+            Bundle rinfo = new Bundle();
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
+            rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
+            rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
+            MIDISession.GetInstance().Connect(rinfo);
+            Subscribe();
+
+
+        }
+
+        private void Subscribe()
+        {
+            MessagingCenter.Subscribe<MIDIReceivedEvent>(this, "MIDIReceivedEvent", OnMIDIReceivedEvent);
+        }
+
+        public bool SendTestMIDI()
+        {
+            Log.Debug("Main", "sendTestMidi 41,127");
+            Bundle testMessage = new Bundle();
+            testMessage.PutInt(MIDIConstants.MSG_COMMAND, 0x09);
+            testMessage.PutInt(MIDIConstants.MSG_CHANNEL, 0);
+            testMessage.PutInt(MIDIConstants.MSG_NOTE, 41);
+            testMessage.PutInt(MIDIConstants.MSG_VELOCITY, 127);
+            //        MIDIMessage m = MIDIMessage.newUsing(testMessage);
+            MIDISession.GetInstance().SendMessage(testMessage);
+            //        MIDISession.getInstance().sendMessage(41,127);
+            //        MIDIMessage message = MIDISession.getInstance().sendNote(41,127);
+            //        if(message != null) {
+            //            MIDISession.getInstance().sendNote(41,127);
+            //        }
+            return true;
+        }
+
+        protected void OnMIDIReceivedEvent(MIDIReceivedEvent _event)
+        {
+            ParseMidiMessage(_event.message);
+        }
+
+        protected void ParseMidiMessage(byte[] mes)
+        {
+            if (mes[0] == 248)
+            {
+         //       midiClockCount++;
+
+            }
+            else
+            {
+                message = mes;
+            }
+        }
+
+
+
+        protected void USleep(uint waitTime)
+        {
+            if (waitTime == 0) return;
+            long time1, time2;
+
+             time1 = JavaLangSystem.NanoTime();
+            do
+            {
+                time2 = JavaLangSystem.NanoTime();
+            }
+            while ((time2-time1) < waitTime*1000000);
+        }
+
+        public void Run()
+        {
+            isPlaying = true;
+            while (isPlaying)
+            {
+                USleep(5000);
+                PlayCurrentTrackPositions();
+            }
+
+        }
+
+        protected void PlayCurrentTrackPositions() {
+            foreach (MIDITrack track in Tracks)
+            {
+                var _event = track.MidiEvents.Where(p => p.absTime > track.absTime).Min(n => n.absTime);
+
+
+            }
+        }
+
+
+
+    }
+
+    public static class JavaLangSystem
+    {
+        static IntPtr class_ref;
+        static IntPtr id_nanoTime;
+        public readonly static long Avg;
+
+        static JavaLangSystem()
+        {
+            class_ref = JNIEnv.FindClass("java/lang/System");
+            id_nanoTime = JNIEnv.GetStaticMethodID(class_ref, "nanoTime", "()J");
+
+            for (int i = 0; i < 10; i++)
+            {
+                NanoTime();
+            }
+
+            long start = NanoTime();
+            for (int i = 0; i < 1000; i++)
+            {
+                NanoTime();
+            }
+            Avg = (NanoTime() - start) / 1000;
+        }
+
+        [Register("nanoTime", "()J", "")]
+        public static long NanoTime()
+        {
+            return JNIEnv.CallStaticLongMethod(class_ref, id_nanoTime);
+        }
     }
 }
