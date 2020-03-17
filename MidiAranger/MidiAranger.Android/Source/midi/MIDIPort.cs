@@ -100,7 +100,7 @@ public class MIDIPort {
                         readyKeys.Clear();
                 }
             } catch (IOException e) {
-                throw new IOException(e.StackTrace);
+                //throw new IOException(e.StackTrace);
             }
         }
 

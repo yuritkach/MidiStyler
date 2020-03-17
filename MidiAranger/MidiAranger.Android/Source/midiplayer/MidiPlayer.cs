@@ -33,7 +33,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
     public class MIDITrack {
         public MIDITrackInfo info;
-        public uint currentEventIndex;
+        public int currentEventIndex;
         public byte lastCommand;
         public uint absTime;
         public List<MIDIEvent> MidiEvents;
@@ -286,8 +286,8 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             if (mes[0] == 248)
             {
-         //       midiClockCount++;
-
+                //       midiClockCount++;
+                MIDISession.GetInstance().SendMessage(mes);
             }
             else
             {
@@ -313,26 +313,29 @@ namespace MidiAranger.Droid.Source.midiplayer
         public void Run()
         {
             isPlaying = true;
+            this.currentSongPosition = 0;
             while (isPlaying)
             {
-                USleep(50000);
-                SendTestMIDI();
-               // PlayCurrentTrackPositions();
+               USleep(1);
+                //SendTestMIDI();
+                PlayCurrentTrackPositions();
+                currentSongPosition++;
             }
 
         }
 
         protected void PlayCurrentTrackPositions() {
+            MIDIEvent evnt;
             foreach (MIDITrack track in Tracks)
             {
-                var _event = track.MidiEvents.Where(p => p.absTime > track.absTime).Min(n => n.absTime);
-
-
+                for (int i = 0/*track.currentEventIndex*/; i < track.MidiEvents.Count; i++)
+                {
+                    evnt = track.MidiEvents[i];
+                        if (evnt.absTime == currentSongPosition)
+                            MIDISession.GetInstance().SendMessage(evnt.MidiMessage);
+                }
             }
         }
-
-
-
     }
 
     public static class JavaLangSystem
