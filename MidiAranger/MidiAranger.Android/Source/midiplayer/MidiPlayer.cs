@@ -315,7 +315,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             isPlaying = true;
             while (isPlaying)
             {
-                USleep(5000);
+                USleep(50000);
                 SendTestMIDI();
                // PlayCurrentTrackPositions();
             }

@@ -12,7 +12,8 @@ namespace midi {
         private bool valid;
         private byte[] message;
 
-        public MIDIMessage() {
+        public MIDIMessage(byte[] message) {
+            this.message = message;
         }
 
         public bool ParseMessage(PacketEvent packet) {

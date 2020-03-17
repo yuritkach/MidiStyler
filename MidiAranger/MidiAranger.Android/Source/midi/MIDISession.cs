@@ -400,7 +400,7 @@ namespace midi {
             if (published_bonjour && streams.Size() > 0)
             {
                 Log.Debug("MIDISession", "byte array:" + BitConverter.ToString(msg).Replace("-", ""));
-                MIDIMessage message = new MIDIMessage();
+                MIDIMessage message = new MIDIMessage(msg);
                 message.ssrc = this.ssrc;
 
                 for (int i = 0; i < streams.Size(); i++)
@@ -472,7 +472,7 @@ namespace midi {
             Log.Debug("MIDISession", "PacketEvent packet from " + e.GetAddress().HostAddress + ":" + e.GetPort());
             // try control first
             MIDIControl applecontrol = new MIDIControl();
-            MIDIMessage message = new MIDIMessage();
+            MIDIMessage message = new MIDIMessage(e.GetData());
             if (applecontrol.Parse(e))
             {
                 Log.Debug("MIDISession", "- parsed as apple control packet");
