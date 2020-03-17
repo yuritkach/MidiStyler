@@ -33,7 +33,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
     public class MIDITrack {
         public MIDITrackInfo info;
-        public int bufferOffset;
+        public uint currentEventIndex;
         public byte lastCommand;
         public uint absTime;
         public List<MIDIEvent> MidiEvents;
@@ -55,7 +55,6 @@ namespace MidiAranger.Droid.Source.midiplayer
         public MIDITrackInfo midiTrackInfo;
         public List<MIDITrack> tracks;
         protected int currentOffset;
-        protected MIDITrack currentTrack;
         public MIDIFile() {
 
         }
@@ -88,8 +87,6 @@ namespace MidiAranger.Droid.Source.midiplayer
             for (int i = 0; i < midiHeaderInfo.tracks; i++)
             {
                 MIDITrack track = new MIDITrack();
-                track.absTime = 0;
-                currentTrack = track;
                 ProcessMIDITrack(track);
                 result.Add(track);
             }
@@ -98,44 +95,46 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected void ProcessMIDITrack(MIDITrack track) {
             track.info = ProcessMidiTrackInfo();
+            track.absTime = 0;
             track.lastCommand = 0;
+            track.currentEventIndex = 0;
             track.MidiEvents = ProcessMidiEvents(track);
-            
         }
 
         protected List<MIDIEvent> ProcessMidiEvents(MIDITrack track) {
             List<MIDIEvent> result = new List<MIDIEvent>();
             while (track.info.length>0) {
-                MIDIEvent _ev = LoadMidiEvent(ref track.info.length);
-
-                result.Add(_ev);
+                MIDIEvent midiEvent = LoadMidiEvent(track);
+                track.absTime+= midiEvent.absTime;
+                midiEvent.absTime = track.absTime;
+                result.Add(midiEvent);
             }
             return result;
         }
 
-        protected MIDIEvent LoadMidiEvent(ref uint length) {
+        protected MIDIEvent LoadMidiEvent(MIDITrack track) {
             MIDIEvent result = new MIDIEvent();
-            result.absTime = GetVariableNumber(ref length);
-            result.MidiMessage = GetMidiMessage(ref length);
+            result.absTime = GetVariableNumber(track);
+            result.MidiMessage = GetMidiMessage(track);
             return result;
         }
 
-        protected byte[] GetMidiMessage(ref uint length) {
+        protected byte[] GetMidiMessage(MIDITrack track) {
             byte command = GetByte();
             byte[] data;
-            length--;
+            track.info.length--;
 
             if (!((command & 0x80) == 0x80)) // is not command?
             {
-                if (currentTrack.lastCommand == 0)
+                if (track.lastCommand == 0)
                     throw new Exception("Bad midi file");
-                command = currentTrack.lastCommand;
+                command = track.lastCommand;
                 currentOffset--; // Command byte - its 1 first data dyte
             }
             else
-                currentTrack.lastCommand = command;
+                track.lastCommand = command;
 
-            data = GetMessageDataForCommand(command, ref length);
+            data = GetMessageDataForCommand(track);
             byte[] result = new byte[data.Length + 1];
             result[0] = command;
             for (int i = 0; i < data.Length; i++)
@@ -143,16 +142,16 @@ namespace MidiAranger.Droid.Source.midiplayer
             return result;
         }
 
-        protected byte[] GetMessageDataForCommand(byte command, ref uint length)
+        protected byte[] GetMessageDataForCommand(MIDITrack track)
         {
             //Meta
-            if (command == 0xFF)
+            if (track.lastCommand == 0xFF)
             {
                 
                 byte type = GetByte();
-                uint oldLength = length;
+                uint oldLength = track.info.length;
                 var oldOffset = currentOffset;
-                uint len = GetVariableNumber(ref length);
+                uint len = GetVariableNumber(track);
                 var lensize=currentOffset-oldOffset;
                 uint resultLength =(uint) (len + lensize + 1);
                 byte[] result = new byte[resultLength];
@@ -162,31 +161,31 @@ namespace MidiAranger.Droid.Source.midiplayer
                 {
                     result[i+1] = GetByte();
                 }
-                length = length - resultLength+1;
+                track.info.length = track.info.length - resultLength+1;
                 return result;
             }
             else
             //SysEx
-            if (command == 0xF0)
+            if (track.lastCommand == 0xF0)
             {
                 throw new NotImplementedException();
             }
             else
-            if (command == 0xF7)
+            if (track.lastCommand == 0xF7)
             {
                 throw new NotImplementedException();
             }
             else
             // Channel message
-            if (IsMasked(command, 0x8) || IsMasked(command, 0x9) || IsMasked(command, 0xA) || IsMasked(command, 0xB) || IsMasked(command, 0xE))
+            if (IsMasked(track.lastCommand, 0x8) || IsMasked(track.lastCommand, 0x9) || IsMasked(track.lastCommand, 0xA) || IsMasked(track.lastCommand, 0xB) || IsMasked(track.lastCommand, 0xE))
             {
-                length -= 2;
+                track.info.length -= 2;
                 return new byte[2] { GetByte(), GetByte() };
             }
             else
-            if (IsMasked(command, 0xC) || IsMasked(command, 0xD))
+            if (IsMasked(track.lastCommand, 0xC) || IsMasked(track.lastCommand, 0xD))
             {
-                length--;
+                track.info.length--;
                 return new byte[1] { GetByte() };
             }
             
@@ -225,13 +224,13 @@ namespace MidiAranger.Droid.Source.midiplayer
             return ByteBuff[currentOffset++];
         }
 
-        protected uint GetVariableNumber(ref uint length) {
+        protected uint GetVariableNumber(MIDITrack track) {
                 uint result = 0;
                 byte byte_in;
                 for (; ; )
                 {
                     byte_in = GetByte();
-                    length--;
+                    track.info.length--;
                     result = ((result << 7) | (uint)(byte_in & 0x7f));
                     if ((byte_in & 0x80)==0)
                         return result;
@@ -248,6 +247,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         private byte[] message;
         private int midiClockCount;
         private Context context;
+        public uint currentSongPosition;
 
         public MIDIPlayer(Context context) {
             this.context = context;
@@ -261,7 +261,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
             Subscribe();
-
+            currentSongPosition = 0;
 
         }
 
@@ -272,19 +272,8 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         public bool SendTestMIDI()
         {
-            Log.Debug("Main", "sendTestMidi 41,127");
-            Bundle testMessage = new Bundle();
-            testMessage.PutInt(MIDIConstants.MSG_COMMAND, 0x09);
-            testMessage.PutInt(MIDIConstants.MSG_CHANNEL, 0);
-            testMessage.PutInt(MIDIConstants.MSG_NOTE, 41);
-            testMessage.PutInt(MIDIConstants.MSG_VELOCITY, 127);
-            //        MIDIMessage m = MIDIMessage.newUsing(testMessage);
-            MIDISession.GetInstance().SendMessage(testMessage);
-            //        MIDISession.getInstance().sendMessage(41,127);
-            //        MIDIMessage message = MIDISession.getInstance().sendNote(41,127);
-            //        if(message != null) {
-            //            MIDISession.getInstance().sendNote(41,127);
-            //        }
+            Log.Debug("Main", "send note on 35,7F");
+            MIDISession.GetInstance().SendMessage(new byte[] { 0x90,0x35,0x7F});
             return true;
         }
 
@@ -327,7 +316,8 @@ namespace MidiAranger.Droid.Source.midiplayer
             while (isPlaying)
             {
                 USleep(5000);
-                PlayCurrentTrackPositions();
+                SendTestMIDI();
+               // PlayCurrentTrackPositions();
             }
 
         }

@@ -394,32 +394,13 @@ namespace midi {
                 }
             }
         }
-
-        public void SendMessage(Bundle m)
+        
+        public void SendMessage(byte[] msg)
         {
             if (published_bonjour && streams.Size() > 0)
             {
-                Log.Debug("MIDISession", "sendMessage c:" + m.GetInt("command", 0x09) + " ch:" + m.GetInt("channel", 0) + " n:" + m.GetInt("note", 0) + " v:" + m.GetInt("velocity", 0));
+                Log.Debug("MIDISession", "byte array:" + BitConverter.ToString(msg).Replace("-", ""));
                 MIDIMessage message = new MIDIMessage();
-                message.CreateNote(
-                        m.GetInt(midi.MIDIConstants.MSG_COMMAND, 0x09),
-                        m.GetInt(midi.MIDIConstants.MSG_CHANNEL, 0),
-                        m.GetInt(midi.MIDIConstants.MSG_NOTE, 0),
-                        m.GetInt(midi.MIDIConstants.MSG_VELOCITY, 0));
-                message.ssrc = this.ssrc;
-
-                for (int i = 0; i < streams.Size(); i++)
-                    streams.Get(streams.KeyAt(i)).SendMessage(message);
-            }
-        }
-
-        public void SendMessage(int note, int velocity)
-        {
-            if (published_bonjour && streams.Size() > 0)
-            {
-                Log.Debug("MIDISession", "note:" + note + " velocity:" + velocity);
-                MIDIMessage message = new MIDIMessage();
-                message.CreateNote(note, velocity);
                 message.ssrc = this.ssrc;
 
                 for (int i = 0; i < streams.Size(); i++)
