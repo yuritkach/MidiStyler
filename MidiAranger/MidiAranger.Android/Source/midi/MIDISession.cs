@@ -186,8 +186,6 @@ namespace midi {
                 RegisterService();
                 isRunning = true;
                 shouldBeRunning = false;
-
-                //EventBus.getDefault().post(new MIDISessionStartEvent());
                 MessagingCenter.Send<MIDISessionStartEvent>(new MIDISessionStartEvent(), "MIDISessionStartEvent");
                 CheckAddressBookForReconnect();
             }
@@ -389,7 +387,7 @@ namespace midi {
                 }
                 else
                 {
-                    Log.Debug("MIDISession", "sendUDPMessage message 5004 rinfo:" + rinfo.ToString());
+                    Log.Debug("MIDISession", "sendUDPMessage message 5005 rinfo:" + rinfo.ToString());
                     messageChannel.SendMidi(m, rinfo);
                 }
             }
@@ -502,6 +500,11 @@ namespace midi {
                     else
                     {
                         Log.Debug("MIDISession", " - got existing stream by ssrc " + applecontrol.ssrc);
+                        //TYV--VVV
+                     //   if (!IsAlreadyConnected(e.GetRInfo()))
+                     //       stream.HandleInvitationRejected(applecontrol, e.GetRInfo());
+                        //TYV-^^^
+
                     }
                     Log.Debug("MIDISession", "- pass control packet to stream");
                     stream.HandleControlMessage(applecontrol, e.GetRInfo());

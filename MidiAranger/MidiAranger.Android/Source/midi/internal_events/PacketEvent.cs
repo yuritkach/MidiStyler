@@ -1,6 +1,7 @@
 using InetAddress = Java.Net.InetAddress;
 using DatagramPacket = Java.Net.DatagramPacket;
 using Android.OS;
+using Android.Util;
 
 namespace midi.internal_events {
     public class PacketEvent {
@@ -13,7 +14,7 @@ namespace midi.internal_events {
             port = packet.Port;
             data = packet.GetData();
             length = packet.Length;
-            //        Log.d("PacketEvent"," p:"+packet.getLength()+ " d:"+data.length);
+            Log.Debug("PacketEvent"," p:"+packet.Length+ " d:"+data.Length);
         }
 
         public Bundle GetRInfo() {

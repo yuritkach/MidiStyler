@@ -298,7 +298,7 @@ public class MIDIStream {
                 break;
             case AppleMIDICommand.END:
 //                Log.d("MIDIStream","handle END");
-                HandleEnd();
+                HandleEnd(control,rinfo);
                 break;
             case AppleMIDICommand.SYNCHRONIZATION:
 //                Log.d("MIDIStream","handle SYNCHRONIZATION");
@@ -332,7 +332,15 @@ public class MIDIStream {
             }
         else 
         if(rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) == rinfo1.GetInt(midi.MIDIConstants.RINFO_PORT)) {
-            return;
+                if (MIDISession.GetInstance().IsHostConnectionAllowed(rinfo))
+                {
+                    this.SendInvitationAccepted(rinfo);
+                }
+                else
+                {
+                    this.SendInvitationRejected(rinfo);
+                }
+                return;
         }
         else 
         if(rinfo2 == null) {
@@ -394,7 +402,7 @@ public class MIDIStream {
             }
 
         
-            checkConnectionFuture = new Timer(30000);
+            checkConnectionFuture = new Timer(3000);
             checkConnectionFuture.Elapsed += (object sender, System.Timers.ElapsedEventArgs e) =>
             {
                 checkConnectionFuture.Stop();
@@ -449,7 +457,6 @@ public class MIDIStream {
                 if (syncFailCount >= syncFailCountMax)
                 {
                     Log.Debug(TAG, "Sync fail count > max ");
-                    //EventBus.getDefault().post(new ConnectionFailedEvent(MIDIFailCode.SYNC_FAILURE,rinfo));
                     MessagingCenter.Send<ConnectionFailedEvent>(new ConnectionFailedEvent(MIDIFailCode.SYNC_FAILURE, rinfo1), "ConnectionFailedEvent");
                     CleanupFailedConnection();
                     ShutdownSyncFuture();
@@ -462,10 +469,6 @@ public class MIDIStream {
                 if (!primarySyncComplete && syncTaskCount > primarySyncCountMax)
                 {
                     primarySyncComplete = true;
-                    //                    EventBus.getDefault().post(new MIDISyncronizationCompleteEvent());
-                    //                    EventBus.getDefault().post(new MIDIConnectionEstablishedEvent());
-                    //                    Log.d("Sync", "primary sync complete");
-
                     SendSyncComplete();
                     ResetSyncService(syncServiceFrequency);
                 }
@@ -496,7 +499,13 @@ public class MIDIStream {
         MessagingCenter.Send<MIDIConnectionRequestRejectedEvent>(new MIDIConnectionRequestRejectedEvent(rinfo), "MIDIConnectionRequestRejectedEvent");
     }
 
-    private void HandleEnd() {
+    private void HandleEnd(MIDIControl control, Bundle rinfo) {
+            if (rinfo != rinfo1)
+            {
+                MessagingCenter.Send<ConnectionFailedEvent>(new ConnectionFailedEvent(MIDIFailCode.REJECTED_INVITATION, rinfo), "ConnectionFailedEvent");
+                return;
+            }
+
         this.isConnected = false;
         // shutdown sync
         if(connectFuture != null) {
@@ -553,7 +562,7 @@ public class MIDIStream {
     public void SendMessage(MIDIMessage m) {
         this.lastSentSequenceNr = (this.lastSentSequenceNr + 1) % 0x10000;
         m.SequenceNumber = this.lastSentSequenceNr;
-        MIDISession.GetInstance().SendUDPMessage(m, rinfo2); //rinfo2
+        MIDISession.GetInstance().SendUDPMessage(m, rinfo2); 
         }
 
     public void SendEnd() {

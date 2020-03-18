@@ -287,7 +287,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             if (mes[0] == 248)
             {
                 //       midiClockCount++;
-                MIDISession.GetInstance().SendMessage(mes);
+   //             MIDISession.GetInstance().SendMessage(mes);
             }
             else
             {
