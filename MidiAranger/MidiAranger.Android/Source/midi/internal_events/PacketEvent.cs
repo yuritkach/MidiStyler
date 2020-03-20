@@ -14,7 +14,7 @@ namespace midi.internal_events {
             port = packet.Port;
             data = packet.GetData();
             length = packet.Length;
-            Log.Debug("PacketEvent"," p:"+packet.Length+ " d:"+data.Length);
+    //        Log.Debug("PacketEvent"," p:"+packet.Length+ " d:"+data.Length);
         }
 
         public Bundle GetRInfo() {

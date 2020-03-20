@@ -307,7 +307,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             {
                 time2 = JavaLangSystem.NanoTime();
             }
-            while ((time2-time1) < waitTime*1000000);
+            while ((time2-time1) < waitTime);
         }
 
         public void Run()
@@ -316,7 +316,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             this.currentSongPosition = 0;
             while (isPlaying)
             {
-               USleep(1);
+               USleep(666654);
                 //SendTestMIDI();
                 PlayCurrentTrackPositions();
                 currentSongPosition++;

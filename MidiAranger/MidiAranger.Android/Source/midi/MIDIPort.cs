@@ -14,6 +14,8 @@ using ThreadPriority = System.Threading.ThreadPriority;
 namespace midi { 
 
 public class MIDIPort {
+        private static readonly bool DEBUG = false;
+
     private readonly int port;
 
     private Selector selector;
@@ -153,7 +155,7 @@ public class MIDIPort {
 
     private void HandleWrite(SelectionKey key) {
         if(!(outboundQueue.Count==0)) {
-            Log.Debug("MIDIPort2","handleWrite "+ outboundQueue.Count);
+            if (DEBUG) Log.Debug("MIDIPort2","handleWrite "+ outboundQueue.Count);
             try {
                 DatagramChannel c = (DatagramChannel) key.Channel();
                 DatagramPacket d = outboundQueue.Dequeue();
@@ -169,7 +171,7 @@ public class MIDIPort {
     public void SendMidi(MIDIControl control, Bundle rinfo) {
 //        Log.d("MIDIPort2","sendMidi(control)");
         if (!isListening) {
-            Log.Debug(TAG,"not listening...");
+                if (DEBUG) Log.Debug(TAG,"not listening...");
             return;
         }
         AddToOutboundQueue(control.GenerateBuffer(),rinfo);
@@ -178,7 +180,7 @@ public class MIDIPort {
     public void SendMidi(MIDIMessage message, Bundle rinfo) {
 //        Log.d("MIDIPort","sendMidi(message)");
         if (!isListening) {
-            Log.Debug(TAG,"not listening...");
+                if (DEBUG) Log.Debug(TAG,"not listening...");
             return;
         }
         AddToOutboundQueue(message.GenerateBuffer(),rinfo);

@@ -25,7 +25,7 @@ namespace midi {
             {
                 message = rawPayload.GetBytes();
                 this.valid = true;
-                Log.Debug("MIDIMessage", "byte array:" + BitConverter.ToString(message).Replace("-", ""));
+      //          Log.Debug("MIDIMessage", "byte array:" + BitConverter.ToString(message).Replace("-", ""));
                 return true;
             }
             else return false;

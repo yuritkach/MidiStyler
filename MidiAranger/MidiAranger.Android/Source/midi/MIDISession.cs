@@ -32,6 +32,8 @@ namespace midi {
 
     public class MIDISession
     {
+        private static readonly bool DEBUG = false;
+
         private static MIDISession midiSessionInstance;
         private readonly static string TAG = typeof(MIDISession).Name;
         private readonly static string BONJOUR_TYPE = "_apple-midi._udp";
@@ -357,15 +359,15 @@ namespace midi {
         {
             if (control != null && rinfo != null)
             {
-                Log.Debug("MIDISession", "sendUDPMessage:control " + rinfo.ToString());
+                if (DEBUG) Log.Debug("MIDISession", "sendUDPMessage:control " + rinfo.ToString());
                 if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0)
                 {
-                    Log.Debug("MIDISession", "sendUDPMessage control 5004 rinfo:" + rinfo.ToString());
+                    if (DEBUG) Log.Debug("MIDISession", "sendUDPMessage control 5004 rinfo:" + rinfo.ToString());
                     controlChannel.SendMidi(control, rinfo);
                 }
                 else
                 {
-                    Log.Debug("MIDISession", "sendUDPMessage control 5005 rinfo:" + rinfo.ToString());
+                    if (DEBUG) Log.Debug("MIDISession", "sendUDPMessage control 5005 rinfo:" + rinfo.ToString());
                     messageChannel.SendMidi(control, rinfo);
                 }
             }
@@ -377,17 +379,17 @@ namespace midi {
 
         public void SendUDPMessage(MIDIMessage m, Bundle rinfo)
         {
-            Log.Debug("MIDISession", "sendUDPMessage:message " + rinfo.ToString());
+            if (DEBUG) Log.Debug("MIDISession", "sendUDPMessage:message " + rinfo.ToString());
             if (m != null && rinfo != null)
             {
                 if (rinfo.GetInt(midi.MIDIConstants.RINFO_PORT) % 2 == 0)
                 {
-                    Log.Debug("MIDISession", "sendUDPMessage message 5004 rinfo:" + rinfo.ToString());
+                    if (DEBUG) Log.Debug("MIDISession", "sendUDPMessage message 5004 rinfo:" + rinfo.ToString());
                     controlChannel.SendMidi(m, rinfo);
                 }
                 else
                 {
-                    Log.Debug("MIDISession", "sendUDPMessage message 5005 rinfo:" + rinfo.ToString());
+                    if (DEBUG) Log.Debug("MIDISession", "sendUDPMessage message 5005 rinfo:" + rinfo.ToString());
                     messageChannel.SendMidi(m, rinfo);
                 }
             }
@@ -397,7 +399,7 @@ namespace midi {
         {
             if (published_bonjour && streams.Size() > 0)
             {
-                Log.Debug("MIDISession", "byte array:" + BitConverter.ToString(msg).Replace("-", ""));
+                if (DEBUG) Log.Debug("MIDISession", "byte array:" + BitConverter.ToString(msg).Replace("-", ""));
                 MIDIMessage message = new MIDIMessage(msg);
                 message.ssrc = this.ssrc;
 
@@ -467,7 +469,7 @@ namespace midi {
 
         public void OnPacketEvent(PacketEvent e)
         {
-            Log.Debug("MIDISession", "PacketEvent packet from " + e.GetAddress().HostAddress + ":" + e.GetPort());
+            //Log.Debug("MIDISession", "PacketEvent packet from " + e.GetAddress().HostAddress + ":" + e.GetPort());
             // try control first
             MIDIControl applecontrol = new MIDIControl();
             MIDIMessage message = new MIDIMessage(e.GetData());
@@ -513,7 +515,7 @@ namespace midi {
             }
             else
             {
-                Log.Debug("MIDISession","message?");
+                if (DEBUG) Log.Debug("MIDISession","message?");
                 message.ParseMessage(e);
                 if (message.IsValid())
                     MessagingCenter.Send<MIDIReceivedEvent>(new MIDIReceivedEvent(message.ToByteArray()), "MIDIReceivedEvent");

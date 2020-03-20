@@ -29,8 +29,10 @@ namespace midi {
             connection lost
    --------------------------------------------------------- */
 public class MIDIStream {
+        private static readonly bool DEBUG = false;
 
-    public int initiator_token = 0;
+
+        public int initiator_token = 0;
     public int ssrc = 0;
 
     public Bundle rinfo1 = null;
@@ -106,24 +108,24 @@ public class MIDIStream {
     public bool ConnectionMatch(Bundle r) {
         bool match = false;
         if(r != null) {
-            Log.Debug(TAG, "ConnectionMatch " + r.ToString() + " ? " + rinfo1.ToString() + "/" + rinfo2.ToString());
+                if (DEBUG) Log.Debug(TAG, "ConnectionMatch " + r.ToString() + " ? " + rinfo1.ToString() + "/" + rinfo2.ToString());
 
             if (rinfo1 == null || rinfo2 == null) {
                 return false;
             }
 
             if (r.GetString(midi.MIDIConstants.RINFO_ADDR).Equals(rinfo1.GetString(midi.MIDIConstants.RINFO_ADDR))) {
-                Log.Debug(TAG, "addr = addr " + r.GetString(midi.MIDIConstants.RINFO_ADDR));
+                    if (DEBUG) Log.Debug(TAG, "addr = addr " + r.GetString(midi.MIDIConstants.RINFO_ADDR));
                 if ((r.GetInt(midi.MIDIConstants.RINFO_PORT) == rinfo1.GetInt(midi.MIDIConstants.RINFO_PORT)) ||
                         ((r.GetInt(midi.MIDIConstants.RINFO_PORT) == rinfo2.GetInt(midi.MIDIConstants.RINFO_PORT)))) {
-                    Log.Debug(TAG, "port = port " + r.GetInt(midi.MIDIConstants.RINFO_PORT));
+                        if (DEBUG) Log.Debug(TAG, "port = port " + r.GetInt(midi.MIDIConstants.RINFO_PORT));
                     match = true;
                 } else {
-                    Log.Debug(TAG, "port != port ");
+                        if (DEBUG) Log.Debug(TAG, "port != port ");
 
                 }
             } else {
-                Log.Debug(TAG, "address != address ");
+                    if (DEBUG) Log.Debug(TAG, "address != address ");
 
             }
         }
@@ -139,7 +141,7 @@ public class MIDIStream {
 
 
     public void Connect(Bundle rinfo) {
-        Log.Debug("MIDIStream","connect "+rinfo.GetString(midi.MIDIConstants.RINFO_ADDR)
+            if (DEBUG) Log.Debug("MIDIStream","connect "+rinfo.GetString(midi.MIDIConstants.RINFO_ADDR)
             +":"+rinfo.GetInt(midi.MIDIConstants.RINFO_PORT));
         if(isConnected) {
             // already connected, should not reconnect with same stream
@@ -153,7 +155,7 @@ public class MIDIStream {
         this.isInitiator = true;
 
 
-        Log.Debug(TAG,"create connection "+rinfo.GetInt(MIDIConstants.RINFO_FAIL,0));
+            if (DEBUG) Log.Debug(TAG,"create connection "+rinfo.GetInt(MIDIConstants.RINFO_FAIL,0));
         int delay =(rinfo.GetInt(MIDIConstants.RINFO_FAIL,0) * 5);
         connectFuture = new Timer(1000);
         connectFuture.Elapsed +=(object sender, System.Timers.ElapsedEventArgs e) =>
@@ -163,7 +165,7 @@ public class MIDIStream {
                     {
                         if (rinfo == null)
                         {
-                            Log.Debug(TAG, "connection task shutdown");
+                            if (DEBUG) Log.Debug(TAG, "connection task shutdown");
                             SendEnd(rinfo);
                             connectFuture.Stop();
                             connectFuture = null;
@@ -173,7 +175,7 @@ public class MIDIStream {
                             connectTaskCount++;
                             if (connectTaskCount > connectCountMax)
                             {
-                                Log.Debug(TAG, "connection task count hit max");
+                                if (DEBUG) Log.Debug(TAG, "connection task count hit max");
                                 rinfo.PutBoolean(MIDIConstants.RINFO_FAIL, true);
                                 MessagingCenter.Send<ConnectionFailedEvent>(
                                     (new ConnectionFailedEvent(MIDIFailCode.UNABLE_TO_CONNECT, rinfo, initiator_token)),
@@ -184,14 +186,14 @@ public class MIDIStream {
                                 Shutdown();
                                 return;
                             }
-                            Log.Debug("MIDIConnectTask", "connectTaskCount:" + connectTaskCount + " ssrc:" + ssrc);
+                            if (DEBUG) Log.Debug("MIDIConnectTask", "connectTaskCount:" + connectTaskCount + " ssrc:" + ssrc);
                             SendInvitation(rinfo);
                         }
 
                     }
                     catch (Exception er)
                     {
-                        Log.Debug("MIDIStream", "exception in send midi task " + er.StackTrace);
+                        if (DEBUG) Log.Debug("MIDIStream", "exception in send midi task " + er.StackTrace);
                     }
                 };
             connectFuture.Enabled = true;
@@ -265,7 +267,7 @@ public class MIDIStream {
     }
 
     public void SendInvitation(Bundle rinfo) {
-        Log.Debug("MIDIStream","sendInvitation "+rinfo.GetString(MIDIConstants.RINFO_ADDR)+":"+rinfo.GetInt(MIDIConstants.RINFO_PORT));
+            if (DEBUG) Log.Debug("MIDIStream","sendInvitation "+rinfo.GetString(MIDIConstants.RINFO_ADDR)+":"+rinfo.GetInt(MIDIConstants.RINFO_PORT));
         MIDIControl invite = new MIDIControl();
         invite.CreateInvitation(initiator_token, MIDISession.GetInstance().ssrc, MIDISession.GetInstance().bonjourName);
 //        invite.dumppacket();
@@ -361,13 +363,13 @@ public class MIDIStream {
     }
 
     private void HandleInvitationAccepted(MIDIControl control, Bundle rinfo) {
-        Log.Debug(TAG,"handleInvitationAccepted "+rinfo.ToString());
+            if (DEBUG) Log.Debug(TAG,"handleInvitationAccepted "+rinfo.ToString());
         if (!this.isConnected && this.rinfo1 == null) {
-            Log.Debug(TAG,"cancel connectFuture");
+                if (DEBUG) Log.Debug(TAG,"cancel connectFuture");
             connectFuture.Stop();
             connectFuture = null;
 
-            Log.Debug(TAG,"set rinfo1 "+rinfo.ToString());
+                if (DEBUG) Log.Debug(TAG,"set rinfo1 "+rinfo.ToString());
             rinfo1 = (Bundle) rinfo.Clone();
             rinfo1.PutString(midi.MIDIConstants.RINFO_NAME,control.name);
             rinfo.PutInt(midi.MIDIConstants.RINFO_PORT,rinfo.GetInt(midi.MIDIConstants.RINFO_PORT)+1);
@@ -376,7 +378,7 @@ public class MIDIStream {
         }
         else 
         if(!this.isConnected && rinfo2 == null) {
-            Log.Debug(TAG,"cancel connectFuture");
+                if (DEBUG) Log.Debug(TAG,"cancel connectFuture");
             connectFuture.Stop();
             connectFuture = null;
             connectTaskCount = 0;
@@ -384,14 +386,14 @@ public class MIDIStream {
             this.isConnected = true;
             this.name = control.name;
             this.ssrc = control.ssrc;
-            Log.Debug(TAG,"set rinfo2 "+rinfo.ToString());
+                if (DEBUG) Log.Debug(TAG,"set rinfo2 "+rinfo.ToString());
             rinfo2 = (Bundle) rinfo.Clone();
             MessagingCenter.Send<StreamConnectedEvent>(new StreamConnectedEvent(this.initiator_token), "StreamConnectedEvent");
             ResetSyncService(syncServicePrimaryFrequency);
         }
         else
         {
-            Log.Debug("MIDI2Stream","unhandled invitation accept");
+                if (DEBUG) Log.Debug("MIDI2Stream","unhandled invitation accept");
         }
     }
 
