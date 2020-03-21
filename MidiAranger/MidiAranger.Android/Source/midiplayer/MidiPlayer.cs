@@ -14,6 +14,8 @@ using Xamarin.Forms;
 using midi;
 using midi.events;
 using Android.Util;
+using Java.Lang;
+using System.Threading;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
@@ -74,7 +76,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             MIDIHeaderInfo result = new MIDIHeaderInfo();
             result.id = GetUint();
             if (result.id != 0x4D546864) // MThd
-                throw new Exception("MIDIFile incorrect file signature!");
+                throw new System.Exception("MIDIFile incorrect file signature!");
             result.size = GetUint();
             result.format = GetUShort();
             result.tracks = GetUShort();
@@ -127,7 +129,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             if (!((command & 0x80) == 0x80)) // is not command?
             {
                 if (track.lastCommand == 0)
-                    throw new Exception("Bad midi file");
+                    throw new System.Exception("Bad midi file");
                 command = track.lastCommand;
                 currentOffset--; // Command byte - its 1 first data dyte
             }
@@ -201,7 +203,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             MIDITrackInfo result = new MIDITrackInfo();
             result.id = GetUint();
             if (result.id != 0x4D54726B) //MTrk
-                throw new Exception("MIDI-File contains bad track signature");
+                throw new System.Exception("MIDI-File contains bad track signature");
             result.length = GetUint();
             return result;
         }
@@ -248,6 +250,13 @@ namespace MidiAranger.Droid.Source.midiplayer
         private int midiClockCount;
         private Context context;
         public uint currentSongPosition;
+        public int pulsesPerQuarterNote;
+
+
+
+        private System.Threading.Thread thread;
+        private long difTime1, difTime2;
+
 
         public MIDIPlayer(Context context) {
             this.context = context;
@@ -262,8 +271,30 @@ namespace MidiAranger.Droid.Source.midiplayer
             MIDISession.GetInstance().Connect(rinfo);
             Subscribe();
             currentSongPosition = 0;
+            pulsesPerQuarterNote = 500000; // 120 BPM
 
+            thread = new System.Threading.Thread(new ThreadStart(Run));
+            thread.Start();
+            isPlaying = false;
         }
+
+
+        public void Start()
+        {
+            currentSongPosition = 0;
+            isPlaying = true;
+        }
+
+        public void Stop()
+        {
+            isPlaying = false;
+        }
+
+        public void Continue()
+        {
+            isPlaying = true;
+        }
+
 
         private void Subscribe()
         {
@@ -297,26 +328,20 @@ namespace MidiAranger.Droid.Source.midiplayer
 
 
 
-        protected void USleep(uint waitTime)
+        protected void USleep(int waitTime)
         {
             if (waitTime == 0) return;
-            long time1, time2;
-
-             time1 = JavaLangSystem.NanoTime();
-            do
-            {
-                time2 = JavaLangSystem.NanoTime();
-            }
-            while ((time2-time1) < waitTime);
+            difTime1 = JavaLangSystem.NanoTime();
+            do { difTime2 = JavaLangSystem.NanoTime(); }
+            while ((difTime2 - difTime1) < waitTime);
         }
 
         public void Run()
         {
-            isPlaying = true;
-            this.currentSongPosition = 0;
             while (isPlaying)
             {
-               USleep(666654);
+                // check state
+                USleep(pulsesPerQuarterNote);
                 //SendTestMIDI();
                 PlayCurrentTrackPositions();
                 currentSongPosition++;
@@ -325,16 +350,20 @@ namespace MidiAranger.Droid.Source.midiplayer
         }
 
         protected void PlayCurrentTrackPositions() {
-            MIDIEvent evnt;
             foreach (MIDITrack track in Tracks)
-            {
-                for (int i = 0/*track.currentEventIndex*/; i < track.MidiEvents.Count; i++)
+                for (int i = track.currentEventIndex; i < track.MidiEvents.Count; i++)
                 {
-                    evnt = track.MidiEvents[i];
-                        if (evnt.absTime == currentSongPosition)
-                            MIDISession.GetInstance().SendMessage(evnt.MidiMessage);
+                    if (track.MidiEvents[i].absTime == currentSongPosition)
+                        MIDISession.GetInstance().SendMessage(track.MidiEvents[i].MidiMessage);
+                    else
+                        if (track.MidiEvents[i].absTime > currentSongPosition)
+                        {
+                        track.currentEventIndex = i;
+                        break;
+                        }   
+
+                        
                 }
-            }
         }
     }
 

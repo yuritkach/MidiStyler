@@ -41,8 +41,7 @@ namespace MidiAranger.Droid
             midiFile.InitMidiFile("ddd");
             MIDIPlayer mplayer = new MIDIPlayer(this);
             mplayer.Tracks = midiFile.tracks;
-            mplayer.Run();
-
+            mplayer.Start();
 
         }
 
