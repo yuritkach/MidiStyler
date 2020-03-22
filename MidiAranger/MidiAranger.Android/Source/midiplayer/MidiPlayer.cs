@@ -20,25 +20,44 @@ using System.Threading;
 namespace MidiAranger.Droid.Source.midiplayer
 {
     public struct MIDIHeaderInfo {
-        public int id;         // MThd signature
-        public int size;       // Always 6 (big-endian)
-        public ushort format;   // format
-        public ushort tracks;   // count of tracks
-        public ushort ticks;    // ticks per quarter note
+        public int Id;         // MThd signature
+        public int Size;       // Always 6 (big-endian)
+        public ushort Format;   // format
+        public ushort TrackCount;   // count of tracks
+        public ushort Ticks;    // ticks per quarter note
     }
 
     public struct MIDITrackInfo {
-        public int id; // Mtrk signature
-        public int length; // Length of track in bytes (big-endian)
+        public int Id; // Mtrk signature
+        public int Length; // Length of track in bytes (big-endian)
 
     }
 
+    public class MIDIMarker
+    {
+        public string Name { get; set; }
+        public int Index { get; set; }
+    }
+
     public class MIDITrack {
-        public MIDITrackInfo info;
-        public int currentEventIndex;
-        public byte lastCommand;
-        public int absTime;
+        public MIDITrackInfo Info;
+        public int CurrentEventIndex;
+        public byte LastCommand;
+        public int AbsTime;
         public List<MIDIEvent> MidiEvents;
+        public List<MIDIMarker> MidiMarkers;
+
+        public MIDITrack()
+        {
+            MidiEvents = new List<MIDIEvent>();
+            MidiMarkers = new List<MIDIMarker>();
+            CurrentEventIndex = 0;
+            LastCommand = 0;
+            AbsTime = 0;
+            Info = new MIDITrackInfo();
+        }
+
+
     }
 
     public struct MIDIEvent {
@@ -53,11 +72,13 @@ namespace MidiAranger.Droid.Source.midiplayer
         public int FileSize;
         public byte[] ByteBuff=null;
         public int PulsesPerQuarterNote;
-        public MIDIHeaderInfo midiHeaderInfo;
-        public MIDITrackInfo midiTrackInfo;
-        public List<MIDITrack> tracks;
+        public MIDIHeaderInfo MidiHeaderInfo;
+        public MIDITrackInfo MidiTrackInfo;
+        public List<MIDITrack> Tracks;
         protected int currentOffset;
         public MIDIFile() {
+            Tracks = new List<MIDITrack>();
+            MidiHeaderInfo = new MIDIHeaderInfo();
 
         }
         public int InitMidiFile(string fileName)
@@ -66,53 +87,50 @@ namespace MidiAranger.Droid.Source.midiplayer
             ByteBuff = DEBUGDATA.midifileData;
             currentOffset = 0;
             FileSize = ByteBuff.Length;
-            midiHeaderInfo = ProcessMIDIHeader();
-            tracks = ProcessMIDITracks();
+            ProcessMIDIHeader();
+            ProcessMIDITracks();
             return 0;
         }
 
-        protected MIDIHeaderInfo ProcessMIDIHeader()
+        protected void ProcessMIDIHeader()
         {
-            MIDIHeaderInfo result = new MIDIHeaderInfo();
-            result.id = GetUint();
-            if (result.id != 0x4D546864) // MThd
+            
+            MidiHeaderInfo.Id = GetUint();
+            if (MidiHeaderInfo.Id != 0x4D546864) // MThd
                 throw new System.Exception("MIDIFile incorrect file signature!");
-            result.size = GetUint();
-            result.format = GetUShort();
-            result.tracks = GetUShort();
-            result.ticks = GetUShort();
-            return result;
+            MidiHeaderInfo.Size = GetUint();
+            MidiHeaderInfo.Format = GetUShort();
+            MidiHeaderInfo.TrackCount = GetUShort();
+            MidiHeaderInfo.Ticks = GetUShort();
         }
 
-        protected List<MIDITrack> ProcessMIDITracks() {
-            List<MIDITrack> result = new List<MIDITrack>();
-            for (int i = 0; i < midiHeaderInfo.tracks; i++)
+        protected void ProcessMIDITracks() {
+            for (int i = 0; i < MidiHeaderInfo.TrackCount; i++)
             {
                 MIDITrack track = new MIDITrack();
                 ProcessMIDITrack(track);
-                result.Add(track);
+                Tracks.Add(track);
             }
-            return result;
         }
 
         protected void ProcessMIDITrack(MIDITrack track) {
-            track.info = ProcessMidiTrackInfo();
-            track.absTime = 0;
-            track.lastCommand = 0;
-            track.currentEventIndex = 0;
+            ProcessMidiTrackInfo(ref track.Info);
+            track.AbsTime = 0;
+            track.LastCommand = 0;
+            track.CurrentEventIndex = 0;
             track.MidiEvents = ProcessMidiEvents(track);
         }
 
         protected List<MIDIEvent> ProcessMidiEvents(MIDITrack track) {
             List<MIDIEvent> result = new List<MIDIEvent>();
             int _old;
-            while (track.info.length>0) {
+            while (track.Info.Length>0) {
                 _old = currentOffset;
                 MIDIEvent midiEvent = LoadMidiEvent(track);
-                track.absTime+= midiEvent.absTime;
-                midiEvent.absTime = track.absTime;
+                track.AbsTime+= midiEvent.absTime;
+                midiEvent.absTime = track.AbsTime;
                 result.Add(midiEvent);
-                track.info.length -= (currentOffset-_old);
+                track.Info.Length -= (currentOffset-_old);
 
             }
             return result;
@@ -130,13 +148,13 @@ namespace MidiAranger.Droid.Source.midiplayer
             byte[] data;
             if (!((command & 0x80) == 0x80)) // is not command?
             {
-                if (track.lastCommand == 0)
+                if (track.LastCommand == 0)
                     throw new System.Exception("Bad midi file");
-                command = track.lastCommand;
+                command = track.LastCommand;
                 currentOffset--; // Command byte - its 1 first data dyte
             }
             else
-                track.lastCommand = command;
+                track.LastCommand = command;
 
             data = GetMessageDataForCommand(track);
             byte[] result = new byte[data.Length + 1];
@@ -155,7 +173,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         protected byte[] GetMessageDataForCommand(MIDITrack track)
         {
             //Meta
-            if (track.lastCommand == 0xFF)
+            if (track.LastCommand == 0xFF)
             {
                 byte type = GetByte();
                 byte[] b = GetVarData();
@@ -166,56 +184,48 @@ namespace MidiAranger.Droid.Source.midiplayer
             }
             else
             //SysEx
-            if (track.lastCommand == 0xF0)
+            if (track.LastCommand == 0xF0)
             {
                 return GetVarData();
             }
             else
-            if (track.lastCommand == 0xF7)
+            if (track.LastCommand == 0xF7)
             {
                 throw new NotImplementedException();
             }
             else
             // Channel message
-            if (IsMasked(track.lastCommand, 0x8) || IsMasked(track.lastCommand, 0x9) || IsMasked(track.lastCommand, 0xA) || IsMasked(track.lastCommand, 0xB) || IsMasked(track.lastCommand, 0xE))
+            if (IsMasked(track.LastCommand, 0x8) || IsMasked(track.LastCommand, 0x9) || IsMasked(track.LastCommand, 0xA) || IsMasked(track.LastCommand, 0xB) || IsMasked(track.LastCommand, 0xE))
             {
                 return new byte[2] { GetByte(), GetByte() };
             }
             else
-            if (IsMasked(track.lastCommand, 0xC) || IsMasked(track.lastCommand, 0xD))
+            if (IsMasked(track.LastCommand, 0xC) || IsMasked(track.LastCommand, 0xD))
             {
                 return new byte[1] { GetByte() };
             }
-            
-            
             return new byte[0];
         }
-            protected bool IsMasked(byte b1, byte mask) {
+
+        protected bool IsMasked(byte b1, byte mask)
+        {
             return (b1 >> 4) == mask;
         }
 
-        protected MIDITrackInfo ProcessMidiTrackInfo()
+        protected void ProcessMidiTrackInfo(ref MIDITrackInfo track)
         {
-            MIDITrackInfo result = new MIDITrackInfo();
-            result.id = GetUint();
-            if (result.id != 0x4D54726B) //MTrk
+            track.Id = GetUint();
+            if (track.Id != 0x4D54726B) //MTrk
                 throw new System.Exception("MIDI-File contains bad track signature");
-            result.length = GetUint();
-            return result;
+            track.Length = GetUint();
         }
 
         protected int GetUint() {
-            int result = GetUShort();
-            result = result << 16;
-            result = result | GetUShort();
-            return result;
+            return GetUShort() << 16 | GetUShort();
         }
 
         protected ushort GetUShort() {
-            ushort result = GetByte();
-            result =(ushort)(result << 8);
-            result =(ushort)(result | GetByte());
-            return result;
+            return (ushort) (GetByte() << 8 | GetByte());
         }
 
         protected byte GetByte() {
@@ -233,7 +243,6 @@ namespace MidiAranger.Droid.Source.midiplayer
                 if ((byte_in & 0x80)==0)
                     return result;
             }
-            throw new System.Exception("eee");
         }
 
     }
@@ -242,7 +251,7 @@ namespace MidiAranger.Droid.Source.midiplayer
     class MIDIPlayer
     {
         private bool isPlaying = false;
-        public List<MIDITrack> Tracks { get; set; }
+        public List<MIDITrack> Tracks;
         private byte[] message;
         private readonly Context context;
         public int currentSongPosition;
@@ -267,7 +276,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             MIDISession.GetInstance().Connect(rinfo);
             Subscribe();
             currentSongPosition = 0;
-            pulsesPerQuarterNote = 500000; // 120 BPM
+            pulsesPerQuarterNote = 500000; // 120 BPM initial tempo
 
             thread = new System.Threading.Thread(new ThreadStart(Run));
             thread.Start();
@@ -295,13 +304,6 @@ namespace MidiAranger.Droid.Source.midiplayer
         private void Subscribe()
         {
             MessagingCenter.Subscribe<MIDIReceivedEvent>(this, "MIDIReceivedEvent", OnMIDIReceivedEvent);
-        }
-
-        public bool SendTestMIDI()
-        {
-            Log.Debug("Main", "send note on 35,7F");
-            MIDISession.GetInstance().SendMessage(new byte[] { 0x90,0x35,0x7F});
-            return true;
         }
 
         protected void OnMIDIReceivedEvent(MIDIReceivedEvent _event)
@@ -343,7 +345,6 @@ namespace MidiAranger.Droid.Source.midiplayer
             {
                 // check state
                 USleep(pulsesPerQuarterNote);
-                //SendTestMIDI();
                 PlayCurrentTrackPositions();
                 currentSongPosition++;
             }
@@ -352,7 +353,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected void PlayCurrentTrackPositions() {
             foreach (MIDITrack track in Tracks)
-                for (int i = track.currentEventIndex; i < track.MidiEvents.Count; i++)
+                for (int i = track.CurrentEventIndex; i < track.MidiEvents.Count; i++)
                 {
                     if (track.MidiEvents[i].absTime == currentSongPosition)
                         if (track.MidiEvents[i].MidiMessage[0] == 0xFF)
@@ -362,7 +363,7 @@ namespace MidiAranger.Droid.Source.midiplayer
                     else
                         if (track.MidiEvents[i].absTime > currentSongPosition)
                     {
-                        track.currentEventIndex = i;
+                        track.CurrentEventIndex = i;
                         break;
                     }   
 
