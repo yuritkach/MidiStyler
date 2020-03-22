@@ -105,18 +105,22 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected List<MIDIEvent> ProcessMidiEvents(MIDITrack track) {
             List<MIDIEvent> result = new List<MIDIEvent>();
+            int _old;
             while (track.info.length>0) {
+                _old = currentOffset;
                 MIDIEvent midiEvent = LoadMidiEvent(track);
                 track.absTime+= midiEvent.absTime;
                 midiEvent.absTime = track.absTime;
                 result.Add(midiEvent);
+                track.info.length -= (currentOffset-_old);
+
             }
             return result;
         }
 
         protected MIDIEvent LoadMidiEvent(MIDITrack track) {
             MIDIEvent result = new MIDIEvent();
-            result.absTime = GetVariableNumber(track);
+            result.absTime = GetVariableNumber();
             result.MidiMessage = GetMidiMessage(track);
             return result;
         }
@@ -124,8 +128,6 @@ namespace MidiAranger.Droid.Source.midiplayer
         protected byte[] GetMidiMessage(MIDITrack track) {
             byte command = GetByte();
             byte[] data;
-            track.info.length--;
-
             if (!((command & 0x80) == 0x80)) // is not command?
             {
                 if (track.lastCommand == 0)
@@ -139,24 +141,13 @@ namespace MidiAranger.Droid.Source.midiplayer
             data = GetMessageDataForCommand(track);
             byte[] result = new byte[data.Length + 1];
             result[0] = command;
-            for (int i = 0; i < data.Length; i++)
-                result[i + 1] = data[i];
+            Array.Copy(data, 0, result, 1, data.Length);
             return result;
         }
 
-        protected byte[] GetVarData(MIDITrack track, bool withCount) {
-            int _old = currentOffset;
-            int len = GetVariableNumber(track);
-            int _new = currentOffset;
-            int numLength = _new - _old;
-            byte[] result = new byte[len+(withCount?numLength:0)];
-            if (withCount)
-                currentOffset = currentOffset - numLength;
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = GetByte();
-            }
-            track.info.length = track.info.length - len - numLength ;
+        protected byte[] GetVarData() {
+            byte[] result = new byte[GetVariableNumber()];
+            for (int i = 0; i < result.Length; i++) result[i] = GetByte();
             return result;
 
         }
@@ -167,20 +158,17 @@ namespace MidiAranger.Droid.Source.midiplayer
             if (track.lastCommand == 0xFF)
             {
                 byte type = GetByte();
-                track.info.length--;
-                byte[] b = GetVarData(track,true);
+                byte[] b = GetVarData();
                 byte[] result = new byte[b.Length + 1];
                 result[0] = type;
-                for (int i = 0; i < b.Length; i++)
-                    result[i + 1] = b[i];
-
+                Array.Copy(b, 0, result, 1, b.Length);
                 return result;
             }
             else
             //SysEx
             if (track.lastCommand == 0xF0)
             {
-                return GetVarData(track,false);
+                return GetVarData();
             }
             else
             if (track.lastCommand == 0xF7)
@@ -191,13 +179,11 @@ namespace MidiAranger.Droid.Source.midiplayer
             // Channel message
             if (IsMasked(track.lastCommand, 0x8) || IsMasked(track.lastCommand, 0x9) || IsMasked(track.lastCommand, 0xA) || IsMasked(track.lastCommand, 0xB) || IsMasked(track.lastCommand, 0xE))
             {
-                track.info.length -= 2;
                 return new byte[2] { GetByte(), GetByte() };
             }
             else
             if (IsMasked(track.lastCommand, 0xC) || IsMasked(track.lastCommand, 0xD))
             {
-                track.info.length--;
                 return new byte[1] { GetByte() };
             }
             
@@ -236,17 +222,18 @@ namespace MidiAranger.Droid.Source.midiplayer
             return ByteBuff[currentOffset++];
         }
 
-        protected int GetVariableNumber(MIDITrack track) {
-                int result = 0;
-                byte byte_in;
-                for (; ; )
-                {
-                    byte_in = GetByte();
-                    track.info.length--;
-                    result = ((result << 7) | (int)(byte_in & 0x7f));
-                    if ((byte_in & 0x80)==0)
-                        return result;
-                }
+        protected int GetVariableNumber()
+        {
+            int result = 0;
+            byte byte_in;
+            for (; ; )
+            {
+                byte_in = GetByte();
+                result = ((result << 7) | (int)(byte_in & 0x7f));
+                if ((byte_in & 0x80)==0)
+                    return result;
+            }
+            throw new System.Exception("eee");
         }
 
     }
@@ -335,7 +322,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             switch (mes[1])
             {
-                case 0x51: pulsesPerQuarterNote = (mes[3] * 0x10000) + (mes[4] * 0x100) + mes[5]; break;// SetTempo
+                case 0x51: pulsesPerQuarterNote = (mes[2] * 0x10000) + (mes[3] * 0x100) + mes[4]; break;// SetTempo
                 default:break;
             }
 
