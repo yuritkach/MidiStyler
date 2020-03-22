@@ -180,6 +180,15 @@ namespace MidiAranger.Droid.Source.midiplayer
                 byte[] result = new byte[b.Length + 1];
                 result[0] = type;
                 Array.Copy(b, 0, result, 1, b.Length);
+
+                if (type == 0x06)
+                {
+                    MIDIMarker marker = new MIDIMarker();
+                    marker.Index = track.MidiEvents.Count();
+                    marker.Name = Encoding.Default.GetString(b);
+                    track.MidiMarkers.Add(marker);
+                }
+
                 return result;
             }
             else
