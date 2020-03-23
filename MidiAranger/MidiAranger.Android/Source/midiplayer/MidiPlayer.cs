@@ -16,6 +16,7 @@ using midi.events;
 using Android.Util;
 using Java.Lang;
 using System.Threading;
+using MidiAranger.Droid.Source.common;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
@@ -204,23 +205,19 @@ namespace MidiAranger.Droid.Source.midiplayer
             }
             else
             // Channel message
-            if (IsMasked(track.LastCommand, 0x8) || IsMasked(track.LastCommand, 0x9) || IsMasked(track.LastCommand, 0xA) || IsMasked(track.LastCommand, 0xB) || IsMasked(track.LastCommand, 0xE))
+            if (Common.IsMasked(track.LastCommand, 0x8) || Common.IsMasked(track.LastCommand, 0x9) || Common.IsMasked(track.LastCommand, 0xA) || Common.IsMasked(track.LastCommand, 0xB) || Common.IsMasked(track.LastCommand, 0xE))
             {
                 return new byte[2] { GetByte(), GetByte() };
             }
             else
-            if (IsMasked(track.LastCommand, 0xC) || IsMasked(track.LastCommand, 0xD))
+            if (Common.IsMasked(track.LastCommand, 0xC) || Common.IsMasked(track.LastCommand, 0xD))
             {
                 return new byte[1] { GetByte() };
             }
             return new byte[0];
         }
 
-        protected bool IsMasked(byte b1, byte mask)
-        {
-            return (b1 >> 4) == mask;
-        }
-
+       
         protected void ProcessMidiTrackInfo(ref MIDITrackInfo track)
         {
             track.Id = GetUint();
@@ -270,7 +267,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         private System.Threading.Thread thread;
         private long difTime1, difTime2;
-
+        public List<byte> currentPressedNotes;
 
         public MIDIPlayer(Context context) {
             this.context = context;
@@ -283,13 +280,15 @@ namespace MidiAranger.Droid.Source.midiplayer
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
-            Subscribe();
+           
             currentSongPosition = 0;
             pulsesPerQuarterNote = 500000; // 120 BPM initial tempo
 
             thread = new System.Threading.Thread(new ThreadStart(Run));
             thread.Start();
             isPlaying = false;
+            currentPressedNotes = new List<byte>();
+            Subscribe();
         }
 
 
@@ -320,12 +319,28 @@ namespace MidiAranger.Droid.Source.midiplayer
             ParseMidiMessage(_event.message);
         }
 
+        protected void AddToCurrentPressed(byte note)
+        {
+            if(!currentPressedNotes.Exists(n=>n==note))
+                currentPressedNotes.Add(note);
+        }
+        protected void RemoveFromCurrentPressed(byte note)
+        {
+             currentPressedNotes.Remove(note);
+        }
+
         protected void ParseMidiMessage(byte[] mes)
         {
             if (mes[0] == 0xF8) { } // Sync
             else
             {
                 message = mes;
+                if (Common.IsMasked(mes[0], 0x9))
+                    AddToCurrentPressed(mes[1]);
+                if (Common.IsMasked(mes[0], 0x8))
+                    RemoveFromCurrentPressed(mes[1]);
+
+
             }
         }
 

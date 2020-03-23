@@ -19,8 +19,14 @@ namespace MidiAranger.Droid.Source.common
         {
             return (long)(DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
         }
+
+        public static bool IsMasked(byte b1, byte mask)
+        {
+            return (b1 >> 4) == mask;
+        }
+
     }
 
-   
+
 
 }

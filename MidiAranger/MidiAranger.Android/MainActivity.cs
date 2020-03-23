@@ -20,6 +20,7 @@ namespace MidiAranger.Droid
     {
         
         private int timeInterval = 1000;
+        MIDIPlayer mplayer;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -39,7 +40,7 @@ namespace MidiAranger.Droid
 
             MIDIFile midiFile = new MIDIFile();
             midiFile.InitMidiFile("ddd");
-            MIDIPlayer mplayer = new MIDIPlayer(this);
+            mplayer = new MIDIPlayer(this);
             mplayer.Tracks = midiFile.Tracks;
             mplayer.Start();
 
@@ -49,15 +50,10 @@ namespace MidiAranger.Droid
 
         protected void SetUIValues(object state)
         {
-         
-            
             RunOnUiThread(() => {
-//                if (message == null)
-//                    message = new byte[0];
-//                string s = BitConverter.ToString(message).Replace("-", "");
-//                FindViewById<TextView>(Resource.Id.miditext).Text = s;
-//                FindViewById<TextView>(Resource.Id.midiClockCount).Text = (midiClockCount*(60000/timeInterval)/24).ToString();
-//                midiClockCount = 0;
+                if (mplayer.currentPressedNotes == null) return;
+                string s = BitConverter.ToString(mplayer.currentPressedNotes.ToArray()).Replace("-", "");
+                FindViewById<TextView>(Resource.Id.miditext).Text = s;
             });
             
         }
