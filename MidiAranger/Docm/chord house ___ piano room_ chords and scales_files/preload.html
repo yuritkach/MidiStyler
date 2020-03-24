@@ -1,0 +1,410 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0062)http://www.looknohands.com/chordhouse/piano/fr_piano_main.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	
+	<title>Chord House, Piano Room: Chords and Scales</title>
+	<meta name="Author" content="Erik van der Neut">
+	<meta name="Keywords" content="acoustic, augmented, chord, chord dictionary, chord finder, chords, composition, blues, diminished, education, educational, easy, electric, Erik van der Neut, fast, flat, free, instructions, interactive,Java, Javascript, jazz, learn piano, lessons, maj, maj9, major, major9, min, minor, music, music tool, musician, note, notes, olga, online music tools, online tools, piano, piano chord finder, piano-chord finder, pianist, pianists, pianos, print, rock, scales, sharp, song, songs, string, strings, sus, sus2, sus4, suspended, tab, tabs, tablature, tune, tuning, Minor, Melodic Minor, Harmonic Minor, Pentatonic Major, Pentatonic Minor, Pentatonic Blues, Pentatonic Neutral, Ionian, Aeolian, Dorian, Mixolydian, Phrygian, Lydian, Locrian, Half Diminished, Whole Diminished, Whole, Augmented, Chromatic, Roumanian Minor, Spanish Gypsy, Blues, Diatonic, Double Harmonic, Eight Tone Spanish, Enigmatic, Leading Whole Tone, Lydian Augmented, Neopolitan Major, Neopolitan Minor, Pelog, Prometheus, Prometheus Neopolitan, Six Tone Symmetrical, Super Locrian, Lydian Minor, Lydian Diminished, Nine Tone Scale, Auxiliary Diminished, Auxiliary Augmented, Auxiliary Diminished Blues, Major Locrian, Overtone, Diminished Whole Tone, Pure Minor, Dominant 7th">
+	<meta name="Description" content="Finger settings for any piano chord. Easy to use, fast, and complete. You get: finger positions, actual notes, optional notes, note names, scales, and more, all clearly displayed.">
+	<!-- Finger settings for any piano chord. Easy to use, fast, and complete. You get: finger positions, actual notes, optional notes, note names, scales, and more, all clearly displayed.
+	acoustic, augmented, chord, chord dictionary, chord finder, chords, composition, blues, diminished, education, educational, easy, electric, Erik van der Neut, fast, flat, free, instructions, interactive,Java, Javascript, jazz, learn piano, lessons, maj, maj9, major, major9, min, minor, music, music tool, musician, note, notes, olga, online music tools, online tools, piano, piano chord finder, piano-chord finder, pianist, pianists, pianos, print, rock, scales, sharp, song, songs, string, strings, sus, sus2, sus4, suspended, tab, tabs, tablature, tune, tuning, Minor, Melodic Minor, Harmonic Minor, Pentatonic Major, Pentatonic Minor, Pentatonic Blues, Pentatonic Neutral, Ionian, Aeolian, Dorian, Mixolydian, Phrygian, Lydian, Locrian, Half Diminished, Whole Diminished, Whole, Augmented, Chromatic, Roumanian Minor, Spanish Gypsy, Blues, Diatonic, Double Harmonic, Eight Tone Spanish, Enigmatic, Leading Whole Tone, Lydian Augmented, Neopolitan Major, Neopolitan Minor, Pelog, Prometheus, Prometheus Neopolitan, Six Tone Symmetrical, Super Locrian, Lydian Minor, Lydian Diminished, Nine Tone Scale, Auxiliary Diminished, Auxiliary Augmented, Auxiliary Diminished Blues, Major Locrian, Overtone, Diminished Whole Tone, Pure Minor, Dominant 7th
+	-->
+
+	<link rel="icon" href="http://www.looknohands.com/favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="http://www.looknohands.com/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="./chordhouse.css">
+
+	<!-- script type="text/JavaScript" src="../ch_browser_test.js"></script -->
+	<!-- script type="text/JavaScript" src="piano_browser_test.js"></script -->
+
+	<script type="text/JavaScript" language="JavaScript1.1" src="./pch.js.&#1041;&#1077;&#1079; &#1085;&#1072;&#1079;&#1074;&#1072;&#1085;&#1080;&#1103;">
+	<!--//
+	// Copyright since 1998 (c) Erik van der Neut
+	//-->
+	</script>
+	<script type="text/JavaScript">
+	<!--// Copyright 2003 (c) Erik van der Neut
+	var speaker  		 = new Image(); speaker.src    		= "../speaker.jpg";
+	var speaker_loading  = new Image(); speaker_loading.src = "../speaker_loading.gif";
+	var speaker_playing  = new Image(); speaker_playing.src = "../speaker_playing.gif";
+	var play_off = new Image(); play_off.src = "../play_off.gif";
+	var play_on  = new Image(); play_on.src  = "../play_on.gif";
+	var stop_off = new Image(); stop_off.src = "../stop_off.gif";
+	var stop_on  = new Image(); stop_on.src  = "../stop_on.gif";
+	var save_off = new Image(); save_off.src = "../save_off.gif";
+	var save_on  = new Image(); save_on.src  = "../save_on.gif";
+
+	function popupthatextrawindow(url, strWindowName, width, height, resizable)
+	{
+		var params = "toolbar=0,scrollbars=1,width=" + width + ",height=" + height + ",resizable=" + resizable + ",status=1";
+		var w = window.open(url, strWindowName, params);
+		w.focus();
+	}
+
+	function speakerStatus(status)
+	{
+		if (status == "loading") 	  document.speaker.src = speaker_loading.src;
+		else if (status == "playing") document.speaker.src = speaker_playing.src;
+		else 						  document.speaker.src = speaker.src;
+	}
+
+	function playMidi(midi_notes, playstyle)
+	{
+		speakerStatus("loading");
+		if (!top.midi_settings) { speakerStatus(""); return; }
+		if (!top.midi_settings.document)  { speakerStatus(""); return; }
+		top.midi_settings.playMidi(midi_notes, playstyle);
+	}
+
+	function stopMidi()
+	{
+		if (!top.midi_playback) { speakerStatus(""); return; }
+		if (!top.midi_playback.document)  { speakerStatus(""); return; }
+		top.midi_playback.location = "../blank.html";
+		speakerStatus("");
+	}
+
+	function saveMidi(midi_notes, playstyle)
+	{
+		var chord_or_scale = "chord";
+
+		speakerStatus("loading");
+		if (!top.midi_settings) { speakerStatus(""); return; }
+		if (!top.midi_settings.document)  { speakerStatus(""); return; }
+
+		if (document.midi.playstyle.value == "piano_scale") chord_or_scale = "scale";
+		top.midi_settings.saveMidi(midi_notes, playstyle, document.midi.full_name.value, chord_or_scale);
+	}
+
+	function playing(now_playing)
+	{
+		if (now_playing) speakerStatus("playing");
+		else speakerStatus("");
+	}
+	//-->
+	</script>
+</head>
+
+<body bgcolor="#ffffff" text="#333333" link="#000099" alink="#0000ff" vlink="#000066">
+<center>
+
+<table border="0" cellpadding="0" cellspacing="0" bgcolor="#000000">
+<tbody><tr>
+	<td valign="bottom"><img src="./corner_rnd_wsml_l.gif" alt=""></td>
+	<td valign="middle"><font color="#ffffff" size="2"><b>
+	&nbsp;
+	<a href="http://www.looknohands.com/chordhouse/" target="_top">Home</a> &nbsp; &nbsp;
+	| &nbsp; &nbsp;
+	<a href="javascript:popupthatextrawindow(&#39;../links_piano.html&#39;,&#39;menu_option&#39;, 500, 500, 0);">Links</a> &nbsp; &nbsp;
+	| &nbsp; &nbsp;
+	<a href="javascript:popupthatextrawindow(&#39;../contact.html&#39;,&#39;menu_option&#39;, 500, 500, 0);">Contact</a> &nbsp; &nbsp;
+	| &nbsp; &nbsp;
+	<a href="javascript:popupthatextrawindow(&#39;../about.html&#39;,&#39;menu_option&#39;, 500, 500, 0);">About</a>
+	&nbsp;
+	</b></font>
+	</td>
+	<td valign="bottom"><img src="./corner_rnd_wsml_r.gif" alt=""></td>
+</tr>
+</tbody></table>
+
+<form name="formChordsAndScales" action="http://www.looknohands.com/chordhouse/piano/fr_piano_main.html">
+
+<table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+<tbody><tr>
+	<td>&nbsp;</td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="10">&nbsp;</td>
+		    <td width="20" align="center"><span id="n2" class="n"></span></td>
+		    <td width="20" align="center"><span id="n4" class="n">D#</span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="10">&nbsp;</td>
+		    <td width="20" align="center"><span id="n7" class="n"></span></td>
+		    <td width="20" align="center"><span id="n9" class="n"></span></td>
+		    <td width="20" align="center"><span id="n11" class="n">A#</span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="10">&nbsp;</td>
+		    <td width="20" align="center"><span id="n14" class="n"></span></td>
+		    <td width="20" align="center"><span id="n16" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="10">&nbsp;</td>
+		    <td width="20" align="center"><span id="n19" class="n"></span></td>
+		    <td width="20" align="center"><span id="n21" class="n"></span></td>
+		    <td width="20" align="center"><span id="n23" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="10">&nbsp;</td>
+		    <td width="20" align="center"><span id="n26" class="n"></span></td>
+		    <td width="20" align="center"><span id="n28" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="10">&nbsp;</td>
+		    <td width="20" align="center"><span id="n31" class="n"></span></td>
+		    <td width="20" align="center"><span id="n33" class="n"></span></td>
+		    <td width="20" align="center"><span id="n35" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td>&nbsp;</td>
+</tr>
+<tr>
+	<td><img border="0" src="./kl.gif" alt=""></td>
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td><img border="0" alt="C" name="k1u" src="./kwuwl.gif"><img border="0" alt="C#/Db" name="k2" src="./kb.gif"><img border="0" alt="D" name="k3u" src="./kwun.gif"><img border="0" alt="D#/Eb" name="k4" src="./kbp.gif"><img border="0" alt="E" name="k5u" src="./kwuwr.gif"></td>
+		</tr>
+		<tr><td><img border="0" alt="C" name="k1" src="./kw.gif"><img border="0" alt="D" name="k3" src="./kw.gif"><img border="0" alt="E" name="k5" src="./kw.gif"></td>
+		</tr></tbody></table></td>
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td><img border="0" alt="F" name="k6u" src="./kwuwl.gif"><img border="0" alt="F#/Gb" name="k7" src="./kb.gif"><img border="0" alt="G" name="k8u" src="./kwun.gif"><img border="0" alt="G#/Ab" name="k9" src="./kb.gif"><img border="0" alt="A" name="k10u" src="./kwun.gif"><img border="0" alt="A#/Bb" name="k11" src="./kbp.gif"><img border="0" alt="B" name="k12u" src="./kwuwr.gif"></td>
+		</tr>
+		<tr><td><img border="0" alt="F" name="k6" src="./kw.gif"><img border="0" alt="G" name="k8" src="./kwp.gif"><img border="0" alt="A" name="k10" src="./kw.gif"><img border="0" alt="B" name="k12" src="./kw.gif"></td>
+		</tr></tbody></table></td>
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td><img border="0" alt="C" name="k13u" src="./kwuwl.gif"><img border="0" alt="C#/Db" name="k14" src="./kb.gif"><img border="0" alt="D" name="k15u" src="./kwun.gif"><img border="0" alt="D#/Eb" name="k16" src="./kb.gif"><img border="0" alt="E" name="k17u" src="./kwuwr.gif"></td>
+		</tr>
+		<tr><td><img border="0" alt="C" name="k13" src="./kw.gif"><img border="0" alt="D" name="k15" src="./kw.gif"><img border="0" alt="E" name="k17" src="./kw.gif"></td>
+		</tr></tbody></table></td>
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td><img border="0" alt="F" name="k18u" src="./kwuwl.gif"><img border="0" alt="F#/Gb" name="k19" src="./kb.gif"><img border="0" alt="G" name="k20u" src="./kwun.gif"><img border="0" alt="G#/Ab" name="k21" src="./kb.gif"><img border="0" alt="A" name="k22u" src="./kwun.gif"><img border="0" alt="A#/Bb" name="k23" src="./kb.gif"><img border="0" alt="B" name="k24u" src="./kwuwr.gif"></td>
+		</tr>
+		<tr><td><img border="0" alt="F" name="k18" src="./kw.gif"><img border="0" alt="G" name="k20" src="./kw.gif"><img border="0" alt="A" name="k22" src="./kw.gif"><img border="0" alt="B" name="k24" src="./kw.gif"></td>
+		</tr></tbody></table></td>
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td><img border="0" alt="C" name="k25u" src="./kwuwl.gif"><img border="0" alt="C#/Db" name="k26" src="./kb.gif"><img border="0" alt="D" name="k27u" src="./kwun.gif"><img border="0" alt="D#/Eb" name="k28" src="./kb.gif"><img border="0" alt="E" name="k29u" src="./kwuwr.gif"></td>
+		</tr>
+		<tr><td><img border="0" alt="C" name="k25" src="./kw.gif"><img border="0" alt="D" name="k27" src="./kw.gif"><img border="0" alt="E" name="k29" src="./kw.gif"></td>
+		</tr></tbody></table></td>
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td><img border="0" alt="F" name="k30u" src="./kwuwl.gif"><img border="0" alt="F#/Gb" name="k31" src="./kb.gif"><img border="0" alt="G" name="k32u" src="./kwun.gif"><img border="0" alt="G#/Ab" name="k33" src="./kb.gif"><img border="0" alt="A" name="k34u" src="./kwun.gif"><img border="0" alt="A#/Bb" name="k35" src="./kb.gif"><img border="0" alt="B" name="k36u" src="./kwuwr.gif"></td>
+		</tr>
+		<tr><td><img border="0" alt="F" name="k30" src="./kw.gif"><img border="0" alt="G" name="k32" src="./kw.gif"><img border="0" alt="A" name="k34" src="./kw.gif"><img border="0" alt="B" name="k36" src="./kw.gif"></td>
+		</tr></tbody></table></td>
+	<td><img border="0" src="./kr.gif" alt=""></td>
+</tr>
+<tr>
+	<td>&nbsp;</td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="20" align="center"><span id="n1" class="n"></span></td>
+		    <td width="20" align="center"><span id="n3" class="n"></span></td>
+		    <td width="20" align="center"><span id="n5" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="20" align="center"><span id="n6" class="n"></span></td>
+		    <td width="20" align="center"><span id="n8" class="n">Fx</span></td>
+		    <td width="20" align="center"><span id="n10" class="n"></span></td>
+		    <td width="20" align="center"><span id="n12" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="20" align="center"><span id="n13" class="n"></span></td>
+		    <td width="20" align="center"><span id="n15" class="n"></span></td>
+		    <td width="20" align="center"><span id="n17" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="20" align="center"><span id="n18" class="n"></span></td>
+		    <td width="20" align="center"><span id="n20" class="n"></span></td>
+		    <td width="20" align="center"><span id="n22" class="n"></span></td>
+		    <td width="20" align="center"><span id="n24" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="20" align="center"><span id="n25" class="n"></span></td>
+		    <td width="20" align="center"><span id="n27" class="n"></span></td>
+		    <td width="20" align="center"><span id="n29" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td><table border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
+		<tbody><tr><td width="20" align="center"><span id="n30" class="n"></span></td>
+		    <td width="20" align="center"><span id="n32" class="n"></span></td>
+		    <td width="20" align="center"><span id="n34" class="n"></span></td>
+		    <td width="20" align="center"><span id="n36" class="n"></span></td>
+		</tr></tbody></table></td>
+
+	<td>&nbsp;</td>
+</tr>
+</tbody></table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="480">
+<tbody><tr>
+	<td colspan="3">
+	<table width="440" border="0" cellpadding="0" cellspacing="0">
+	<tbody><tr>
+		<td width="180"><span id="rb_display_names" class="rb">
+			<acronym title="Note names: C, D, E, etc.">
+			<input type="radio" name="displayNames" value="nn" onclick="switchInNn(&#39;nn&#39;);"><b><u>D</u></b>isplay
+			note names</acronym><br>
+
+			<acronym title="Intervals: 1, 2, 3, etc.">
+			<input type="radio" name="displayNames" value="in" onclick="switchInNn(&#39;in&#39;);"><b><u>D</u></b>isplay
+			intervals</acronym>
+
+		</span></td>
+		<td width="180"><span id="rb_spelling" class="rb">
+			<acronym title="Strict enharmonic spelling: double sharps (x), double flats (bb), etc.">
+			<input type="radio" name="enharmonicSpelling" value="STRICT" onclick="switchSpelling(&#39;STRICT&#39;);"><b><u>S</u></b>trict
+			spelling <font color="#666666">(x is ##)</font></acronym><br>
+
+			<acronym title="Simplified enharmonic spelling: translates to common note names only">
+			<input type="radio" name="enharmonicSpelling" value="SIMPLE" onclick="switchSpelling(&#39;SIMPLE&#39;);"><b><u>S</u></b>implified
+			spelling</acronym>
+
+		</span></td>
+		<td><span id="rb_root" class="rb">
+			<acronym title="#: resolve ambiguous root notes to sharps">
+			<input type="radio" name="rootSharpOrFlat" value="#" onclick="switchSharpFlat(&#39;#&#39;);"><b><u>R</u></b>oot:
+			#</acronym><br>
+
+			<acronym title="b: resolve ambiguous root notes to flats">
+			<input type="radio" name="rootSharpOrFlat" value="b" onclick="switchSharpFlat(&#39;b&#39;);"><b><u>R</u></b>oot:
+			b</acronym>
+
+		</span></td>
+	</tr>
+	</tbody></table></td>
+</tr>
+<tr>
+	<td colspan="3"><img src="./dot_clear(1).gif" height="5" alt=""></td>
+</tr>
+<tr>
+	<td align="left">
+	<table border="0">
+	<tbody><tr><td valign="bottom" bgcolor="#000000"><!-- CHORDS-->
+			<img src="./sel_chords.gif" width="10" alt=""></td>
+		<td><span style="white-space: nowrap;">
+			<select class="cssChordList" name="chordRoot" size="12" onchange="showFingerSetting(&#39;Chords&#39;);">
+			<option value="C">C
+			</option><option value="C#">C#/Db
+			</option><option value="D">D
+			</option><option value="D#">D#/Eb
+			</option><option value="E">E
+			</option><option value="F">F
+			</option><option value="F#">F#/Gb
+			</option><option value="G">G
+			</option><option value="G#">G#/Ab
+			</option><option value="A">A
+			</option><option value="A#">A#/Bb
+			</option><option value="B">B
+			</option></select>
+
+			<script type="text/JavaScript">
+			<!--//
+				document.write("<select class=\"cssChordList\" name=\"chordName\" "
+							+  "size=12	onChange=\"showFingerSetting('Chords');\">");
+				addChordOptions();
+				document.write("</" + "select" + ">");  // <<< W3C validation hack
+			//-->
+			</script><select class="cssChordList" name="chordName" size="12" onchange="showFingerSetting(&#39;Chords&#39;);"><option value=" Major"> Major</option><option value="5">5</option><option value="-5">-5</option><option value="6">6</option><option value="6/9">6/9</option><option value="7">7</option><option value="add9">add9</option><option value="maj7">maj7</option><option value="maj7+5">maj7+5</option><option value="maj9">maj9</option><option value="maj11">maj11</option><option value="maj13">maj13</option><option value="2">2</option><option value="m">m</option><option value="m6">m6</option><option value="m6/9">m6/9</option><option value="mmaj7">mmaj7</option><option value="mmaj9">mmaj9</option><option value="madd9">madd9</option><option value="m7">m7</option><option value="m9">m9</option><option value="m11">m11</option><option value="m13">m13</option><option value="m-5">m-5</option><option value="dim">dim</option><option value="dim7">dim7</option><option value="m7-5">m7-5</option><option value="7">7</option><option value="7-9">7-9</option><option value="7+9">7+9</option><option value="7-5">7-5</option><option value="7+5">7+5</option><option value="7/6">7/6</option><option value="9">9</option><option value="9-5">9-5</option><option value="9+5">9+5</option><option value="add9">add9</option><option value="9/6">9/6</option><option value="9+11">9+11</option><option value="11">11</option><option value="11-9">11-9</option><option value="13">13</option><option value="13-9">13-9</option><option value="13-9-5">13-9-5</option><option value="13-9+11">13-9+11</option><option value="13+11">13+11</option><option value="7/13">7/13</option><option value="aug">aug</option><option value="sus2">sus2</option><option value="sus4">sus4</option><option value="7sus4">7sus4</option><option value="-9">-9</option><option value="-9+5">-9+5</option><option value="-9+11">-9+11</option><option value="-9-5">-9-5</option><option value="+5">+5</option><option value="+9">+9</option><option value="+11">+11</option></select>
+			</span>
+		</td>
+	</tr></tbody></table></td>
+
+	<td align="center">
+		<!-- Sound controls: -->
+		<img name="speaker" src="./speaker_loading.gif" alt="(*)" align="middle"><br>
+		<img src="./dot_clear(1).gif" width="1" height="10" alt=""><br>
+
+		<a href="Javascript:playMidi(document.midi.music_notes.value,document.midi.playstyle.value);" onmouseover="imgOn(&#39;play_&#39;);window.status=document.midi.statusmsgplay.value;return true;" onmouseout="imgOff(&#39;play_&#39;);window.status=&#39;&#39;;return true;"><img name="play_" src="./play_off.gif" alt="Play" border="0" align="middle"></a><br>
+
+		<img src="./dot_clear(1).gif" width="1" height="10" alt=""><br>
+
+		<a href="Javascript:stopMidi();" onmouseover="imgOn(&#39;stop_&#39;);window.status=&#39;Stop sound&#39;;return true;" onmouseout="imgOff(&#39;stop_&#39;);window.status=&#39;&#39;;return true;"><img name="stop_" src="./stop_off.gif" alt="Stop" border="0" align="middle"></a><br>
+
+		<img src="./dot_clear(1).gif" width="1" height="10" alt=""><br>
+
+		<a href="Javascript:saveMidi(document.midi.music_notes.value,document.midi.playstyle.value);" onmouseover="imgOn(&#39;save_&#39;);window.status=document.midi.statusmsgsave.value;return true;" onmouseout="imgOff(&#39;save_&#39;);window.status=&#39;&#39;;return true;"><img name="save_" src="./save_off.gif" alt="Save" border="0" align="middle"></a>
+	</td>
+
+	<td align="right">
+	<table border="0">
+	<tbody><tr><td valign="bottom" bgcolor="#000000"><img src="./sel_scales.gif" width="10" alt=""></td>
+
+		<td><span style="white-space: nowrap;"> <!-- SCALES-->
+			<select class="cssScaleList" name="scaleRoot" size="12" onchange="showFingerSetting(&#39;Scales&#39;);">
+			<option value="C">C
+			</option><option value="C#">C#/Db
+			</option><option value="D">D
+			</option><option value="D#">D#/Eb
+			</option><option value="E">E
+			</option><option value="F">F
+			</option><option value="F#">F#/Gb
+			</option><option value="G">G
+			</option><option value="G#">G#/Ab
+			</option><option value="A">A
+			</option><option value="A#">A#/Bb
+			</option><option value="B">B
+			</option></select>
+
+			<script type="text/JavaScript">
+			<!--//
+				document.write("<select class=\"cssScaleList\" name=\"scaleName\" "
+							+  "size=12 onChange=\"showFingerSetting('Scales');\">");
+				addScaleOptions();
+				document.write("</" + "select" + ">");  // <<< W3C validation hack
+			//-->
+			</script><select class="cssScaleList" name="scaleName" size="12" onchange="showFingerSetting(&#39;Scales&#39;);"><option value="::: REGULAR SCALES :::">::: REGULAR SCALES :::</option><option value="Major">Major</option><option value="Harmonic Minor">Harmonic Minor</option><option value="Melodic Minor (Ascending)">Melodic Minor (Ascending)</option><option value="Melodic Minor (Descending)">Melodic Minor (Descending)</option><option value="Chromatic">Chromatic</option><option value="Whole Tone">Whole Tone</option><option value="Pentatonic Major">Pentatonic Major</option><option value="Pentatonic Minor">Pentatonic Minor</option><option value="Pentatonic Blues">Pentatonic Blues</option><option value="Pentatonic Neutral">Pentatonic Neutral</option><option value="Octatonic (H-W)">Octatonic (H-W)</option><option value="Octatonic (W-H)">Octatonic (W-H)</option><option value="Ionian">Ionian</option><option value="Dorian">Dorian</option><option value="Phrygian">Phrygian</option><option value="Lydian">Lydian</option><option value="Mixolydian">Mixolydian</option><option value="Aeolian">Aeolian</option><option value="Locrian">Locrian</option><option value="::: EXOTIC SCALES :::">::: EXOTIC SCALES :::</option><option value="Algerian">Algerian</option><option value="Arabian (a)">Arabian (a)</option><option value="Arabian (b)">Arabian (b)</option><option value="Augmented">Augmented</option><option value="Auxiliary Diminished">Auxiliary Diminished</option><option value="Auxiliary Augmented">Auxiliary Augmented</option><option value="Auxiliary Diminished Blues">Auxiliary Diminished Blues</option><option value="Balinese">Balinese</option><option value="Blues">Blues</option><option value="Byzantine">Byzantine</option><option value="Chinese">Chinese</option><option value="Chinese Mongolian">Chinese Mongolian</option><option value="Diatonic">Diatonic</option><option value="Diminished">Diminished</option><option value="Diminished, Half">Diminished, Half</option><option value="Diminished, Whole">Diminished, Whole</option><option value="Diminished Whole Tone">Diminished Whole Tone</option><option value="Dominant 7th">Dominant 7th</option><option value="Double Harmonic">Double Harmonic</option><option value="Egyptian">Egyptian</option><option value="Eight Tone Spanish">Eight Tone Spanish</option><option value="Enigmatic">Enigmatic</option><option value="Ethiopian (A raray)">Ethiopian (A raray)</option><option value="Ethiopian (Geez &amp; Ezel)">Ethiopian (Geez &amp; Ezel)</option><option value="Half Diminished (Locrian)">Half Diminished (Locrian)</option><option value="Half Diminished #2 (Locrian #2)">Half Diminished #2 (Locrian #2)</option><option value="Hawaiian">Hawaiian</option><option value="Hindu">Hindu</option><option value="Hindustan">Hindustan</option><option value="Hirajoshi">Hirajoshi</option><option value="Hungarian Major">Hungarian Major</option><option value="Hungarian Gypsy">Hungarian Gypsy</option><option value="Hungarian Gypsy Persian">Hungarian Gypsy Persian</option><option value="Hungarian Minor">Hungarian Minor</option><option value="Japanese (A)">Japanese (A)</option><option value="Japanese (B)">Japanese (B)</option><option value="Japanese (Ichikosucho)">Japanese (Ichikosucho)</option><option value="Japanese (Taishikicho)">Japanese (Taishikicho)</option><option value="Javaneese">Javaneese</option><option value="Jewish (Adonai Malakh)">Jewish (Adonai Malakh)</option><option value="Jewish (Ahaba Rabba)">Jewish (Ahaba Rabba)</option><option value="Jewish (Magen Abot)">Jewish (Magen Abot)</option><option value="Kumoi">Kumoi</option><option value="Leading Whole Tone">Leading Whole Tone</option><option value="Lydian Augmented">Lydian Augmented</option><option value="Lydian Minor">Lydian Minor</option><option value="Lydian Diminished">Lydian Diminished</option><option value="Major Locrian">Major Locrian</option><option value="Mela Bhavapriya (44)">Mela Bhavapriya (44)</option><option value="Mela Chakravakam (16)">Mela Chakravakam (16)</option><option value="Mela Chalanata (36)">Mela Chalanata (36)</option><option value="Mela Charukesi (26)">Mela Charukesi (26)</option><option value="Mela Chitrambari (66)">Mela Chitrambari (66)</option><option value="Mela Dharmavati (59)">Mela Dharmavati (59)</option><option value="Mela Dhatuvardhani (69)">Mela Dhatuvardhani (69)</option><option value="Mela Dhavalambari (49)">Mela Dhavalambari (49)</option><option value="Mela Dhenuka (9)">Mela Dhenuka (9)</option><option value="Mela Dhirasankarabharana (29)">Mela Dhirasankarabharana (29)</option><option value="Mela Divyamani (48)">Mela Divyamani (48)</option><option value="Mela Gamanasrama (53)">Mela Gamanasrama (53)</option><option value="Mela Ganamurti (3)">Mela Ganamurti (3)</option><option value="Mela Gangeyabhusani (33)">Mela Gangeyabhusani (33)</option><option value="Mela Gaurimanohari (23)">Mela Gaurimanohari (23)</option><option value="Mela Gavambodhi (43)">Mela Gavambodhi (43)</option><option value="Mela Gayakapriya (13)">Mela Gayakapriya (13)</option><option value="Mela Hanumattodi (8)">Mela Hanumattodi (8)</option><option value="Mela Harikambhoji (28)">Mela Harikambhoji (28)</option><option value="Mela Hatakambari (18)">Mela Hatakambari (18)</option><option value="Mela Hemavati (58)">Mela Hemavati (58)</option><option value="Mela Jalarnavam (38)">Mela Jalarnavam (38)</option><option value="Mela Jhalavarali (39)">Mela Jhalavarali (39)</option><option value="Mela Jhankaradhvani (19)">Mela Jhankaradhvani (19)</option><option value="Mela Jyotisvarupini (68)">Mela Jyotisvarupini (68)</option><option value="Mela Kamavardhani (51)">Mela Kamavardhani (51)</option><option value="Mela Kanakangi (1)">Mela Kanakangi (1)</option><option value="Mela Kantamani (61)">Mela Kantamani (61)</option><option value="Mela Kharaharapriya (22)">Mela Kharaharapriya (22)</option><option value="Mela Kiravani (21)">Mela Kiravani (21)</option><option value="Mela Kokilapriya (11)">Mela Kokilapriya (11)</option><option value="Mela Kosalam (71)">Mela Kosalam (71)</option><option value="Mela Latangi (63)">Mela Latangi (63)</option><option value="Mela Manavati (5)">Mela Manavati (5)</option><option value="Mela Mararanjani (25)">Mela Mararanjani (25)</option><option value="Mela Mayamalavagaula (15)">Mela Mayamalavagaula (15)</option><option value="Mela Mechakalyani (65)">Mela Mechakalyani (65)</option><option value="Mela Naganandini (30)">Mela Naganandini (30)</option><option value="Mela Namanarayani (50)">Mela Namanarayani (50)</option><option value="Mela Nasikabhusani (70)">Mela Nasikabhusani (70)</option><option value="Mela Natabhairavi (20)">Mela Natabhairavi (20)</option><option value="Mela Natakapriya (10)">Mela Natakapriya (10)</option><option value="Mela Navanitam (40)">Mela Navanitam (40)</option><option value="Mela Nitimati (60)">Mela Nitimati (60)</option><option value="Mela Pavani (41)">Mela Pavani (41)</option><option value="Mela Ragavardhani (32)">Mela Ragavardhani (32)</option><option value="Mela Raghupriya (42)">Mela Raghupriya (42)</option><option value="Mela Ramapriya (52)">Mela Ramapriya (52)</option><option value="Mela Rasikapriya (72)">Mela Rasikapriya (72)</option><option value="Mela Ratnangi (2)">Mela Ratnangi (2)</option><option value="Mela Risabhapriya (62)">Mela Risabhapriya (62)</option><option value="Mela Rupavati (12)">Mela Rupavati (12)</option><option value="Mela Sadvidhamargini (46)">Mela Sadvidhamargini (46)</option><option value="Mela Salagam (37)">Mela Salagam (37)</option><option value="Mela Sanmukhapriya (56)">Mela Sanmukhapriya (56)</option><option value="Mela Sarasangi (27)">Mela Sarasangi (27)</option><option value="Mela Senavati (7)">Mela Senavati (7)</option><option value="Mela Simhendramadhyama (57)">Mela Simhendramadhyama (57)</option><option value="Mela Subhapantuvarali (45)">Mela Subhapantuvarali (45)</option><option value="Mela Sucharitra (67)">Mela Sucharitra (67)</option><option value="Mela Sulini (35)">Mela Sulini (35)</option><option value="Mela Suryakantam (17)">Mela Suryakantam (17)</option><option value="Mela Suvarnangi (47)">Mela Suvarnangi (47)</option><option value="Mela Syamalangi (55)">Mela Syamalangi (55)</option><option value="Mela Tanarupi (6)">Mela Tanarupi (6)</option><option value="Mela Vaschaspati (64)">Mela Vaschaspati (64)</option><option value="Mela Vagadhisvari (34)">Mela Vagadhisvari (34)</option><option value="Mela Vakulabharanam (14)">Mela Vakulabharanam (14)</option><option value="Mela Vanaspati (4)">Mela Vanaspati (4)</option><option value="Mela Varunapriya (24)">Mela Varunapriya (24)</option><option value="Mela Visvambari (54)">Mela Visvambari (54)</option><option value="Mela Yagapriya (31)">Mela Yagapriya (31)</option><option value="Mohammedan">Mohammedan</option><option value="Neopolitan">Neopolitan</option><option value="Neoploitan Major">Neoploitan Major</option><option value="Neopolitan Minor">Neopolitan Minor</option><option value="Nine Tone Scale">Nine Tone Scale</option><option value="Oriental (a)">Oriental (a)</option><option value="Oriental (b)">Oriental (b)</option><option value="Overtone">Overtone</option><option value="Overtone Dominant">Overtone Dominant</option><option value="Pelog">Pelog</option><option value="Persian">Persian</option><option value="Prometheus">Prometheus</option><option value="Prometheus Neopolitan">Prometheus Neopolitan</option><option value="Pure Minor">Pure Minor</option><option value="Purvi Theta">Purvi Theta</option><option value="Roumanian Minor">Roumanian Minor</option><option value="Six Tone Symmetrical">Six Tone Symmetrical</option><option value="Spanish Gypsy">Spanish Gypsy</option><option value="Super Locrian">Super Locrian</option><option value="Theta, Asavari">Theta, Asavari</option><option value="Theta, Bilaval">Theta, Bilaval</option><option value="Theta, Bhairav">Theta, Bhairav</option><option value="Theta, Bhairavi">Theta, Bhairavi</option><option value="Theta, Kafi">Theta, Kafi</option><option value="Theta, Kalyan">Theta, Kalyan</option><option value="Theta, Khamaj">Theta, Khamaj</option><option value="Theta, Marva">Theta, Marva</option><option value="Todi Theta">Todi Theta</option></select>
+			</span>
+		</td>
+	</tr></tbody></table>
+	</td>
+</tr>
+<tr>
+	<td colspan="3">
+	<table border="0" width="470">
+	<tbody><tr><td valign="bottom" bgcolor="#000000">
+			<img src="./sel_details.gif" width="10" alt=""></td>
+		<td>
+			<font face="CourierNew,Courier" size="1"><textarea id="infoText" rows="5" cols="60">CHORD HOUSE: Piano Room</textarea>
+			</font></td>
+	</tr></tbody></table>
+	</td>
+</tr>
+<tr>
+	<td align="left" colspan="3"><div class="history">
+	Update, 07/14/2009: &gt;&gt;&gt;&gt; SITE CLEANUP COMPLETE, SITE OPERATIONAL AGAIN<br>
+	</div></td>
+</tr>
+</tbody></table>
+</form>
+
+
+<div class="copyright">
+<script type="text/Javascript">
+<!--//
+	var time = new Date();
+	var year = time.getYear();
+	if (year < 2000) year += 1900;
+	document.write("&copy; 1998 - " + year + ", Erik van der Neut");
+	document.write(", Last modified: " + document.lastModified);
+// -->
+</script>© 1998 - 2020, Erik van der Neut, Last modified: 07/14/2009 09:14:45
+</div>
+
+<form name="midi" action="http://www.looknohands.com/chordhouse/piano/fr_piano_main.html">
+<input type="hidden" name="music_notes" value="Dis_3,G_3,Ais_3">
+<input type="hidden" name="playstyle" value="piano_chord">
+<input type="hidden" name="full_name" value="D#  Major">
+<input type="hidden" name="statusmsgplay" value="Hear this chord...">
+<input type="hidden" name="statusmsgstop" value="Stop the sound...">
+<input type="hidden" name="statusmsgsave" value="Save the sound file for this chord...">
+</form>
+
+<script type="text/Javascript" language="JavaScript1.1">
+<!--//
+	setRadioButtons();	// set radio buttons to default settings
+	FirstChord();		// display C Major chord upon page load
+//-->
+</script>
+
+</center>
+
+</body></html>

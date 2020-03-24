@@ -1,0 +1,194 @@
+/********************************************************************
+ Chord House ::: Cascading Style Sheet, Erik van der Neut, 03/06/2004 
+ ********************************************************************/
+
+html, body 
+{
+	margin		: 0px;
+	padding		: 0px;
+	font		: 11px Helvetica,Arial,sans-serif;
+	color		: #000000;
+}
+
+.main
+{
+	font		: 10px Verdana,Arial,Helvetica,sans-serif;
+	color		: #ffffff;
+	letter-spacing: 1px;
+}
+
+#navbar_title
+{
+	font-size	: 17px; 
+	font-weight	: bold;
+	color		: #ffffff;
+	text-align  : left;
+	white-space	: nowrap;
+	padding-left: 1em;
+}
+
+a
+{
+	font		: bold 10px Verdana,Arial,Helvetica,sans-serif;
+	letter-spacing: 2px;
+}
+
+a:link,
+a:visited
+{
+	color		: #ffffff;
+	text-decoration: none;
+}
+
+a:active,
+a:hover
+{
+	color		: #ffcc33;
+	text-decoration: underline;
+}
+
+abbr,
+acronym
+{	
+	border-bottom: 0px; 
+	cursor		: help; 
+}
+
+input,
+select 
+{ 
+	color		: #000000;
+	background	: #ffffff;
+	font		: 11px Helvetica,Arial,sans-serif;
+}
+
+textarea
+{
+/*	font		: 12px "Courier New",Courier,monospace;  */
+	font		: 12px monospace;
+}
+
+.email_snapshot
+{
+	width		: 265px;
+	background	: #ffffff;
+    color		: #666666;
+    font		: 11px monospace;
+}
+
+.navbar 
+{
+    background	: #000000;
+    color		: #ffffff;
+    font		: 12px Helvetica,Arial,sans-serif;
+}
+
+.history
+{
+	font		: 10px Arial,sans-serif;
+	color		: blue;
+}
+
+.copyright
+{
+	font		: 11px Verdana,sans-serif;
+	color		: gray;
+}
+
+.rb 					/* radio buttons */
+{
+	font		: 8pt Arial,Helvetica,Geneva,sans-serif; 
+	color		: #333333;
+	text-align  : left;
+}  
+
+/*
+select.cssMidi
+select.cssChordList
+select.cssScaleList
+select.cssPrintList
+select.cssChRooms 
+select.cssGuestBook
+input.cssChordName
+*/
+
+select.cssChRooms, 
+select.cssGuestBook 	/* navbar drop down lists */
+{ 
+	color		: #0000cc; 
+}
+
+select.cssChordList, 
+select.cssScaleList 	/* chord/scale selection interface */
+{ 
+	background	: #efefef; 
+}
+
+select.cssMidi 			/* midi instrument selection */	
+{ 
+	color		: #ff3333;
+	background	: #ffeeee;
+	font-size	: 10px; 
+}
+
+input.cssChordName 		/* chord name display in Easy Guitar Room */
+{ 
+	font-size	: 14px; 
+	font-weight	: bold;
+	text-align	: center;
+}
+
+.fretno					/* guitar fretboard fret numbers */
+{
+	font		: 10px Arial,sans-serif;
+	color		: #333333;
+	text-align	: center;
+}
+
+.n_img { }				/* guitar note images */
+
+.n_txt					/* guitar note text labels */
+{
+	margin-top	: -16px;
+	margin-bottom: -16px;
+	height: 0;
+
+	font		: bold 10px Arial,sans-serif;
+	color		: #ffffff;
+	text-align	: center;
+}
+
+.n 						/* piano key text labels: */
+{
+	width		: 20px;
+	font		: 8pt Arial,sans-serif;
+	color		: #000000;
+	text-align	: center;
+}
+
+.bb 					/* double flats */
+{ 
+	font-size	: 0.8em; 
+	letter-spacing: -1px; 
+}  
+
+textarea#linksText		/* info window on links pages */
+{
+	overflow	: auto;
+	width		: 450px;
+	color		: #333333;
+	background	: #ffcc99;
+	border-style: dashed;
+	border-width: 1px 1px 1px 1px;
+	border-color: #ffffff;
+}
+
+textarea#infoText		/* DETAILS window in Advanced Guitar Room and Piano Room */
+{
+/*	overflow	: scroll; */
+	width		: 470px;
+	background	: #efefef; 
+	border-style: dotted;
+	border-width: 1px 1px 1px 0px;
+	border-color: #666666;
+}
