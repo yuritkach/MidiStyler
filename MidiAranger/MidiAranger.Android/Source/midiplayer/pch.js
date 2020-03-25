@@ -1,23 +1,23 @@
 // Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 © Erik van der Neut - All rights reserved.
 if (document) {
-    var b10 = new Array;
-    b10["C"] = 1;
-    b10["C#"] = 2;
-    b10["Db"] = 2;
-    b10["D"] = 3;
-    b10["D#"] = 4;
-    b10["Eb"] = 4;
-    b10["E"] = 5;
-    b10["F"] = 6;
-    b10["F#"] = 7;
-    b10["Gb"] = 7;
-    b10["G"] = 8;
-    b10["G#"] = 9;
-    b10["Ab"] = 9;
-    b10["A"] = 10;
-    b10["A#"] = 11;
-    b10["Bb"] = 11;
-    b10["B"] = 12;
+    var noteOffset = new Array;
+    noteOffset["C"] = 1;
+    noteOffset["C#"] = 2;
+    noteOffset["Db"] = 2;
+    noteOffset["D"] = 3;
+    noteOffset["D#"] = 4;
+    noteOffset["Eb"] = 4;
+    noteOffset["E"] = 5;
+    noteOffset["F"] = 6;
+    noteOffset["F#"] = 7;
+    noteOffset["Gb"] = 7;
+    noteOffset["G"] = 8;
+    noteOffset["G#"] = 9;
+    noteOffset["Ab"] = 9;
+    noteOffset["A"] = 10;
+    noteOffset["A#"] = 11;
+    noteOffset["Bb"] = 11;
+    noteOffset["B"] = 12;
 
     var c38 = new Array("C", "C#", "Db", "D", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B");
     c38["C"] = new Array("C", "D", "E", "F", "G", "A", "B");
@@ -38,36 +38,36 @@ if (document) {
     c38["Bb"] = new Array("Bb", "C", "D", "Eb", "F", "G", "A");
     c38["B"] = new Array("B", "C#", "D#", "E", "F#", "G#", "A#");
 
-    var b28 = new Array;
-    b28["1"] = 0;
-    b28["b2"] = 1;
-    b28["2"] = 2;
-    b28["#2"] = 3;
-    b28["b3"] = 3;
-    b28["3"] = 4;
-    b28["4"] = 5;
-    b28["#4"] = 6;
-    b28["b5"] = 6;
-    b28["5"] = 7;
-    b28["#5"] = 8;
-    b28["b6"] = 8;
-    b28["6"] = 9;
-    b28["bb7"] = 9;
-    b28["#6"] = 10;
-    b28["b7"] = 10;
-    b28["7"] = 11;
-    b28["8"] = 12;
-    b28["b9"] = 13;
-    b28["9"] = 14;
-    b28["#9"] = 15;
-    b28["10"] = 16;
-    b28["11"] = 17;
-    b28["#11"] = 18;
-    b28["12"] = 19;
-    b28["b13"] = 20;
-    b28["13"] = 21;
+    var halfTones = new Array;
+    halfTones["1"] = 0;
+    halfTones["b2"] = 1;
+    halfTones["2"] = 2;
+    halfTones["#2"] = 3;
+    halfTones["b3"] = 3;
+    halfTones["3"] = 4;
+    halfTones["4"] = 5;
+    halfTones["#4"] = 6;
+    halfTones["b5"] = 6;
+    halfTones["5"] = 7;
+    halfTones["#5"] = 8;
+    halfTones["b6"] = 8;
+    halfTones["6"] = 9;
+    halfTones["bb7"] = 9;
+    halfTones["#6"] = 10;
+    halfTones["b7"] = 10;
+    halfTones["7"] = 11;
+    halfTones["8"] = 12;
+    halfTones["b9"] = 13;
+    halfTones["9"] = 14;
+    halfTones["#9"] = 15;
+    halfTones["10"] = 16;
+    halfTones["11"] = 17;
+    halfTones["#11"] = 18;
+    halfTones["12"] = 19;
+    halfTones["b13"] = 20;
+    halfTones["13"] = 21;
 
-    var b19 = "Chord";
+    var mde = "Chord";
     var Chords = new Array();
     var a81 = 0;
     var b63 = new Array();
@@ -259,7 +259,7 @@ function switchInNn(a33){
     if(a33==displayNames)
         return ;
     displayNames=a33;
-    showFingerSetting(b19);
+    showFingerSetting(mde);
 }
 
 function toggleSpelling(){
@@ -275,7 +275,7 @@ function switchSpelling(a33){
     if(a33==c13)
         return ;
     c13=a33;
-    showFingerSetting(b19);
+    showFingerSetting(mde);
 }
 
 function toggleSharpFlat(){
@@ -291,7 +291,7 @@ function switchSharpFlat(a33){
     if(a33==root_disambig_sharp_or_flat)
         return ;
     root_disambig_sharp_or_flat=a33;
-    showFingerSetting(b19);
+    showFingerSetting(mde);
 }
 
 function imgOn(b21){
@@ -569,10 +569,10 @@ function a76() {
     scale("Scale", "Todi Theta", "", "1,b2,b3,#4,5,b6,7");
 }
 
-function showFingerSetting(c25) {
-    b19 = c25;
+function showFingerSetting(mode) {
+    mde = mode;
     c41 = "";
-    var a25 = "";
+    var noteName = "";
     var a33 = "";
     var sep = "|";
     var a85 = -1;
@@ -582,7 +582,7 @@ function showFingerSetting(c25) {
     var a13 = "";
     var a54 = "";
 
-    if (b19 == "Chords") {
+    if (mde == "Chords") {
         if (document.formChordsAndScales.chordRoot.selectedIndex == -1)
             document.formChordsAndScales.chordRoot.selectedIndex = document.formChordsAndScales.scaleRoot.selectedIndex;
         if (document.formChordsAndScales.chordName.selectedIndex == -1)
@@ -590,13 +590,13 @@ function showFingerSetting(c25) {
 
         document.formChordsAndScales.scaleRoot.selectedIndex = -1;
         document.formChordsAndScales.scaleName.selectedIndex = -1;
-        a25 = document.formChordsAndScales.chordRoot.options[document.formChordsAndScales.chordRoot.selectedIndex].value;
+        noteName = document.formChordsAndScales.chordRoot.options[document.formChordsAndScales.chordRoot.selectedIndex].value;
         a33 = document.formChordsAndScales.chordName.options[document.formChordsAndScales.chordName.selectedIndex].value;
 
         a23 = Chords["R" + a33];
         c10 = document.formChordsAndScales.chordName.selectedIndex;
     }
-    else if (b19 == "Scales") {
+    else if (mde == "Scales") {
         if (document.formChordsAndScales.scaleRoot.selectedIndex == -1)
             document.formChordsAndScales.scaleRoot.selectedIndex = document.formChordsAndScales.chordRoot.selectedIndex;
         if (document.formChordsAndScales.scaleName.selectedIndex == -1)
@@ -605,7 +605,7 @@ function showFingerSetting(c25) {
         document.formChordsAndScales.chordRoot.selectedIndex = -1;
         document.formChordsAndScales.chordName.selectedIndex = -1;
 
-        a25 = document.formChordsAndScales.scaleRoot.options[document.formChordsAndScales.scaleRoot.selectedIndex].value;
+        noteName = document.formChordsAndScales.scaleRoot.options[document.formChordsAndScales.scaleRoot.selectedIndex].value;
         a33 = document.formChordsAndScales.scaleName.options[document.formChordsAndScales.scaleName.selectedIndex].value;
 
         if (a33.charAt(0) == ":") {
@@ -623,7 +623,7 @@ function showFingerSetting(c25) {
         c11 = document.formChordsAndScales.scaleName.selectedIndex;
     }
     else
-        alert("ERROR: `infoType' error.\nPlease contact Erik van der Neut via the Chord House forum.\ninfoType = " + b19 + "\nThank you.");
+        alert("ERROR: `infoType' error.\nPlease contact Erik van der Neut via the Chord House forum.\ninfoType = " + mde + "\nThank you.");
 
     a84 = a23.indexOf(sep);
 
@@ -642,14 +642,14 @@ function showFingerSetting(c25) {
     }
 
     if (root_disambig_sharp_or_flat == "b") {
-        if (a25 == "C#")  a25 = "Db";
-        else if (a25 == "D#") a25 = "Eb";
-        else if (a25 == "F#") a25 = "Gb";
-        else if (a25 == "G#") a25 = "Ab";
-        else if (a25 == "A#") a25 = "Bb";
+        if (noteName == "C#")  noteName = "Db";
+        else if (noteName == "D#") noteName = "Eb";
+        else if (noteName == "F#") noteName = "Gb";
+        else if (noteName == "G#") noteName = "Ab";
+        else if (noteName == "A#") noteName = "Bb";
     }
 
-    a67(a25, a33, a23.substring(a85 + 1, a23.length), a13, a54);
+    a67(noteName, a33, a23.substring(a85 + 1, a23.length), a13, a54);
 }
 
 function b01(b07) {
@@ -660,7 +660,7 @@ function b01(b07) {
     return music_note;
 }
 
-function a67(a25, a15, a43, a13, a54) {
+function a67(noteName, a15, interval, a13, a54) {
     var sep = ",";
     var a85 = -1;
     var a84 = 0;
@@ -668,61 +668,61 @@ function a67(a25, a15, a43, a13, a54) {
     var a30 = "";
     var b09 = true;
     var base_C = 48;
-    top.main_window.document.midi.music_notes.value = "";
+    document.midi.music_notes.value = "";
     for (i = 1; i <= 36; i++)
         clear(i);
-    a84 = a43.indexOf(sep);
+    a84 = interval.indexOf(sep);
     while (b09) {
         if (a84 != -1)
-            a30 = a43.substring(a85 + 1, a84);
+            a30 = interval.substring(a85 + 1, a84);
         else {
-            a30 = a43.substring(a85 + 1, a43.length);
+            a30 = interval.substring(a85 + 1, interval.length);
             b09 = false;
         }
 
         if (a30.charAt(0) == "(") {
             a30 = a30.substring(1, a30.length - 1);
-            a82(b10[a25] + b28[a30], c23(a25, a30, displayNames));
-            c41 += ("(" + c23(a25, a30, "nn") + "),");
+            a82(noteOffset[noteName] + halfTones[a30], c23(noteName, a30, displayNames));
+            c41 += ("(" + c23(noteName, a30, "nn") + "),");
         }
         else {
-            a83(b10[a25] + b28[a30], c23(a25, a30, displayNames));
-            c41 += (c23(a25, a30, "nn") + ",");
+            a83(noteOffset[noteName] + halfTones[a30], c23(noteName, a30, displayNames));
+            c41 += (c23(noteName, a30, "nn") + ",");
 
-            if (top.main_window.document.midi.music_notes.value != "")
-                top.main_window.document.midi.music_notes.value += ",";
+            if (document.midi.music_notes.value != "")
+                document.midi.music_notes.value += ",";
 
-            top.main_window.document.midi.music_notes.value += b01(base_C + b10[a25] - 1 + b28[a30]);
+            document.midi.music_notes.value += b01(base_C + noteOffset[noteName] - 1 + halfTones[a30]);
         }
 
         if (a84 != -1) {
             a85 = a84;
-            a84 = a43.indexOf(sep, a85 + 1);
+            a84 = interval.indexOf(sep, a85 + 1);
         }
     }
 
-    a54 = a98("<R>", a25, a54);
-    top.main_window.document.midi.full_name.value = a25 + " " + a15;
+    a54 = a98("<R>", noteName, a54);
+    document.midi.full_name.value = noteName + " " + a15;
 
     if (a13.toLowerCase() == "scale") {
-        top.main_window.document.midi.playstyle.value = "piano_scale";
-        top.main_window.document.midi.statusmsgplay.value = "Hear this scale...";
-        top.main_window.document.midi.statusmsgsave.value = "Save the sound file for this scale...";
-        document.formChordsAndScales.infoText.value = "            " + a25 + " " + a15 + " Scale\n";
+        document.midi.playstyle.value = "piano_scale";
+        document.midi.statusmsgplay.value = "Hear this scale...";
+        document.midi.statusmsgsave.value = "Save the sound file for this scale...";
+        document.formChordsAndScales.infoText.value = "            " + noteName + " " + a15 + " Scale\n";
     }
     else {
-        top.main_window.document.midi.playstyle.value = "piano_chord";
-        top.main_window.document.midi.statusmsgplay.value = "Hear this chord...";
-        top.main_window.document.midi.statusmsgsave.value = "Save the sound file for this chord...";
-        document.formChordsAndScales.infoText.value = "            " + a25 + a15;
+        document.midi.playstyle.value = "piano_chord";
+        document.midi.statusmsgplay.value = "Hear this chord...";
+        document.midi.statusmsgsave.value = "Save the sound file for this chord...";
+        document.formChordsAndScales.infoText.value = "            " + noteName + a15;
         document.formChordsAndScales.infoText.value += "\n";
     }
 
     if (a54 != "")
         document.formChordsAndScales.infoText.value += "a.k.a.:     " + a54 + "\n";
 
-    document.formChordsAndScales.infoText.value += "intervals:  " + a43 + "\n" + "half-steps: ";
-    c12(a43, a13);
+    document.formChordsAndScales.infoText.value += "intervals:  " + interval + "\n" + "half-steps: ";
+    c12(interval, a13);
     for (var i = 0; i < c08.length; i++){
         document.formChordsAndScales.infoText.value += c08[i];
         if (i < c08.length - 1)
@@ -745,8 +745,8 @@ function a67(a25, a15, a43, a13, a54) {
     document.formChordsAndScales.infoText.value += "notes:      " + c41;
 }
 
-function c12(c27, c25) {
-    var c26 = c27.split(",");
+function c12(intervl, mode) {
+    var c26 = intervl.split(",");
     var num1 = 0;
     var num2 = 0;
     var a87 = false;
@@ -756,7 +756,7 @@ function c12(c27, c25) {
     c09 = [];
     for (i = 1; i < c26.length; i++){
         if (c26[i].charAt(0) != "(") {
-            num2 = b28[c26[i]];
+            num2 = halfTones[c26[i]];
             c08[j] = num2 - num1;
             num1 = num2;
             j++;
@@ -764,7 +764,7 @@ function c12(c27, c25) {
         else
             a87 = true;
     }
-    if (c25.toLowerCase() == "scale") {
+    if (mode.toLowerCase() == "scale") {
         c08[i - 1] = 12 - num1;
     }
     num1 = 0;
@@ -772,16 +772,16 @@ function c12(c27, c25) {
     if (a87) {
         for (var i = 1; i < c26.length; i++){
             if (c26[i].charAt(0) == "(") {
-                num2 = b28[c26[i].substring(1, c26[i].length - 1)];
+                num2 = halfTones[c26[i].substring(1, c26[i].length - 1)];
             }
             else {
-                num2 = b28[c26[i]];
+                num2 = halfTones[c26[i]];
             }
             c09[i - 1] = num2 - num1;
             num1 = num2;
         }
 
-        if (c25.toLowerCase() == "scale") {
+        if (mode.toLowerCase() == "scale") {
             c09[i - 1] = 12 - num1;
         }
     }
@@ -816,13 +816,13 @@ function clear(a96) {
     c18("n" + a96, "");
 }
 
-function c23(a25, c21, settingInOrNN) {
+function c23(noteName, c21, settingInOrNN) {
     if (settingInOrNN == "in")
         return c21;
     var c22 = c21.substring(c17(c21));
     var c20 = c21.substring(0, c17(c21));
     if (c22 > 7) c22 -= 7;
-    var c14 = c38[a25][c22 - 1];
+    var c14 = c38[noteName][c22 - 1];
     for (var i = 0; i < c20.length; i++){
         if (c20.charAt(i) == 'b')
             c14 = c15(c14);

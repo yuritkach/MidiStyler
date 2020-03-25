@@ -17,22 +17,22 @@
 	<!-- script type="text/JavaScript" src="../ch_browser_test.js"></script -->
 	<!-- script type="text/JavaScript" src="piano_browser_test.js"></script -->
 
-	<script type="text/JavaScript" language="JavaScript1.1" src="./pch.js.&#1041;&#1077;&#1079; &#1085;&#1072;&#1079;&#1074;&#1072;&#1085;&#1080;&#1103;">
+	<script type="text/JavaScript" language="JavaScript1.1" src="./pch.js">
 	<!--//
 	// Copyright since 1998 (c) Erik van der Neut
 	//-->
 	</script>
 	<script type="text/JavaScript">
 	<!--// Copyright 2003 (c) Erik van der Neut
-	var speaker  		 = new Image(); speaker.src    		= "../speaker.jpg";
-	var speaker_loading  = new Image(); speaker_loading.src = "../speaker_loading.gif";
-	var speaker_playing  = new Image(); speaker_playing.src = "../speaker_playing.gif";
-	var play_off = new Image(); play_off.src = "../play_off.gif";
-	var play_on  = new Image(); play_on.src  = "../play_on.gif";
-	var stop_off = new Image(); stop_off.src = "../stop_off.gif";
-	var stop_on  = new Image(); stop_on.src  = "../stop_on.gif";
-	var save_off = new Image(); save_off.src = "../save_off.gif";
-	var save_on  = new Image(); save_on.src  = "../save_on.gif";
+	var speaker  		 = new Image(); speaker.src    		= "./speaker.jpg";
+	var speaker_loading  = new Image(); speaker_loading.src = "./speaker_loading.gif";
+	var speaker_playing  = new Image(); speaker_playing.src = "./speaker_playing.gif";
+	var play_off = new Image(); play_off.src = "./play_off.gif";
+	var play_on  = new Image(); play_on.src  = "./play_on.gif";
+	var stop_off = new Image(); stop_off.src = "./stop_off.gif";
+	var stop_on  = new Image(); stop_on.src  = "./stop_on.gif";
+	var save_off = new Image(); save_off.src = "./save_off.gif";
+	var save_on  = new Image(); save_on.src  = "./save_on.gif";
 
 	function popupthatextrawindow(url, strWindowName, width, height, resizable)
 	{
@@ -295,14 +295,6 @@
 			</option><option value="A#">A#/Bb
 			</option><option value="B">B
 			</option></select>
-
-			<script type="text/JavaScript">
-			<!--//
-				document.write("<select class=\"cssChordList\" name=\"chordName\" "
-							+  "size=12	onChange=\"showFingerSetting('Chords');\">");
-				addChordOptions();
-				document.write("</" + "select" + ">");  // <<< W3C validation hack
-			//-->
 			</script><select class="cssChordList" name="chordName" size="12" onchange="showFingerSetting(&#39;Chords&#39;);"><option value=" Major"> Major</option><option value="5">5</option><option value="-5">-5</option><option value="6">6</option><option value="6/9">6/9</option><option value="7">7</option><option value="add9">add9</option><option value="maj7">maj7</option><option value="maj7+5">maj7+5</option><option value="maj9">maj9</option><option value="maj11">maj11</option><option value="maj13">maj13</option><option value="2">2</option><option value="m">m</option><option value="m6">m6</option><option value="m6/9">m6/9</option><option value="mmaj7">mmaj7</option><option value="mmaj9">mmaj9</option><option value="madd9">madd9</option><option value="m7">m7</option><option value="m9">m9</option><option value="m11">m11</option><option value="m13">m13</option><option value="m-5">m-5</option><option value="dim">dim</option><option value="dim7">dim7</option><option value="m7-5">m7-5</option><option value="7">7</option><option value="7-9">7-9</option><option value="7+9">7+9</option><option value="7-5">7-5</option><option value="7+5">7+5</option><option value="7/6">7/6</option><option value="9">9</option><option value="9-5">9-5</option><option value="9+5">9+5</option><option value="add9">add9</option><option value="9/6">9/6</option><option value="9+11">9+11</option><option value="11">11</option><option value="11-9">11-9</option><option value="13">13</option><option value="13-9">13-9</option><option value="13-9-5">13-9-5</option><option value="13-9+11">13-9+11</option><option value="13+11">13+11</option><option value="7/13">7/13</option><option value="aug">aug</option><option value="sus2">sus2</option><option value="sus4">sus4</option><option value="7sus4">7sus4</option><option value="-9">-9</option><option value="-9+5">-9+5</option><option value="-9+11">-9+11</option><option value="-9-5">-9-5</option><option value="+5">+5</option><option value="+9">+9</option><option value="+11">+11</option></select>
 			</span>
 		</td>

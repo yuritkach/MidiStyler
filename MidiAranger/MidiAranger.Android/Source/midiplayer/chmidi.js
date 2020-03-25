@@ -157,9 +157,9 @@ function setNotes(root, c27) {
             b52 = b52.substring(1, b52.length - 1);
         }
         else {
-            var b07 = b03[root] + a75[b52];
-            b06 += b07;
-            music_notes += b01(b07);
+            var noteCode = b03[root] + a75[b52];
+            b06 += noteCode;
+            music_notes += convertToNoteName(noteCode);
 
             if (b09) {
                 b06 += ",";
@@ -174,11 +174,11 @@ function setNotes(root, c27) {
     return music_notes;
 }
 
-function b01(b07) {
-    var b00 = new Array("C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "Ais", "B");
-    var music_note = b00[b07 % 12];
+function convertToNoteName(noteCode) {
+    var noteNames = new Array("C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "Ais", "B");
+    var music_note = noteNames[noteCode % 12];
     music_note += "_";
-    music_note += Math.floor((b07 / 12) - 1);
+    music_note += Math.floor((noteCode / 12) - 1);
     return music_note;
 }
 
