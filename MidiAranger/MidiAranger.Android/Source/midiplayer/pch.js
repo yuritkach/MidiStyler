@@ -937,20 +937,20 @@ function c18(id, str) {
 function a98(a28, a32, a17) {
     var a85 = -1;
     var a84 = 0;
-    var tmp = "";
+    var result = "";
     var b09 = true;
     while (b09) {
         a84 = a17.indexOf(a28, a85 + 1);
         if (a84 != -1) {
-            tmp += a17.substring(a85 + 1, a84) + a32;
+            result += a17.substring(a85 + 1, a84) + a32;
             a85 = a84 + a28.length - 1;
         }
         else {
-            tmp += a17.substring(a85 + 1, a17.length);
+            result += a17.substring(a85 + 1, a17.length);
             b09 = false;
         }
     }
-    return tmp;
+    return result;
 }
 
 function a99(c19, element, sep) {
