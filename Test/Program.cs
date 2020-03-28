@@ -8,25 +8,22 @@ namespace Test
     {
         public List<ushort> ProcessChordDefinition(int startIndex,ushort mask, string[] definitions,int leng)
         {
-            List<ushort> result =new List<ushort>();
+            
             for (int i = startIndex; i < definitions.Length; i++)
             {
-                string sss = definitions[i];
-                if (sss.Substring(0, 1) == "(")
+                string s = definitions[i];
+                if (s.Substring(0, 1) == "(")
                 {
                     List<ushort> res1 = ProcessChordDefinition(i + 1, mask,definitions,leng);
-                    mask = (ushort)(mask | (1 << (16 - byte.Parse(sss.Substring(1,sss.Length-2)))));
+                    mask = (ushort)(mask | (1 << (16 - byte.Parse(s.Substring(1,s.Length-2)))));
                     List<ushort> res2 = ProcessChordDefinition(i + 1, mask,definitions,leng);
-                    result.AddRange(res1);
-                    result.AddRange(res2);
-                    return result;
+                    res1.AddRange(res2);
+                    return res1;
                 }
                 else
-                {
-                    mask =(ushort) (mask| (1<<(16-byte.Parse(sss))));
-                    
-                }
+                    mask =(ushort) (mask| (1<<(16-byte.Parse(s))));
             }
+            List<ushort> result = new List<ushort>();
             result.Add(mask);
             return result;
 
