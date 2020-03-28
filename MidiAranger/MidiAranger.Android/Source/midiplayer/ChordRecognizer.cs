@@ -12,7 +12,7 @@ using Android.Widget;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
-    public static class ChordRecognizer
+    public class ChordRecognizer
     {
         private readonly static Dictionary<string, int> halfTones = new Dictionary<string, int>() {
             {"1",0},
@@ -44,10 +44,9 @@ namespace MidiAranger.Droid.Source.midiplayer
             {"13",21}
         };
 
-        private readonly static Dictionary<string, string> chords = new Dictionary<string, string>()
-        {
-                                                                         {"R Major", "1,3,5" },
-                                                                         { "R5","1,5" },
+        static readonly Dictionary<string, string> chords = new Dictionary<string, string>()   {
+            {"R Major","1,5"},
+            {"R5","1,5" },
             {"R-5","1,3,b5" },
             {"R6","1,3,5,6" },
             {"R6/9","1,3,(5),6,9" },
@@ -107,23 +106,33 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         };
 
+
+
         private class ChordDefinition
         {
             public string Name;
-            public byte[] IncludedOptionalNotes;
-            public byte[] ExcludedOptionalNotes;
+            public byte[] HalfTones;
         }
 
-        static readonly ChordDefinition[] chordDefinitions = new ChordDefinition[]
+        private List<ChordDefinition> chordDefinitions = new List<ChordDefinition>();
+
+        static ChordRecognizer() {
+            InitializeChordDefinitions();
+
+
+        }
+
+        private static void InitializeChordDefinitions()
+        {
+            foreach (var chord in chords)
             {
-                new ChordDefinition() { Name ="R Major",IncludedOptionalNotes = new byte[] {0,5,7}, ExcludedOptionalNotes = new byte[] {0,5,7}},
-                new ChordDefinition() { Name ="R5",IncludedOptionalNotes = new byte[] {0,5}, ExcludedOptionalNotes = new byte[] {0,5}},
 
-                new ChordDefinition() { Name ="R-5",IncludedOptionalNotes = new byte[] {1,5}, ExcludedOptionalNotes = new byte[] {1,5}},
 
-                new ChordDefinition() { Name ="R",IncludedOptionalNotes = new byte[] {1,5}, ExcludedOptionalNotes = new byte[] {1,5}},
+            }
 
-            };
+
+        }
+
 
     }
 }
