@@ -29,6 +29,33 @@ namespace Test
 
         }
 
+        public List<string> GetMixedDefinitions(string definition)
+        {
+            List<string> result = new List<string>();
+            string s;
+            string[] keys = definition.Split(",");
+            for (int i = 0; i < keys.Length; i++)
+            {
+                s ="";
+                for (int j = 0; j < i; j++) s = s + ","+keys[j];
+                for (int j = i+1; j < keys.Length; j++) s = s + ","+keys[j];
+                if (keys.Length > 1)
+                {
+                    s = s.Substring(1);
+                    List<string> r = GetMixedDefinitions(s);
+                    for (int j = 0; j < r.Count; j++)
+                    {
+                        s = keys[i] + "," + r[j];
+                        result.Add(s);
+                    }
+                }
+                else result.Add(keys[i]);
+
+            }
+
+            return result;
+        }
+
     }
 
     class Program
@@ -41,9 +68,13 @@ namespace Test
         {
             List<ushort> result;
             ChordRecognizer r = new ChordRecognizer();
-            string[] keys = ("(1),3,(5),(7)").Split(",");
-            result = r.ProcessChordDefinition(0,0,keys,keys.Length);
-            Console.WriteLine(result.ToString());
+            string definition = "(1),3,(5),(7)";
+            List<string> mixedDefs = r.GetMixedDefinitions(definition);
+            foreach (string key in mixedDefs) {
+                string[] keys = (key).Split(",");
+                result = r.ProcessChordDefinition(0, 0, keys, keys.Length);
+                Console.WriteLine(result.ToString());
+            }
             Console.ReadLine();
         }
 

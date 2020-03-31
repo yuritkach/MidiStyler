@@ -172,8 +172,10 @@ namespace MidiAranger.Droid.Source.midiplayer
                     uint[] res1 = ProcessChordDefinition(i + 1, mask, definitions, leng);
                     mask = mask |(uint) (1 << (31 - GetOffset(s.Substring(1, s.Length - 2))));
                     uint[] res2 = ProcessChordDefinition(i + 1, mask, definitions, leng);
-                    Array.Copy(res2,0,res1,res1.Length,res2.Length);
-                    return res1;
+                    uint[] res = new uint[res1.Length + res2.Length];
+                    res1.CopyTo(res, 0);
+                    res2.CopyTo(res, res1.Length);
+                    return res;
                 }
                 else
                     mask = mask | (uint)(1 << (31 - GetOffset(s)));
@@ -184,6 +186,34 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         }
 
+        public List<string> GetMixedDefinitions(string definition)
+        {
+            List<string> result = new List<string>();
+            string s;
+            string[] keys = definition.Split(",");
+            for (int i = 0; i < keys.Length; i++)
+            {
+                s = "";
+                for (int j = 0; j < i; j++) s = s + "," + keys[j];
+                for (int j = i + 1; j < keys.Length; j++) s = s + "," + keys[j];
+                if (keys.Length > 1)
+                {
+                    s = s.Substring(1);
+                    List<string> r = GetMixedDefinitions(s);
+                    for (int j = 0; j < r.Count; j++)
+                    {
+                        s = keys[i] + "," + r[j];
+                        result.Add(s);
+                    }
+                }
+                else result.Add(keys[i]);
+
+            }
+
+            return result;
+        }
+
+
 
         private void InitializeChordDefinitions()
         {
@@ -191,17 +221,30 @@ namespace MidiAranger.Droid.Source.midiplayer
             chordDefinitions = new List<ChordDefinition>();
             for (int i = 0; i < chordDeclarations.Length; i++)
             {
-                string[] keys = chordDeclarations[i].ChordOffsets.Split(",");
-                offsets = ProcessChordDefinition(0, 0, keys, keys.Length);
-                for(int j = 0; j < offsets.Length; j++)
-                    
+                
+                List<string> mixedDefs = GetMixedDefinitions(chordDeclarations[i].ChordOffsets);
+                foreach (string key in mixedDefs)
                 {
-                    ChordDefinition cd = new ChordDefinition(chordDeclarations[i].ChordName,offsets[j]);
-                    chordDefinitions.Add(cd);
+
+                    string[] keys = key.Split(",");
+                    offsets = ProcessChordDefinition(0, 0, keys, keys.Length);
+                    for (int j = 0; j < offsets.Length; j++)
+                    {
+                        ChordDefinition cd = new ChordDefinition(chordDeclarations[i].ChordName, offsets[j]);
+                        chordDefinitions.Add(cd);
+                    }
+
                 }
+            }
+
+
+            for (int i = 0; i < chordDefinitions.Count; i++)
+            {
+                if (chordDefinitions[i].HalfTonesBitMask == 25525)
+                    break;
 
             }
-            
+
         }
 
 

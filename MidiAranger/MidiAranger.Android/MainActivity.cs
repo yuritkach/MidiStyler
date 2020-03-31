@@ -21,6 +21,7 @@ namespace MidiAranger.Droid
         
         private int timeInterval = 1000;
         MIDIPlayer mplayer;
+        ChordRecognizer chordRecognizer;
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -37,6 +38,8 @@ namespace MidiAranger.Droid
             
             
             var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
+
+            chordRecognizer = new ChordRecognizer();
 
             MIDIFile midiFile = new MIDIFile();
             midiFile.InitMidiFile("ddd");
