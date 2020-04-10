@@ -13,10 +13,10 @@ using Android.Widget;
 namespace MidiAranger.Droid.Source.midiplayer
 {
 
-    public struct HalfToneOffset
+    public class HalfToneOffset
     {
-        public string Name;
-        public byte Offset;
+        public string Name { get; set; }
+        public byte Offset { get; set; }
         public HalfToneOffset(string name, byte offset)
         {
             Name=name;
@@ -24,13 +24,15 @@ namespace MidiAranger.Droid.Source.midiplayer
         }
     }
 
-    public struct ChordDeclaration
+    public class ChordDeclaration
     {
-        public string ChordName;
-        public string ChordOffsets;
+        public int ChordId { get; protected set; }
+        public string ChordName { get; protected set; }
+        public string ChordOffsets { get; protected set; }
 
-        public ChordDeclaration(string chordName, string chorOffsets)
+        public ChordDeclaration(int id,string chordName, string chorOffsets)
         {
+            ChordId = id;
             ChordName = chordName;
             ChordOffsets = chorOffsets;
         }
@@ -72,65 +74,45 @@ namespace MidiAranger.Droid.Source.midiplayer
 
 
         protected readonly static ChordDeclaration[] chordDeclarations = {
-            new ChordDeclaration("R Major","1,5"),
-            new ChordDeclaration( "R5","1,5" ),
-            new ChordDeclaration( "R-5","1,3,b5" ),
-            new ChordDeclaration( "R6","1,3,5,6" ),
-            new ChordDeclaration( "R6/9","1,3,(5),6,9" ),
-            new ChordDeclaration( "R7","1,3,(5),b7" ),
-            new ChordDeclaration( "Radd9","1,3,5,9" ),
-            new ChordDeclaration( "Rmaj7","1,3,5,7" ),
-            new ChordDeclaration( "Rmaj7+5","1,3,#5,7" ),
-            new ChordDeclaration( "Rmaj9","1,3,(5),7,9" ),
-            new ChordDeclaration( "Rmaj11", "1,(3),5,7,(9),11" ),
-            new ChordDeclaration( "Rmaj13", "1,3,(5),7,(9),(11),13" ),
-            new ChordDeclaration( "R2", "1,2,3,5" ),
-            new ChordDeclaration( "Rm", "1,b3,5" ),
-            new ChordDeclaration( "Rm6", "1,b3,5,6" ),
-            new ChordDeclaration( "Rm6/9", "1,b3,(5),6,9" ),
-            new ChordDeclaration( "Rmmaj7",  "1,b3,5,7" ),
-            new ChordDeclaration( "Rmmaj9",  "1,b3,(5),7,9" ),
-            new ChordDeclaration( "Rmadd9",  "1,b3,(5),9" ),
-            new ChordDeclaration( "Rm7",  "1,b3,5,b7" ),
-            new ChordDeclaration( "Rm9",  "1,b3,(5),b7,9" ),
-            new ChordDeclaration( "Rm11", "1,b3,(5),b7,(9),11" ),
-            new ChordDeclaration( "Rm13", "1,b3,(5),b7,(9),(11),13" ),
-            new ChordDeclaration( "Rm-5", "1,b3,b5" ),
-            new ChordDeclaration( "Rdim",  "1,b3,b5" ),
-            new ChordDeclaration( "Rdim7","1,b3,b5,bb7" ),
-            new ChordDeclaration( "Rm7-5",  "1,b3,b5,b7" ),
-            new ChordDeclaration( "R7","1,3,5,b7" ),
-            new ChordDeclaration( "R7-9",  "1,3,(5),b7,b9" ),
-            new ChordDeclaration( "R7+9", "1,3,(5),b7,#9" ),
-            new ChordDeclaration( "R7-5", "1,3,b5,b7" ),
-            new ChordDeclaration( "R7+5",  "1,3,#5,b7" ),
-            new ChordDeclaration( "R7/6",  "1,3,(5),6,b7" ),
-            new ChordDeclaration( "R9",  "1,3,(5),b7,9" ),
-            new ChordDeclaration( "R9-5", "1,(3),b5,b7,9" ),
-            new ChordDeclaration( "R9+5", "1,(3),#5,b7,9" ),
-            new ChordDeclaration( "Radd9", "1,3,5,9" ),
-            new ChordDeclaration( "R9/6",  "1,(3),(5),6,b7,9" ),
-            new ChordDeclaration( "R9+11", "1,3,(5),b7,9,#11" ),
-            new ChordDeclaration( "R11",  "1,(3),5,b7,(9),11" ),
-            new ChordDeclaration( "R11-9", "1,(3),(5),b7,b9,11" ),
-            new ChordDeclaration( "R13",  "1,(3),5,b7,(9),(11),13" ),
-            new ChordDeclaration( "R13-9","1,(3),(5),b7,b9,(11),13" ),
-            new ChordDeclaration( "R13-9-5", "(1),(3),b5,b7,b9,(11),13" ),
-            new ChordDeclaration( "R13-9+11", "(1),(3),(5),b7,b9,#11,13" ),
-            new ChordDeclaration( "R13+11", "1,(3),(5),b7,(9),#11,13" ),
-            new ChordDeclaration( "R7/13", "1,3,(5),b7,13" ),
-            new ChordDeclaration( "Raug",  "1,3,#5" ),
-            new ChordDeclaration( "Rsus2", "1,2,5" ),
-            new ChordDeclaration( "Rsus4","1,4,5" ),
-            new ChordDeclaration( "R7sus4", "1,4,5,b7" ),
-            new ChordDeclaration( "R-9",  "1,3,(5),b7,b9" ),
-            new ChordDeclaration( "R-9+5", "1,(3),#5,b7,b9" ),
-            new ChordDeclaration( "R-9+11", "1,(3),(5),b7,b9,#11" ),
-            new ChordDeclaration( "R-9-5",  "1,(3),b5,b7,b9" ),
-            new ChordDeclaration( "R+5",  "1,3,#5" ),
-            new ChordDeclaration( "R+9",  "1,3,(5),b7,#9" ),
-            new ChordDeclaration( "R+11", "1,(3),(5),b7,9,#11" )
+            new ChordDeclaration(0x00, "RMaj", "1,3,5"),
+            new ChordDeclaration(0x01, "RMaj6", "1,3,5,6"),
+            new ChordDeclaration(0x02, "RMaj7", "1,3,(5),7"),
+            new ChordDeclaration(0x03, "RMaj7#11", "1,(2),3,#4,(5),7"),
+            new ChordDeclaration(0x04, "RMajAdd9", "1,2,3,5"),
+            new ChordDeclaration(0x05, "RMaj7(9)", "1,2,3,(5),7"),
+            new ChordDeclaration(0x06, "RMaj6(9)", "1,2,3,(5),6"),
 
+            new ChordDeclaration(0x07, "RAug", "1,3,#5"),
+
+            new ChordDeclaration(0x08, "Rmin", "1,b3,5"),
+            new ChordDeclaration(0x09, "Rmin6", "1,b3,5,6"),
+            new ChordDeclaration(0x0A, "Rmin7", "1,b3,(5),7"),
+            new ChordDeclaration(0x0B, "Rmin7b5", "1,b3,b5,b7"),
+            new ChordDeclaration(0x0C, "RminAdd9", "1,2,b3,5"),
+            new ChordDeclaration(0x0D, "Rmin7(9)", "1,2,b3,(5),b7"),
+            new ChordDeclaration(0x0E, "Rmin7(11)", "1,(2),b3,4,5,(b7)"),
+            new ChordDeclaration(0x0F, "RminMaj7", "1,b3,(5),7"),
+            new ChordDeclaration(0x10, "RminMaj7(9)", "1,2,b3,(5),7"),
+
+            new ChordDeclaration(0x11, "Rdim", "1,b3,b5"),
+            new ChordDeclaration(0x12, "Rdim7", "1,b3,b5,6"),
+
+            new ChordDeclaration(0x13, "R7th", "1,3,(5),b7"),
+            new ChordDeclaration(0x14, "R7sus4", "1,4,5,b7"),
+            new ChordDeclaration(0x15, "R7b5", "1,3,b5,b7"),
+            new ChordDeclaration(0x16, "R7(9)", "1,2,3,(5),b7"),
+            new ChordDeclaration(0x17, "R7#11", "1,(2),3,#4,(5),b7"),
+
+            new ChordDeclaration(0x18, "R7(13)", "1,3,(5),6,b7"),
+            new ChordDeclaration(0x19, "R7(b9)", "1,b2,3,(5),b7"),
+            new ChordDeclaration(0x1A, "R7(b13)", "1,3,5,b6,b7"),
+            new ChordDeclaration(0x1B, "R7(#9)", "(1),#2,3,(5),b7"),
+            new ChordDeclaration(0x1C, "RMaj7Aug", "1,3,#5,7"),
+            new ChordDeclaration(0x1D, "R7Aug", "(1),3,#5,b7"),
+            new ChordDeclaration(0x1E, "R1+8", "1,8"),
+            new ChordDeclaration(0x1F, "R1+5", "1,5"),
+            new ChordDeclaration(0x20, "Rsus4", "1,4,5"),
+            new ChordDeclaration(0x21, "R1+2+5", "1,2,5")
         };
 
         private byte GetOffset(string key)
