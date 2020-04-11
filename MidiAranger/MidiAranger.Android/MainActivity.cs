@@ -12,6 +12,7 @@ using Xamarin.Forms;
 using midi.events;
 using System.Threading;
 using MidiAranger.Droid.Source.midiplayer;
+using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
 
 namespace MidiAranger.Droid
 {
@@ -47,6 +48,8 @@ namespace MidiAranger.Droid
             mplayer.Tracks = midiFile.Tracks;
             mplayer.Start();
 
+
+
         }
 
      
@@ -55,8 +58,10 @@ namespace MidiAranger.Droid
         {
             RunOnUiThread(() => {
                 if (mplayer.currentPressedNotes == null) return;
-                string s = BitConverter.ToString(mplayer.currentPressedNotes.ToArray()).Replace("-", "");
-                FindViewById<TextView>(Resource.Id.miditext).Text = s;
+
+                ChordDefinition cd = chordRecognizer.Recognize(mplayer.currentPressedNotes.ToArray());
+                
+                FindViewById<TextView>(Resource.Id.miditext).Text = cd!=null?cd.ChordName:"";
             });
             
         }

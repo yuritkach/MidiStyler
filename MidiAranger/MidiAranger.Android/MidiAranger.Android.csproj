@@ -68,6 +68,7 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\common\Common.cs" />
+    <Compile Include="Source\common\RBTree.cs" />
     <Compile Include="Source\midiplayer\8BEATPOP.cs" />
     <Compile Include="Source\midiplayer\ChordRecognizer.cs" />
     <Compile Include="Source\midiplayer\lai.cs" />

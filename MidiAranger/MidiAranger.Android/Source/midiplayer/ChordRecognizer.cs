@@ -9,6 +9,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using MidiAranger.Droid.Source.common;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
@@ -75,44 +76,44 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected readonly static ChordDeclaration[] chordDeclarations = {
             new ChordDeclaration(0x00, "RMaj", "1,3,5"),
-            new ChordDeclaration(0x01, "RMaj6", "1,3,5,6"),
-            new ChordDeclaration(0x02, "RMaj7", "1,3,(5),7"),
-            new ChordDeclaration(0x03, "RMaj7#11", "1,(2),3,#4,(5),7"),
-            new ChordDeclaration(0x04, "RMajAdd9", "1,2,3,5"),
-            new ChordDeclaration(0x05, "RMaj7(9)", "1,2,3,(5),7"),
-            new ChordDeclaration(0x06, "RMaj6(9)", "1,2,3,(5),6"),
+//            new ChordDeclaration(0x01, "RMaj6", "1,3,5,6"),
+//            new ChordDeclaration(0x02, "RMaj7", "1,3,(5),7"),
+//            new ChordDeclaration(0x03, "RMaj7#11", "1,(2),3,#4,(5),7"),
+//            new ChordDeclaration(0x04, "RMajAdd9", "1,2,3,5"),
+//            new ChordDeclaration(0x05, "RMaj7(9)", "1,2,3,(5),7"),
+//            new ChordDeclaration(0x06, "RMaj6(9)", "1,2,3,(5),6"),
 
-            new ChordDeclaration(0x07, "RAug", "1,3,#5"),
+//            new ChordDeclaration(0x07, "RAug", "1,3,#5"),
 
             new ChordDeclaration(0x08, "Rmin", "1,b3,5"),
-            new ChordDeclaration(0x09, "Rmin6", "1,b3,5,6"),
-            new ChordDeclaration(0x0A, "Rmin7", "1,b3,(5),7"),
-            new ChordDeclaration(0x0B, "Rmin7b5", "1,b3,b5,b7"),
-            new ChordDeclaration(0x0C, "RminAdd9", "1,2,b3,5"),
-            new ChordDeclaration(0x0D, "Rmin7(9)", "1,2,b3,(5),b7"),
-            new ChordDeclaration(0x0E, "Rmin7(11)", "1,(2),b3,4,5,(b7)"),
-            new ChordDeclaration(0x0F, "RminMaj7", "1,b3,(5),7"),
-            new ChordDeclaration(0x10, "RminMaj7(9)", "1,2,b3,(5),7"),
+//            new ChordDeclaration(0x09, "Rmin6", "1,b3,5,6"),
+//            new ChordDeclaration(0x0A, "Rmin7", "1,b3,(5),7"),
+//            new ChordDeclaration(0x0B, "Rmin7b5", "1,b3,b5,b7"),
+//            new ChordDeclaration(0x0C, "RminAdd9", "1,2,b3,5"),
+//            new ChordDeclaration(0x0D, "Rmin7(9)", "1,2,b3,(5),b7"),
+//            new ChordDeclaration(0x0E, "Rmin7(11)", "1,(2),b3,4,5,(b7)"),
+//            new ChordDeclaration(0x0F, "RminMaj7", "1,b3,(5),7"),
+//            new ChordDeclaration(0x10, "RminMaj7(9)", "1,2,b3,(5),7"),
 
-            new ChordDeclaration(0x11, "Rdim", "1,b3,b5"),
-            new ChordDeclaration(0x12, "Rdim7", "1,b3,b5,6"),
+ //           new ChordDeclaration(0x11, "Rdim", "1,b3,b5"),
+ //           new ChordDeclaration(0x12, "Rdim7", "1,b3,b5,6"),
 
-            new ChordDeclaration(0x13, "R7th", "1,3,(5),b7"),
-            new ChordDeclaration(0x14, "R7sus4", "1,4,5,b7"),
-            new ChordDeclaration(0x15, "R7b5", "1,3,b5,b7"),
-            new ChordDeclaration(0x16, "R7(9)", "1,2,3,(5),b7"),
-            new ChordDeclaration(0x17, "R7#11", "1,(2),3,#4,(5),b7"),
+ //           new ChordDeclaration(0x13, "R7th", "1,3,(5),b7"),
+ //           new ChordDeclaration(0x14, "R7sus4", "1,4,5,b7"),
+ //           new ChordDeclaration(0x15, "R7b5", "1,3,b5,b7"),
+ //           new ChordDeclaration(0x16, "R7(9)", "1,2,3,(5),b7"),
+ //           new ChordDeclaration(0x17, "R7#11", "1,(2),3,#4,(5),b7"),
 
-            new ChordDeclaration(0x18, "R7(13)", "1,3,(5),6,b7"),
-            new ChordDeclaration(0x19, "R7(b9)", "1,b2,3,(5),b7"),
-            new ChordDeclaration(0x1A, "R7(b13)", "1,3,5,b6,b7"),
-            new ChordDeclaration(0x1B, "R7(#9)", "(1),#2,3,(5),b7"),
-            new ChordDeclaration(0x1C, "RMaj7Aug", "1,3,#5,7"),
-            new ChordDeclaration(0x1D, "R7Aug", "(1),3,#5,b7"),
-            new ChordDeclaration(0x1E, "R1+8", "1,8"),
-            new ChordDeclaration(0x1F, "R1+5", "1,5"),
-            new ChordDeclaration(0x20, "Rsus4", "1,4,5"),
-            new ChordDeclaration(0x21, "R1+2+5", "1,2,5")
+ //           new ChordDeclaration(0x18, "R7(13)", "1,3,(5),6,b7"),
+ //           new ChordDeclaration(0x19, "R7(b9)", "1,b2,3,(5),b7"),
+ //           new ChordDeclaration(0x1A, "R7(b13)", "1,3,5,b6,b7"),
+ //           new ChordDeclaration(0x1B, "R7(#9)", "(1),#2,3,(5),b7"),
+ //           new ChordDeclaration(0x1C, "RMaj7Aug", "1,3,#5,7"),
+ //           new ChordDeclaration(0x1D, "R7Aug", "(1),3,#5,b7"),
+ //           new ChordDeclaration(0x1E, "R1+8", "1,8"),
+ //           new ChordDeclaration(0x1F, "R1+5", "1,5"),
+ //           new ChordDeclaration(0x20, "Rsus4", "1,4,5"),
+ //           new ChordDeclaration(0x21, "R1+2+5", "1,2,5")
         };
 
         private byte GetOffset(string key)
@@ -122,7 +123,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             return 0xFF;
         }
 
-        private class ChordDefinition
+        public class ChordDefinition
         {
             public string ChordName;
             public uint HalfTonesBitMask;
@@ -135,7 +136,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         private List<ChordDefinition> chordDefinitions;
 
-
+        private RedBlackTree<int> chordIndex;
 
         public ChordRecognizer() {
             InitializeChordDefinitions();
@@ -199,6 +200,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         private void InitializeChordDefinitions()
         {
+            chordIndex = new RedBlackTree<int>();
             uint[] offsets;
             chordDefinitions = new List<ChordDefinition>();
             for (int i = 0; i < chordDeclarations.Length; i++)
@@ -219,16 +221,37 @@ namespace MidiAranger.Droid.Source.midiplayer
                 }
             }
 
-
             for (int i = 0; i < chordDefinitions.Count; i++)
-            {
-                if (chordDefinitions[i].HalfTonesBitMask == 25525)
-                    break;
+                chordIndex.Add(chordDefinitions[0].HalfTonesBitMask, i);
 
-            }
-
+            
+            
         }
 
+        public ChordDefinition Recognize(byte[] notes)
+        {
+            if (notes.Length < 2) return null;
+            Array.Sort(notes);
+            int initialOffset = notes[0];
+            uint mask = 0;
+            for (int i = 0; i < notes.Length; i++)
+            {
+                int ofs = 31-(notes[i] - initialOffset);
+                mask = mask | (uint)(1 << ofs);
+            }
+
+            int res;
+            try
+            {
+                res = chordIndex.Get(mask);
+            }
+            catch
+            {
+                res = -1;
+            }
+
+            return res ==-1 ? null : chordDefinitions[res];
+        }
 
     }
 }
