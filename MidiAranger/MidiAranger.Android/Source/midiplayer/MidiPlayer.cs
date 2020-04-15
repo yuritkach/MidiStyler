@@ -371,6 +371,11 @@ namespace MidiAranger.Droid.Source.midiplayer
                 USleep(pulsesPerQuarterNote);
                 PlayCurrentTrackPositions();
                 currentSongPosition++;
+                if (currentSongPosition > 34000)
+                {
+                    currentSongPosition = 0;
+                    Tracks[0].CurrentEventIndex = 0;
+                }
             }
 
         }

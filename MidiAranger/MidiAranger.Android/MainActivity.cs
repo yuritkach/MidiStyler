@@ -20,7 +20,7 @@ namespace MidiAranger.Droid
     public partial class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         
-        private int timeInterval = 1000;
+        private int timeInterval = 100;
         MIDIPlayer mplayer;
         ChordRecognizer chordRecognizer;
         protected override void OnCreate(Bundle savedInstanceState)
@@ -48,8 +48,6 @@ namespace MidiAranger.Droid
             mplayer.Tracks = midiFile.Tracks;
             mplayer.Start();
 
-
-
         }
 
      
@@ -59,7 +57,7 @@ namespace MidiAranger.Droid
             RunOnUiThread(() => {
                 if (mplayer.currentPressedNotes == null) return;
 
-                ChordDefinition cd = chordRecognizer.Recognize(mplayer.currentPressedNotes.ToArray());
+                ChordDeclaration cd = chordRecognizer.Recognize(mplayer.currentPressedNotes.ToArray());
                 
                 FindViewById<TextView>(Resource.Id.miditext).Text = cd!=null?cd.ChordName:"";
             });

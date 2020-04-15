@@ -88,6 +88,21 @@ namespace MidiAranger.Droid.Source.common
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Exists(uint key)
+        {
+            try
+            {
+                Get(key);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
         internal RedBlackTreeNode<TValue> Root { get; private set; }
 
         public void Add(uint key, TValue value)
