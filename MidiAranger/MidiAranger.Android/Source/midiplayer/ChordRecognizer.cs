@@ -13,18 +13,6 @@ using MidiAranger.Droid.Source.common;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
-
-    public class HalfToneOffset
-    {
-        public string Name { get; set; }
-        public byte Offset { get; set; }
-        public HalfToneOffset(string name, byte offset)
-        {
-            Name=name;
-            Offset=offset;
-        }
-    }
-
     public class ChordDeclaration
     {
         public int ChordId { get; protected set; }
@@ -38,6 +26,20 @@ namespace MidiAranger.Droid.Source.midiplayer
             ChordOffsets = chorOffsets;
         }
     }
+
+    public class ChordDefinition
+    {
+        public ChordDeclaration Chord { get; set; }
+        public uint HalfTonesBitMask { get; set; }
+        public byte RootOffset { get; set; }
+        public ChordDefinition(ChordDeclaration chord, uint halfToneBitMask, byte rootOffset)
+        {
+            Chord = chord;
+            HalfTonesBitMask = halfToneBitMask;
+            RootOffset = rootOffset;
+        }
+    }
+
 
 
     public class ChordRecognizer
@@ -84,27 +86,13 @@ namespace MidiAranger.Droid.Source.midiplayer
             new ChordDeclaration(0x20, "Rsus4", "0,5,7"),
             new ChordDeclaration(0x21, "R1+2+5", "0,2,7")
         };
-
        
-        public class ChordDefinition
-        {
-            public string ChordName;
-            public uint HalfTonesBitMask;
-            public ChordDefinition(string chordName, uint halfToneBitMask)
-            {
-                ChordName = chordName;
-                HalfTonesBitMask = halfToneBitMask;
-            }
-        }
-
-        private List<ChordDefinition> chordDefinitions;
+        private Dictionary<int,ChordDefinition> chordDefinitions;
 
         private RedBlackTree<int> chordIndex;
 
         public ChordRecognizer() {
             InitializeChordDefinitions();
-
-
         }
         private int _delta;
         private int MakeOffset(int rootIndex, int curIndex,byte s)
@@ -195,7 +183,6 @@ namespace MidiAranger.Droid.Source.midiplayer
         private void SortLeftPart(ref string[] keys, int rootOffset)
         {
             string s;
-            // Sort by offset left part to rootOffset
             for (int i = 0; i < rootOffset; i++)
             {
                 for (int j = 1; j < rootOffset; j++)
@@ -206,54 +193,43 @@ namespace MidiAranger.Droid.Source.midiplayer
                         keys[i] = keys[j];
                         keys[j] = s;
                     }
-
                 }
-
             }
-
-
         }
-
 
         private void InitializeChordDefinitions()
         {
             chordIndex = new RedBlackTree<int>();
+            int id = 0;
             uint[] offsets;
-            int rootIndex;
-            chordDefinitions = new List<ChordDefinition>();
+            byte rootIndex;
+            chordDefinitions = new Dictionary<int,ChordDefinition>();
             for (int i = 0; i < chordDeclarations.Length; i++)
             {
-                
                 List<string> mixedDefs = GetMixedDefinitions(chordDeclarations[i].ChordOffsets);
                 string rootOffset = chordDeclarations[i].ChordOffsets.Split(",")[0] ;
                 foreach (string key in mixedDefs)
                 {
-
                     string[] keys = key.Split(",");
-
                     _delta = 0;
-
-                    rootIndex = Array.IndexOf(keys, rootOffset);
+                    rootIndex = (byte)Array.IndexOf(keys, rootOffset);
                     SortLeftPart(ref keys, rootIndex);
                     offsets = ProcessChordDefinition(0, 0, keys, keys.Length, rootIndex);
                     for (int j = 0; j < offsets.Length; j++)
                     {
-                        ChordDefinition cd = new ChordDefinition(chordDeclarations[i].ChordName, offsets[j]);
+                        ChordDefinition cd = new ChordDefinition(chordDeclarations[i], offsets[j],rootIndex);
                         if (!chordIndex.Exists(cd.HalfTonesBitMask))
                         {
-                            chordDefinitions.Add(cd);
-                            chordIndex.Add(cd.HalfTonesBitMask, chordDeclarations[i].ChordId);
+                            chordDefinitions.Add(id,cd);
+                            chordIndex.Add(cd.HalfTonesBitMask, id);
+                            id++;
                         }
-                        
                     }
-
                 }
             }
-
-            
         }
 
-        public ChordDeclaration Recognize(byte[] notes)
+        public ChordDefinition ChordRecognize(byte[] notes)
         {
             if (notes.Length < 2) return null;
             Array.Sort(notes);
@@ -275,7 +251,15 @@ namespace MidiAranger.Droid.Source.midiplayer
                 res = -1;
             }
 
-            return res ==-1 ? null : chordDeclarations[res];
+            return res ==-1 ? null : chordDefinitions.GetValueOrDefault(res);
+        }
+
+        
+
+        public string NoteRecognize(byte note)
+        {
+            int ofs = note % 12;
+            return "";
         }
 
     }

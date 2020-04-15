@@ -57,9 +57,10 @@ namespace MidiAranger.Droid
             RunOnUiThread(() => {
                 if (mplayer.currentPressedNotes == null) return;
 
-                ChordDeclaration cd = chordRecognizer.Recognize(mplayer.currentPressedNotes.ToArray());
-                
-                FindViewById<TextView>(Resource.Id.miditext).Text = cd!=null?cd.ChordName:"";
+                byte[] b = mplayer.currentPressedNotes.ToArray();
+                ChordDefinition cd = chordRecognizer.ChordRecognize(b);
+
+                FindViewById<TextView>(Resource.Id.miditext).Text = cd!=null?(cd.Chord.ChordName+" -- "+((b.Length>0)?(b[cd.RootOffset].ToString()):"")) : "";
             });
             
         }
