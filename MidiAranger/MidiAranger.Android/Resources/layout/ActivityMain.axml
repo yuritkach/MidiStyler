@@ -3,11 +3,40 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-	<Button 
+	<LinearLayout
+		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-	    android:text="SendMidi" 
-	    android:id="@+id/SendMidiButton" />
+		android:id="@+id/linearLayout1">
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="A"
+			android:id="@+id/MainA" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="A-B"
+			android:id="@+id/FillAB" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="B"
+			android:id="@+id/MainB" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="BA"
+			android:id="@+id/FillBA" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="Ending B"
+			android:id="@+id/EndingB" />
+
+	</LinearLayout>
+
+
 	<TextView 
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"

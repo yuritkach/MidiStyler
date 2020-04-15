@@ -13,6 +13,7 @@ using midi.events;
 using System.Threading;
 using MidiAranger.Droid.Source.midiplayer;
 using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
+using MidiAranger.Droid.Source.styler;
 
 namespace MidiAranger.Droid
 {
@@ -32,20 +33,22 @@ namespace MidiAranger.Droid
 
            
 
-            FindViewById<Android.Widget.Button>(Resource.Id.SendMidiButton).Click += (object sender, EventArgs e) => {
-             //   SendTestMIDI();
-            };
+            FindViewById<Android.Widget.Button>(Resource.Id.MainA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.MainA); };
+            FindViewById<Android.Widget.Button>(Resource.Id.MainB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.MainB); };
+            FindViewById<Android.Widget.Button>(Resource.Id.FillAB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.FillInAB); };
+            FindViewById<Android.Widget.Button>(Resource.Id.FillBA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.FillInBA); };
+            FindViewById<Android.Widget.Button>(Resource.Id.EndingB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.EndingB); };
 
-            
-            
+
+
             var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
 
             chordRecognizer = new ChordRecognizer();
 
-            MIDIFile midiFile = new MIDIFile();
-            midiFile.InitMidiFile("ddd");
+            MIDIStyle midiStyle = new MIDIStyle();
+            midiStyle.LoadStyle("ddd");
             mplayer = new MIDIPlayer(this);
-            mplayer.Tracks = midiFile.Tracks;
+            mplayer.Tracks = midiStyle.MidiSection.Tracks;
             mplayer.Start();
 
         }
@@ -59,6 +62,8 @@ namespace MidiAranger.Droid
 
                 byte[] b = mplayer.currentPressedNotes.ToArray();
                 ChordDefinition cd = chordRecognizer.ChordRecognize(b);
+                
+
 
                 FindViewById<TextView>(Resource.Id.miditext).Text = cd!=null?(cd.Chord.ChordName+" -- "+((b.Length>0)?(b[cd.RootOffset].ToString()):"")) : "";
             });

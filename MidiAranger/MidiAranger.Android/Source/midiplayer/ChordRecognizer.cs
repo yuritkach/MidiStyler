@@ -13,6 +13,25 @@ using MidiAranger.Droid.Source.common;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
+    /*
+    noteOffset["C"] = 1;
+    noteOffset["C#"] = 2;
+    noteOffset["Db"] = 2;
+    noteOffset["D"] = 3;
+    noteOffset["D#"] = 4;
+    noteOffset["Eb"] = 4;
+    noteOffset["E"] = 5;
+    noteOffset["F"] = 6;
+    noteOffset["F#"] = 7;
+    noteOffset["Gb"] = 7;
+    noteOffset["G"] = 8;
+    noteOffset["G#"] = 9;
+    noteOffset["Ab"] = 9;
+    noteOffset["A"] = 10;
+    noteOffset["A#"] = 11;
+    noteOffset["Bb"] = 11;
+    noteOffset["B"] = 12;
+    */
     public class ChordDeclaration
     {
         public int ChordId { get; protected set; }

@@ -25,6 +25,8 @@ namespace MidiAranger.Droid.Source.common
             return (b1 >> 4) == mask;
         }
 
+        
+
     }
 
 
