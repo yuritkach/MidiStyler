@@ -111,7 +111,9 @@
     <Compile Include="Source\midi\utility\DataBufferReader.cs" />
     <Compile Include="Source\midi\utility\DataBufferWriter.cs" />
     <Compile Include="Source\midi\utility\OutDataBuffer.cs" />
+    <Compile Include="Source\styler\CASMSection.cs" />
     <Compile Include="Source\styler\IFileParser.cs" />
+    <Compile Include="Source\styler\MIDIFileBase.cs" />
     <Compile Include="Source\styler\MIDISection.cs" />
     <Compile Include="Source\styler\MidiStyle.cs" />
   </ItemGroup>

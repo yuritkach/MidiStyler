@@ -18,6 +18,7 @@ using Java.Lang;
 using System.Threading;
 using MidiAranger.Droid.Source.common;
 using MidiAranger.Droid.Source.styler;
+using static MidiAranger.Droid.Source.common.Common;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
@@ -139,37 +140,13 @@ namespace MidiAranger.Droid.Source.midiplayer
             while ((difTime2 - difTime1) < waitTime);
         }
 
-        public enum StyleSections { IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC }
-        public string SectionName(StyleSections styleSection)
-        {
-            switch (styleSection)
-            {
-                case StyleSections.IntroA:return "Intro A";
-                case StyleSections.IntroB: return "Intro B";
-                case StyleSections.IntroC: return "Intro C";
-                case StyleSections.MainA: return "Main A";
-                case StyleSections.MainB: return "Main B";
-                case StyleSections.MainC: return "Main C";
-                case StyleSections.MainD: return "Main D";
-                case StyleSections.FillInAA: return "Fill In AA";
-                case StyleSections.FillInBB: return "Fill In BB";
-                case StyleSections.FillInCC: return "Fill In CC";
-                case StyleSections.FillInDD: return "Fill In DD";
-                case StyleSections.FillInBA: return "Fill In BA";
-                case StyleSections.FillInAB: return "Fill In AB";
-                case StyleSections.EndingA: return "Ending A";
-                case StyleSections.EndingB: return "Ending B";
-                case StyleSections.EndingC: return "Ending C";
-                default: return null;
-            }
-        }
+        
 
-
-        public void GotoSection(StyleSections section)
+        public void GotoSection(Common.StyleSections section)
         {
-            MIDIMarker marker = Tracks[0].MidiMarkers.Where(j => j.Name == SectionName(section)).FirstOrDefault();
-            Tracks[0].CurrentEventIndex = marker.Index;
-            currentSongPosition = Tracks[0].MidiEvents[marker.Index].absTime;
+            MIDIMarker marker = Tracks[0].MidiMarkers.Where(j => j.Name == Common.GetSectionName(section)).FirstOrDefault();
+            Tracks[0].CurrentEventIndex = marker.StartIndex;
+            currentSongPosition = Tracks[0].MidiEvents[marker.StartIndex].absTime;
 
         }
 
@@ -183,7 +160,7 @@ namespace MidiAranger.Droid.Source.midiplayer
                 currentSongPosition++;
                 if (currentSongPosition > 34000)
                 {
-                    GotoSection(StyleSections.MainB);
+                    GotoSection(StyleSections.IntroB);
                 }
             }
 

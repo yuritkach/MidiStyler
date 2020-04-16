@@ -14,6 +14,7 @@ using System.Threading;
 using MidiAranger.Droid.Source.midiplayer;
 using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
 using MidiAranger.Droid.Source.styler;
+using static MidiAranger.Droid.Source.common.Common;
 
 namespace MidiAranger.Droid
 {
@@ -33,11 +34,11 @@ namespace MidiAranger.Droid
 
            
 
-            FindViewById<Android.Widget.Button>(Resource.Id.MainA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.MainA); };
-            FindViewById<Android.Widget.Button>(Resource.Id.MainB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.MainB); };
-            FindViewById<Android.Widget.Button>(Resource.Id.FillAB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.FillInAB); };
-            FindViewById<Android.Widget.Button>(Resource.Id.FillBA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.FillInBA); };
-            FindViewById<Android.Widget.Button>(Resource.Id.EndingB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(MIDIPlayer.StyleSections.EndingB); };
+            FindViewById<Android.Widget.Button>(Resource.Id.MainA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainA); };
+            FindViewById<Android.Widget.Button>(Resource.Id.MainB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainB); };
+            FindViewById<Android.Widget.Button>(Resource.Id.FillAB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInAB); };
+            FindViewById<Android.Widget.Button>(Resource.Id.FillBA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInBA); };
+            FindViewById<Android.Widget.Button>(Resource.Id.EndingB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.EndingB); };
 
 
 

@@ -16,7 +16,6 @@ namespace MidiAranger.Droid.Source.styler
 {
     public struct MIDIHeaderInfo
     {
-        public int Id;         // MThd signature
         public int Size;       // Always 6 (big-endian)
         public ushort Format;   // format
         public ushort TrackCount;   // count of tracks
@@ -33,10 +32,12 @@ namespace MidiAranger.Droid.Source.styler
     public class MIDIMarker
     {
         public string Name { get; set; }
-        public int Index { get; set; }
+        public int StartIndex { get; set; }
+        public int StopIndex { get; set; }
+
     }
 
-    
+
 
     public class MIDITrack
     {
@@ -47,6 +48,8 @@ namespace MidiAranger.Droid.Source.styler
         public List<MIDIEvent> MidiEvents;
         public List<MIDIMarker> MidiMarkers;
 
+        public MIDIMarker CurrentMarker;
+
         public MIDITrack()
         {
             MidiEvents = new List<MIDIEvent>();
@@ -55,6 +58,7 @@ namespace MidiAranger.Droid.Source.styler
             LastCommand = 0;
             AbsTime = 0;
             Info = new MIDITrackInfo();
+            CurrentMarker = null;
         }
 
 
@@ -68,13 +72,13 @@ namespace MidiAranger.Droid.Source.styler
 
 
 
-    class MIDISection : IFileParser
+    class MIDISection : MIDIFileBase,IFileParser
     {
         public byte[] _debugFileBuff = { 1, 2 };
 
 
         public int FileSize;
-        public byte[] ByteBuff = null;
+        public byte[] ByteBuff;
     //    public int PulsesPerQuarterNote;
         public MIDIHeaderInfo MidiHeaderInfo;
         public MIDITrackInfo MidiTrackInfo;
@@ -83,23 +87,19 @@ namespace MidiAranger.Droid.Source.styler
         public string StyleName { get; protected set; }
         protected int currentOffset;
 
+        
         public MIDISection()
         {
             Tracks = new List<MIDITrack>();
             MidiHeaderInfo = new MIDIHeaderInfo();
-
         }
 
         protected void ProcessMIDIHeader()
         {
-
-            MidiHeaderInfo.Id = GetUint();
-            if (MidiHeaderInfo.Id != 0x4D546864) // MThd
-                throw new System.Exception("MIDIFile incorrect file signature!");
-            MidiHeaderInfo.Size = GetUint();
-            MidiHeaderInfo.Format = GetUShort();
-            MidiHeaderInfo.TrackCount = GetUShort();
-            MidiHeaderInfo.Ticks = GetUShort();
+            MidiHeaderInfo.Size = Common.GetUint(ref ByteBuff, ref currentOffset);
+            MidiHeaderInfo.Format = Common.GetUShort(ref ByteBuff, ref currentOffset);
+            MidiHeaderInfo.TrackCount = Common.GetUShort(ref ByteBuff, ref currentOffset);
+            MidiHeaderInfo.Ticks = Common.GetUShort(ref ByteBuff, ref currentOffset);
         }
 
         protected void ProcessMIDITracks()
@@ -119,6 +119,8 @@ namespace MidiAranger.Droid.Source.styler
             track.LastCommand = 0;
             track.CurrentEventIndex = 0;
             ProcessMidiEvents(track);
+            if (track.CurrentMarker!=null)
+                track.CurrentMarker.StopIndex = track.MidiEvents.Count() - 1;
         }
 
         protected void ProcessMidiEvents(MIDITrack track)
@@ -140,14 +142,14 @@ namespace MidiAranger.Droid.Source.styler
         protected MIDIEvent LoadMidiEvent(MIDITrack track)
         {
             MIDIEvent result = new MIDIEvent();
-            result.absTime = GetVariableNumber();
+            result.absTime = Common.GetVariableNumber(ref ByteBuff, ref currentOffset);
             result.MidiMessage = GetMidiMessage(track);
             return result;
         }
 
         protected byte[] GetMidiMessage(MIDITrack track)
         {
-            byte command = GetByte();
+            byte command = Common.GetByte(ref ByteBuff, ref currentOffset);
             byte[] data;
             if (!((command & 0x80) == 0x80)) // is not command?
             {
@@ -168,8 +170,8 @@ namespace MidiAranger.Droid.Source.styler
 
         protected byte[] GetVarData()
         {
-            byte[] result = new byte[GetVariableNumber()];
-            for (int i = 0; i < result.Length; i++) result[i] = GetByte();
+            byte[] result = new byte[Common.GetVariableNumber(ref ByteBuff, ref currentOffset)];
+            for (int i = 0; i < result.Length; i++) result[i] = Common.GetByte(ref ByteBuff, ref currentOffset);
             return result;
 
         }
@@ -179,7 +181,7 @@ namespace MidiAranger.Droid.Source.styler
             //Meta
             if (track.LastCommand == 0xFF)
             {
-                byte type = GetByte();
+                byte type = Common.GetByte(ref ByteBuff, ref currentOffset);
                 byte[] b = GetVarData();
                 byte[] result = new byte[b.Length + 1];
                 result[0] = type;
@@ -187,9 +189,14 @@ namespace MidiAranger.Droid.Source.styler
 
                 if (type == 0x06)
                 {
+                    if (track.CurrentMarker != null)
+                    {
+                        track.CurrentMarker.StopIndex = track.MidiEvents.Count()-1;
+                    }
                     MIDIMarker marker = new MIDIMarker();
-                    marker.Index = track.MidiEvents.Count();
+                    marker.StartIndex = track.MidiEvents.Count();
                     marker.Name = Encoding.Default.GetString(b);
+                    track.CurrentMarker = marker;
                     track.MidiMarkers.Add(marker);
                 }
                 if (type == 0x03)
@@ -216,12 +223,12 @@ namespace MidiAranger.Droid.Source.styler
             // Channel message
             if (Common.IsMasked(track.LastCommand, 0x8) || Common.IsMasked(track.LastCommand, 0x9) || Common.IsMasked(track.LastCommand, 0xA) || Common.IsMasked(track.LastCommand, 0xB) || Common.IsMasked(track.LastCommand, 0xE))
             {
-                return new byte[2] { GetByte(), GetByte() };
+                return new byte[2] { Common.GetByte(ref ByteBuff, ref currentOffset), Common.GetByte(ref ByteBuff, ref currentOffset) };
             }
             else
             if (Common.IsMasked(track.LastCommand, 0xC) || Common.IsMasked(track.LastCommand, 0xD))
             {
-                return new byte[1] { GetByte() };
+                return new byte[1] { Common.GetByte(ref ByteBuff, ref currentOffset) };
             }
             return new byte[0];
         }
@@ -229,49 +236,22 @@ namespace MidiAranger.Droid.Source.styler
 
         protected void ProcessMidiTrackInfo(ref MIDITrackInfo track)
         {
-            track.Id = GetUint();
+            track.Id = Common.GetUint(ref ByteBuff, ref currentOffset);
             if (track.Id != 0x4D54726B) //MTrk
                 throw new System.Exception("MIDI-File contains bad track signature");
-            track.Length = GetUint();
+            track.Length = Common.GetUint(ref ByteBuff, ref currentOffset);
         }
 
-        protected int GetUint()
-        {
-            return GetUShort() << 16 | GetUShort();
-        }
-
-        protected ushort GetUShort()
-        {
-            return (ushort)(GetByte() << 8 | GetByte());
-        }
-
-        protected byte GetByte()
-        {
-            return ByteBuff[currentOffset++];
-        }
-
-        protected int GetVariableNumber()
-        {
-            int result = 0;
-            byte byte_in;
-            for (;;)
-            {
-                byte_in = GetByte();
-                result = (result << 7) | byte_in & 0x7f;
-                if ((byte_in & 0x80) == 0)
-                    return result;
-            }
-        }
-
+        
 
         public void Parse(ref byte[] buff, ref int position)
         {
-            //ByteBuff = buff;
-            ByteBuff = DEBUGDATA.midifileData;
+            ByteBuff = buff;
             currentOffset = position;
             FileSize = ByteBuff.Length;
             ProcessMIDIHeader();
             ProcessMIDITracks();
+            position = currentOffset; 
         }
     }
 }
