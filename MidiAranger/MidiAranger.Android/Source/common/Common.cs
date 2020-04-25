@@ -111,6 +111,14 @@ namespace MidiAranger.Droid.Source.common
             }
         }
 
+        public static string[] NoteNames = new string[] { "C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B" };
+
+        public static string GetNoteName(byte noteOffset)
+        {
+            int a = noteOffset % 12;
+            return NoteNames[a];
+        }
+
     }
 
 

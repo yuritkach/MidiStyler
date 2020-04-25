@@ -67,5 +67,12 @@ namespace MidiAranger.Droid.Source.styler
 
         private int buffPosition; 
         private byte[] filebuff;
+
+
+
+        public byte[] ProcessMessage(MIDITrack track, int messageIndex)
+        {
+            return track.MidiEvents[messageIndex].MidiMessage;
+        }
     }
 }

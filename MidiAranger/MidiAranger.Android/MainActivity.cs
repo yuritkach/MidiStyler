@@ -15,6 +15,7 @@ using MidiAranger.Droid.Source.midiplayer;
 using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
 using MidiAranger.Droid.Source.styler;
 using static MidiAranger.Droid.Source.common.Common;
+using MidiAranger.Droid.Source.common;
 
 namespace MidiAranger.Droid
 {
@@ -48,7 +49,7 @@ namespace MidiAranger.Droid
 
             MIDIStyle midiStyle = new MIDIStyle();
             midiStyle.LoadStyle("ddd");
-            mplayer = new MIDIPlayer(this);
+            mplayer = new MIDIPlayer(this,midiStyle);
             mplayer.Tracks = midiStyle.MidiSection.Tracks;
             mplayer.Start();
 
@@ -60,13 +61,16 @@ namespace MidiAranger.Droid
         {
             RunOnUiThread(() => {
                 if (mplayer.currentPressedNotes == null) return;
-
-                byte[] b = mplayer.currentPressedNotes.ToArray();
-                ChordDefinition cd = chordRecognizer.ChordRecognize(b);
-                
-
-
-                FindViewById<TextView>(Resource.Id.miditext).Text = cd!=null?(cd.Chord.ChordName+" -- "+((b.Length>0)?(b[cd.RootOffset].ToString()):"")) : "";
+                string t = "";
+                byte[] pressedNotes = mplayer.currentPressedNotes.ToArray();
+                if (pressedNotes.Length > 0) {
+                    ChordDefinition cd = chordRecognizer.ChordRecognize(pressedNotes);
+                    if (cd != null)
+                    {
+                        t = Common.GetNoteName(pressedNotes[cd.RootOffset]) + cd.Chord.ChordName.Substring(1) + " -- " + pressedNotes[cd.RootOffset].ToString();
+                    }
+                }
+                FindViewById<TextView>(Resource.Id.miditext).Text = t;
             });
             
         }

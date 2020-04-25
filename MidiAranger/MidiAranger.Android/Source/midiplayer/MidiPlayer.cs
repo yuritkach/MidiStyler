@@ -45,9 +45,11 @@ namespace MidiAranger.Droid.Source.midiplayer
         private System.Threading.Thread thread;
         private long difTime1, difTime2;
         public List<byte> currentPressedNotes;
+        public MIDIStyle Style { get; protected set; }
 
-        public MIDIPlayer(Context context) {
+        public MIDIPlayer(Context context, MIDIStyle style) {
             this.context = context;
+            Style = style;
 
             MIDISession.GetInstance().Init(context);
             MIDISession.GetInstance().Start();
@@ -166,6 +168,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         }
 
+        private byte[] ba;
         protected void PlayCurrentTrackPositions() {
             foreach (MIDITrack track in Tracks)
                 for (int i = track.CurrentEventIndex; i < track.MidiEvents.Count; i++)
@@ -174,7 +177,11 @@ namespace MidiAranger.Droid.Source.midiplayer
                         if (track.MidiEvents[i].MidiMessage[0] == 0xFF)
                             ProcessMetaEvent(track.MidiEvents[i].MidiMessage);
                         else
-                            MIDISession.GetInstance().SendMessage(track.MidiEvents[i].MidiMessage);
+                        {
+                            ba = Style.ProcessMessage(track, i);
+                            MIDISession.GetInstance().SendMessage(ba);
+                        }
+                        
                     else
                         if (track.MidiEvents[i].absTime > currentSongPosition)
                     {
