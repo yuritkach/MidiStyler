@@ -1252,8 +1252,8 @@ namespace midi {
             //        }
             if (networkListenerRegistered)
                 RemoveNetworkListener();
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.AddAction(ConnectivityManager.ConnectivityAction);
+         
+            IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
             this.wifiReceiver = new MidiBroadCastReceiver(this);
             if (appContext != null)
                 appContext.RegisterReceiver(this.wifiReceiver, intentFilter);

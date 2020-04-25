@@ -81,7 +81,6 @@ namespace MidiAranger.Droid.Source.styler
         public byte[] ByteBuff;
     //    public int PulsesPerQuarterNote;
         public MIDIHeaderInfo MidiHeaderInfo;
-        public MIDITrackInfo MidiTrackInfo;
         public List<MIDITrack> Tracks;
 
         public string StyleName { get; protected set; }

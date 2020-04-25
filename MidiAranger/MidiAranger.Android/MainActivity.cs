@@ -35,11 +35,11 @@ namespace MidiAranger.Droid
 
            
 
-            FindViewById<Android.Widget.Button>(Resource.Id.MainA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainA); };
-            FindViewById<Android.Widget.Button>(Resource.Id.MainB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainB); };
-            FindViewById<Android.Widget.Button>(Resource.Id.FillAB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInAB); };
-            FindViewById<Android.Widget.Button>(Resource.Id.FillBA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInBA); };
-            FindViewById<Android.Widget.Button>(Resource.Id.EndingB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.EndingB); };
+            FindViewById<Android.Widget.Button>(Resource.Id.MainA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainA,false); };
+            FindViewById<Android.Widget.Button>(Resource.Id.MainB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainB,false); };
+            FindViewById<Android.Widget.Button>(Resource.Id.FillAB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInAB,true); };
+            FindViewById<Android.Widget.Button>(Resource.Id.FillBA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInBA,true); };
+            FindViewById<Android.Widget.Button>(Resource.Id.EndingB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.EndingB,false); };
 
 
 

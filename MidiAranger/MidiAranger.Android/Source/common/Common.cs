@@ -16,37 +16,19 @@ namespace MidiAranger.Droid.Source.common
     public static class Common
     {
         private static readonly DateTime Jan1st1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        public static long CurrentTimeMillis()
-        {
-            return (long)(DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
-        }
+        public static string[] NoteNames = new string[] { "C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B" };
 
-        public static bool IsMasked(byte b1, byte mask)
-        {
-            return (b1 >> 4) == mask;
-        }
+        public static long CurrentTimeMillis()=>(long)(DateTime.UtcNow - Jan1st1970).TotalMilliseconds;
 
+        public static bool IsMasked(byte b1, byte mask) =>(b1 >> 4) == mask;
 
-        public static SectionID GetSectionId(ref byte[] filebuff, ref int buffPosition)
-        {
-            return (SectionID)GetUint(ref filebuff, ref buffPosition);
-        }
+        public static SectionID GetSectionId(ref byte[] filebuff, ref int buffPosition) =>(SectionID)GetUint(ref filebuff, ref buffPosition);
 
+        public static int GetUint(ref byte[] filebuff, ref int buffPosition) =>GetUShort(ref filebuff, ref buffPosition) << 16 | GetUShort(ref filebuff, ref buffPosition);
 
-        public static int GetUint(ref byte[] filebuff, ref int buffPosition)
-        {
-            return GetUShort(ref filebuff, ref buffPosition) << 16 | GetUShort(ref filebuff, ref buffPosition);
-        }
+        public static ushort GetUShort(ref byte[] filebuff, ref int buffPosition) =>(ushort)(GetByte(ref filebuff, ref buffPosition) << 8 | GetByte(ref filebuff, ref buffPosition));
 
-        public static ushort GetUShort(ref byte[] filebuff, ref int buffPosition)
-        {
-            return (ushort)(GetByte(ref filebuff, ref buffPosition) << 8 | GetByte(ref filebuff, ref buffPosition));
-        }
-
-        public static byte GetByte(ref byte[] filebuff, ref int buffPosition)
-        {
-            return filebuff[buffPosition++];
-        }
+        public static byte GetByte(ref byte[] filebuff, ref int buffPosition)=>filebuff[buffPosition++];
 
         public static int GetVariableNumber(ref byte[] filebuff, ref int buffPosition)
         {
@@ -111,13 +93,9 @@ namespace MidiAranger.Droid.Source.common
             }
         }
 
-        public static string[] NoteNames = new string[] { "C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B" };
 
-        public static string GetNoteName(byte noteOffset)
-        {
-            int a = noteOffset % 12;
-            return NoteNames[a];
-        }
+        public static string GetNoteName(byte noteOffset) => NoteNames[noteOffset % 12];
+        
 
     }
 

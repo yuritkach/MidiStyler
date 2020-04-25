@@ -35,11 +35,12 @@ namespace MidiAranger.Droid.Source.midiplayer
     {
         private bool isPlaying = false;
         public List<MIDITrack> Tracks;
-        private byte[] message;
         private readonly Context context;
         public int currentSongPosition;
         public int pulsesPerQuarterNote;
 
+        protected MIDIMarker currentMarker;
+        protected MIDIMarker nextMarker;
 
 
         private System.Threading.Thread thread;
@@ -68,13 +69,17 @@ namespace MidiAranger.Droid.Source.midiplayer
             isPlaying = false;
             currentPressedNotes = new List<byte>();
             Subscribe();
-        }
+
+    }
 
 
-        public void Start()
+    public void Start()
         {
             currentSongPosition = 0;
             isPlaying = true;
+            currentMarker = GetMarkerOnSection(StyleSections.MainA);
+            nextMarker = currentMarker;
+            GotoSection(Common.GetSectionCode(currentMarker.Name),true);
         }
 
         public void Stop()
@@ -113,13 +118,10 @@ namespace MidiAranger.Droid.Source.midiplayer
             if (mes[0] == 0xF8) { } // Sync
             else
             {
-                message = mes;
                 if (Common.IsMasked(mes[0], 0x9))
                     AddToCurrentPressed(mes[1]);
                 if (Common.IsMasked(mes[0], 0x8))
                     RemoveFromCurrentPressed(mes[1]);
-
-
             }
         }
 
@@ -142,13 +144,46 @@ namespace MidiAranger.Droid.Source.midiplayer
             while ((difTime2 - difTime1) < waitTime);
         }
 
-        
-
-        public void GotoSection(Common.StyleSections section)
+        protected MIDIMarker GetMarkerOnSection(Common.StyleSections section)
         {
-            MIDIMarker marker = Tracks[0].MidiMarkers.Where(j => j.Name == Common.GetSectionName(section)).FirstOrDefault();
-            Tracks[0].CurrentEventIndex = marker.StartIndex;
-            currentSongPosition = Tracks[0].MidiEvents[marker.StartIndex].absTime;
+            return Tracks[0].MidiMarkers.Where(j => j.Name == Common.GetSectionName(section)).FirstOrDefault();
+        }
+
+        public void GotoSection(Common.StyleSections section, bool instant)
+        {
+            currentMarker = GetMarkerOnSection(section);
+            Tracks[0].CurrentEventIndex = currentMarker.StartIndex;
+            currentSongPosition = Tracks[0].MidiEvents[currentMarker.StartIndex].absTime;
+            AllNotesOff();
+        }
+
+        protected void AllNotesOff()
+        {
+            MIDISession session = MIDISession.GetInstance();
+            byte[] b = new byte[3] { 0, 123, 0 };
+            for (byte i = 0xB0; i < 0xC0; i++)
+            {
+                b[0] =i;
+                session.SendMessage(b);
+            }
+
+        }
+
+        protected StyleSections GetNextSection()
+        {
+            switch (Common.GetSectionCode(currentMarker.Name))
+            {
+                case StyleSections.MainA:return StyleSections.MainA;
+                case StyleSections.MainB: return StyleSections.MainB;
+                case StyleSections.FillInAB: return StyleSections.MainB;
+                case StyleSections.FillInBA: return StyleSections.MainA;
+                case StyleSections.FillInAA: return StyleSections.MainA;
+                case StyleSections.FillInBB: return StyleSections.MainB;
+                case StyleSections.IntroA: return StyleSections.MainA;
+
+                default:return StyleSections.EndingA;
+
+            }
 
         }
 
@@ -158,38 +193,33 @@ namespace MidiAranger.Droid.Source.midiplayer
             {
                 // check state
                 USleep(pulsesPerQuarterNote);
-                PlayCurrentTrackPositions();
+                PlayCurrentMarkerPositions();
                 currentSongPosition++;
-                if (currentSongPosition > 34000)
+                if (currentSongPosition > Tracks[0].MidiEvents[currentMarker.StopIndex].absTime)
                 {
-                    GotoSection(StyleSections.IntroB);
+                    GotoSection(GetNextSection(),false);
                 }
             }
 
         }
 
-        private byte[] ba;
-        protected void PlayCurrentTrackPositions() {
+        protected void PlayCurrentMarkerPositions() {
+            MIDISession session = MIDISession.GetInstance();
             foreach (MIDITrack track in Tracks)
-                for (int i = track.CurrentEventIndex; i < track.MidiEvents.Count; i++)
+            //    for (int i = track.CurrentEventIndex; i < track.MidiEvents.Count; i++)
+                for (int i = currentMarker.StartIndex; i < currentMarker.StopIndex; i++)
                 {
                     if (track.MidiEvents[i].absTime == currentSongPosition)
                         if (track.MidiEvents[i].MidiMessage[0] == 0xFF)
                             ProcessMetaEvent(track.MidiEvents[i].MidiMessage);
                         else
-                        {
-                            ba = Style.ProcessMessage(track, i);
-                            MIDISession.GetInstance().SendMessage(ba);
-                        }
-                        
+                            session.SendMessage(Style.ProcessMessage(track, i));
                     else
                         if (track.MidiEvents[i].absTime > currentSongPosition)
-                    {
-                        track.CurrentEventIndex = i;
-                        break;
-                    }   
-
-                        
+                        {
+                            track.CurrentEventIndex = i;
+                            break;
+                        }   
                 }
         }
     }
