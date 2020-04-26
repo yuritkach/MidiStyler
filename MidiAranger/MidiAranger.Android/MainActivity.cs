@@ -43,6 +43,7 @@ namespace MidiAranger.Droid
 
 
 
+
             var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
 
             chordRecognizer = new ChordRecognizer();
@@ -50,12 +51,20 @@ namespace MidiAranger.Droid
             MIDIStyle midiStyle = new MIDIStyle();
             midiStyle.LoadStyle("ddd");
             mplayer = new MIDIPlayer(this,midiStyle);
+            mplayer.OnTactEvent += Mplayer_OnTactEvent;            
             mplayer.Tracks = midiStyle.MidiSection.Tracks;
+
             mplayer.Start();
+
 
         }
 
-     
+        private void Mplayer_OnTactEvent(object sender, OnTactEventArgs e)
+        {
+            RunOnUiThread(() => {
+                FindViewById<TextView>(Resource.Id.currenttact).Text = e.CurrentTact.ToString();
+            });
+        }
 
         protected void SetUIValues(object state)
         {

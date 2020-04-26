@@ -9040,6 +9040,9 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a00b0
 			public const int coordinator = 2131361968;
 			
+			// aapt resource value: 0x7f0a00a4
+			public const int currenttact = 2131361956;
+			
 			// aapt resource value: 0x7f0a007c
 			public const int custom = 2131361916;
 			
@@ -9198,9 +9201,6 @@ namespace MidiAranger.Droid
 			
 			// aapt resource value: 0x7f0a0038
 			public const int middle = 2131361848;
-			
-			// aapt resource value: 0x7f0a00a4
-			public const int midiClockCount = 2131361956;
 			
 			// aapt resource value: 0x7f0a00a5
 			public const int midiTempo = 2131361957;
