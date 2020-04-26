@@ -48,6 +48,8 @@ namespace MidiAranger.Droid.Source.midiplayer
         public List<byte> currentPressedNotes;
         public MIDIStyle Style { get; protected set; }
 
+        protected int pulsesPerQuarterNote;
+
         public MIDIPlayer(Context context, MIDIStyle style) {
             this.context = context;
             Style = style;
@@ -63,6 +65,8 @@ namespace MidiAranger.Droid.Source.midiplayer
            
             currentSongPosition = 0;
             msOnPulse = 500000; // 120 BPM initial tempo
+            pulsesPerQuarterNote = style.MidiSection.MidiHeaderInfo.Ticks;
+
 
             thread = new System.Threading.Thread(new ThreadStart(Run));
             thread.Start();
@@ -202,9 +206,8 @@ namespace MidiAranger.Droid.Source.midiplayer
                 USleep(msOnPulse);
                 PlayCurrentMarkerPositions();
                 currentSongPosition++;
-
                 counter++;
-                if (counter > 480)
+                if (counter > pulsesPerQuarterNote)
                 {
                     tact++;
                     e.CurrentTact = tact % 4;
