@@ -44,11 +44,12 @@ namespace MidiAranger.Droid.Source.common
         }
 
 
-        public enum StyleSections { IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC, none }
+        public enum StyleSections {Init,IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC, none }
         public static string GetSectionName(StyleSections styleSection)
         {
             switch (styleSection)
             {
+                case StyleSections.Init: return "Init";
                 case StyleSections.IntroA: return "Intro A";
                 case StyleSections.IntroB: return "Intro B";
                 case StyleSections.IntroC: return "Intro C";
@@ -73,6 +74,7 @@ namespace MidiAranger.Droid.Source.common
         {
             switch (sectionName)
             {
+                case "Init": return StyleSections.Init;
                 case "Intro A": return StyleSections.IntroA;
                 case "Intro B" : return StyleSections.IntroB;
                 case "Intro C" : return StyleSections.IntroC;

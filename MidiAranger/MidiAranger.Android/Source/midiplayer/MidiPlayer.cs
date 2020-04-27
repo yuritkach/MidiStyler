@@ -80,9 +80,9 @@ namespace MidiAranger.Droid.Source.midiplayer
     public void Start()
         {
             currentSongPosition = 0;
+            currentMarker = GetMarkerOnSection(StyleSections.Init);
+            nextMarker = GetMarkerOnSection(StyleSections.MainA);
             isPlaying = true;
-            currentMarker = GetMarkerOnSection(StyleSections.MainA);
-            nextMarker = currentMarker;
             GotoSection(Common.GetSectionCode(currentMarker.Name),true);
         }
 
@@ -143,9 +143,10 @@ namespace MidiAranger.Droid.Source.midiplayer
         protected void USleep(int waitTime)
         {
             if (waitTime == 0) return;
-            difTime1 = JavaLangSystem.NanoTime();
+            
             do { difTime2 = JavaLangSystem.NanoTime(); }
             while ((difTime2 - difTime1) < waitTime);
+            difTime1 = JavaLangSystem.NanoTime();
         }
 
         protected MIDIMarker GetMarkerOnSection(Common.StyleSections section)
@@ -177,6 +178,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             switch (Common.GetSectionCode(currentMarker.Name))
             {
+                case StyleSections.Init: return StyleSections.MainA;
                 case StyleSections.MainA:return StyleSections.MainA;
                 case StyleSections.MainB: return StyleSections.MainB;
                 case StyleSections.FillInAB: return StyleSections.MainB;
@@ -192,18 +194,26 @@ namespace MidiAranger.Droid.Source.midiplayer
         }
 
         public event EventHandler<OnTactEventArgs> OnTactEvent;
-
+              
         public void Run()
         {
-            
+            difTime1 = Java.Lang.JavaSystem.NanoTime();
+            //difTime1 = JavaLangSystem.NanoTime();
+
+
             EventHandler<OnTactEventArgs> onTactHandler = OnTactEvent;
             OnTactEventArgs e = new OnTactEventArgs();
             int tact = 0;
             int counter = 1;
             while (isPlaying)
             {
-                // check state
-                USleep(msOnPulse);
+
+                do
+                {
+                    difTime2 = JavaSystem.NanoTime();
+                }
+                while ((difTime2 - difTime1)<msOnPulse/1000* pulsesPerQuarterNote);
+
                 PlayCurrentMarkerPositions();
                 currentSongPosition++;
                 counter++;
@@ -218,6 +228,8 @@ namespace MidiAranger.Droid.Source.midiplayer
                 {
                     GotoSection(GetNextSection(),false);
                 }
+
+                difTime1 = JavaSystem.NanoTime();
             }
 
         }

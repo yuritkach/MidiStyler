@@ -117,6 +117,12 @@ namespace MidiAranger.Droid.Source.styler
             track.AbsTime = 0;
             track.LastCommand = 0;
             track.CurrentEventIndex = 0;
+
+            MIDIMarker marker = new MIDIMarker();
+            marker.StartIndex = track.MidiEvents.Count();
+            marker.Name = "Init";
+            track.CurrentMarker = marker;
+            track.MidiMarkers.Add(marker);
             ProcessMidiEvents(track);
             if (track.CurrentMarker!=null)
                 track.CurrentMarker.StopIndex = track.MidiEvents.Count() - 1;
@@ -192,11 +198,15 @@ namespace MidiAranger.Droid.Source.styler
                     {
                         track.CurrentMarker.StopIndex = track.MidiEvents.Count()-1;
                     }
-                    MIDIMarker marker = new MIDIMarker();
-                    marker.StartIndex = track.MidiEvents.Count();
-                    marker.Name = Encoding.Default.GetString(b);
-                    track.CurrentMarker = marker;
-                    track.MidiMarkers.Add(marker);
+                    string name = Encoding.Default.GetString(b);
+                    if (name != "SFF1" && name != "SInt")
+                    {
+                        MIDIMarker marker = new MIDIMarker();
+                        marker.StartIndex = track.MidiEvents.Count();
+                        marker.Name = name;
+                        track.CurrentMarker = marker;
+                        track.MidiMarkers.Add(marker);
+                    }
                 }
                 if (type == 0x03)
                 {
