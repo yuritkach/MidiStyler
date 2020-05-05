@@ -145,7 +145,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             if (waitTime == 0) return;
             
             do { difTime2 = JavaLangSystem.NanoTime(); }
-            while ((difTime2 - difTime1) < waitTime);
+            while ((difTime2 - difTime1) < waitTime*1000);
             difTime1 = JavaLangSystem.NanoTime();
         }
 
@@ -157,8 +157,16 @@ namespace MidiAranger.Droid.Source.midiplayer
         public void GotoSection(Common.StyleSections section, bool instant)
         {
             currentMarker = GetMarkerOnSection(section);
-            Tracks[0].CurrentEventIndex = currentMarker.StartIndex;
-            currentSongPosition = Tracks[0].MidiEvents[currentMarker.StartIndex].absTime;
+            if (currentMarker == null)
+            {
+                isPlaying = false;
+            }
+            else
+            {
+                isPlaying = true;
+                Tracks[0].CurrentEventIndex = currentMarker.StartIndex;
+                currentSongPosition = Tracks[0].MidiEvents[currentMarker.StartIndex].absTime;
+            }
             AllNotesOff();
         }
 
@@ -212,9 +220,10 @@ namespace MidiAranger.Droid.Source.midiplayer
                 {
                     difTime2 = JavaSystem.NanoTime();
                 }
-                while ((difTime2 - difTime1)<msOnPulse/1000* pulsesPerQuarterNote);
-
+                while ((difTime2 - difTime1)/ pulsesPerQuarterNote *1000< msOnPulse);
+                difTime1 = JavaSystem.NanoTime();
                 PlayCurrentMarkerPositions();
+                
                 currentSongPosition++;
                 counter++;
                 if (counter > pulsesPerQuarterNote)
@@ -229,7 +238,7 @@ namespace MidiAranger.Droid.Source.midiplayer
                     GotoSection(GetNextSection(),false);
                 }
 
-                difTime1 = JavaSystem.NanoTime();
+                
             }
 
         }
