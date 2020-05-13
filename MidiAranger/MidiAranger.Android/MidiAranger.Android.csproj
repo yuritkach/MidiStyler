@@ -116,6 +116,7 @@
     <Compile Include="Source\styler\MIDIFileBase.cs" />
     <Compile Include="Source\styler\MIDISection.cs" />
     <Compile Include="Source\styler\MidiStyle.cs" />
+    <Compile Include="Source\Views\Indicator\IndicatorView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

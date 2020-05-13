@@ -24,13 +24,6 @@ namespace MidiAranger.Droid.Source.midiplayer
 {
    
 
-  
-   
-    public class MIDIFile {
-        
-    }
-
-
     class MIDIPlayer
     {
         private bool isPlaying = false;
@@ -142,11 +135,12 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected void USleep(int waitTime)
         {
-            if (waitTime == 0) return;
-            
-            do { difTime2 = JavaLangSystem.NanoTime(); }
-            while ((difTime2 - difTime1) < waitTime*1000);
-            difTime1 = JavaLangSystem.NanoTime();
+            do
+            {
+                difTime2 = JavaSystem.NanoTime();
+            }
+            while ((difTime2 - difTime1) / waitTime * 1000 < msOnPulse);
+            difTime1 = JavaSystem.NanoTime();
         }
 
         protected MIDIMarker GetMarkerOnSection(Common.StyleSections section)
@@ -216,12 +210,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             while (isPlaying)
             {
 
-                do
-                {
-                    difTime2 = JavaSystem.NanoTime();
-                }
-                while ((difTime2 - difTime1)/ pulsesPerQuarterNote *1000< msOnPulse);
-                difTime1 = JavaSystem.NanoTime();
+                USleep(pulsesPerQuarterNote);
                 PlayCurrentMarkerPositions();
                 
                 currentSongPosition++;
@@ -268,35 +257,5 @@ namespace MidiAranger.Droid.Source.midiplayer
     {
         public int CurrentTact { get; set; }
     }
-
-    public static class JavaLangSystem
-    {
-        static readonly IntPtr class_ref;
-        static readonly IntPtr id_nanoTime;
-        public readonly static long Avg;
-
-        static JavaLangSystem()
-        {
-            class_ref = JNIEnv.FindClass("java/lang/System");
-            id_nanoTime = JNIEnv.GetStaticMethodID(class_ref, "nanoTime", "()J");
-
-            for (int i = 0; i < 10; i++)
-            {
-                NanoTime();
-            }
-
-            long start = NanoTime();
-            for (int i = 0; i < 1000; i++)
-            {
-                NanoTime();
-            }
-            Avg = (NanoTime() - start) / 1000;
-        }
-
-        [Register("nanoTime", "()J", "")]
-        public static long NanoTime()
-        {
-            return JNIEnv.CallStaticLongMethod(class_ref, id_nanoTime);
-        }
-    }
+   
 }
