@@ -33,14 +33,19 @@ namespace MidiAranger.Droid.Source.Views.Indicator
             Initialize();
         }
 
+        private Color ActiveSegmentColor;
+        private Color PassiveSegmentColor;
+
         private void Initialize()
         {
+            ActiveSegmentColor = new Color(100, 255, 100);
+            PassiveSegmentColor = new Color(200, 200, 200);
         }
 
         protected override void OnDraw(Canvas canvas)
         {
             base.OnDraw(canvas);
-            DrawValue(canvas, value);
+            DrawValue(canvas, 1);
 
             
 
@@ -48,20 +53,50 @@ namespace MidiAranger.Droid.Source.Views.Indicator
 
         private void DrawValue(Canvas canvas, int value)
         {
-            DrawHorizontalSegment(4 * measureCoefX, 3 * measureCoefY, segments[value] & 1); //top middle segment
-            DrawHorizontalSegment(4 * measureCoefX, 27 * measureCoefY, segments[value] & 1); //middle middle segment
-            DrawHorizontalSegment(4 * measureCoefX, 51 * measureCoefY, segments[value] & 1); //bottom middle segment
+            DrawHorizontalSegment(canvas, 4 * measureCoefX, 3 * measureCoefY, (segments[value] & 1)==1); //top middle segment
+            DrawHorizontalSegment(canvas, 4 * measureCoefX, 27 * measureCoefY, (segments[value] & 1)==8); //middle middle segment
+            DrawHorizontalSegment(canvas, 4 * measureCoefX, 51 * measureCoefY, (segments[value] & 1)==64); //bottom middle segment
 
-            DrawVerticalSegment(4 * measureCoefX, 3 * measureCoefY, segments[value] & 1); //top middle segment
-            DrawVerticalSegment(4 * measureCoefX, 27 * measureCoefY, segments[value] & 1); //top middle segment
-            DrawVerticalSegment(4 * measureCoefX, 51 * measureCoefY, segments[value] & 1); //top middle segment
-            DrawVerticalSegment(4 * measureCoefX, 51 * measureCoefY, segments[value] & 1); //top middle segment
-
-
-
-            canvas.DrawRect(1, 1, measureHeight, measureWidth, new Paint());
+            DrawVerticalSegment(canvas, 3 * measureCoefX, 4 * measureCoefY, (segments[value] & 2)==2); //top left segment
+            DrawVerticalSegment(canvas, 24 * measureCoefX, 4 * measureCoefY, (segments[value] & 4)==4); //top right segment
+            DrawVerticalSegment(canvas, 3 * measureCoefX, 28 * measureCoefY, (segments[value] & 16)==16); //bottom left segment
+            DrawVerticalSegment(canvas, 24 * measureCoefX, 28 * measureCoefY, (segments[value] & 32)==32); //bottom right segment
 
         }
+
+        private void DrawHorizontalSegment(Canvas canvas, float startX, float startY, bool isActiveSegment)
+        {
+            Paint paint = new Paint();
+            paint.Color = isActiveSegment ? ActiveSegmentColor : PassiveSegmentColor;
+            paint.SetStyle(Paint.Style.Fill);
+            Path path = new Path();
+            path.Reset(); 
+            path.MoveTo(startX, startY); 
+            path.LineTo(startX + (3 * measureCoefX), startY - (3 * measureCoefY));
+            path.LineTo(startX + (16 * measureCoefX), startY - (3 * measureCoefY));
+            path.LineTo(startX +(19 * measureCoefX),startY);
+            path.LineTo(startX + (16 * measureCoefX), startY + (3 * measureCoefY));
+            path.LineTo(startX + (3 * measureCoefX), startY + (3 * measureCoefY));
+            canvas.DrawPath(path, paint);
+        }
+
+        private void DrawVerticalSegment(Canvas canvas, float startX, float startY, bool isActiveSegment)
+        {
+            Paint paint = new Paint();
+            paint.Color = isActiveSegment ? ActiveSegmentColor : PassiveSegmentColor;
+            paint.SetStyle(Paint.Style.Fill);
+            Path path = new Path();
+            path.Reset(); 
+            path.MoveTo(startX, startY);
+            path.LineTo(startX + (3 * measureCoefX), startY + (3 * measureCoefY));
+            path.LineTo(startX + (3 * measureCoefX), startY + (19 * measureCoefY));
+            path.LineTo(startX , startY + (22 * measureCoefY));
+            path.LineTo(startX - (3 * measureCoefX), startY + (19 * measureCoefY));
+            path.LineTo(startX - (3 * measureCoefX), startY + (3 * measureCoefY));
+            canvas.DrawPath(path, paint);
+        }
+
+
 
 
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
@@ -69,8 +104,8 @@ namespace MidiAranger.Droid.Source.Views.Indicator
             base.OnMeasure(widthMeasureSpec, heightMeasureSpec);
             measureHeight = MeasureHeight(heightMeasureSpec);
             measureWidth = MeasureWidth(widthMeasureSpec);
-            measureCoefX = measureWidth / 6 / 5;
-            measureCoefY = measureWidth / 6 / 9;
+            measureCoefX = measureWidth / 6 / 6;
+            measureCoefY = measureWidth / 6 / 10;
             SetMeasuredDimension(measureHeight,measureWidth);
         }
 
