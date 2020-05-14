@@ -16,6 +16,7 @@ using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
 using MidiAranger.Droid.Source.styler;
 using static MidiAranger.Droid.Source.common.Common;
 using MidiAranger.Droid.Source.common;
+using MidiAranger.Droid.Source.Views.Indicator;
 
 namespace MidiAranger.Droid
 {
@@ -62,7 +63,9 @@ namespace MidiAranger.Droid
         private void Mplayer_OnTactEvent(object sender, OnTactEventArgs e)
         {
             RunOnUiThread(() => {
-                FindViewById<TextView>(Resource.Id.currenttact).Text = e.CurrentTact.ToString();
+            FindViewById<TextView>(Resource.Id.currenttact).Text = e.CurrentTact.ToString();
+                Source.Views.Indicator.IndicatorView v = FindViewById<Source.Views.Indicator.IndicatorView>(Resource.Id.tempoIndicator);
+            v.SetValue(140,e.CurrentTact);
             });
         }
 

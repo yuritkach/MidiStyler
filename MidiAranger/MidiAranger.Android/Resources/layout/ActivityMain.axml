@@ -52,11 +52,12 @@
 		android:layout_height="wrap_content"
 		android:text=""
 		android:id="@+id/midiTempo" />
+	 <MidiAranger.Droid.Source.Views.Indicator.IndicatorView
+			android:layout_width="100dp"
+			android:layout_height="90dp"
+		    android:text="123"
+			android:id="@+id/tempoIndicator"/>
+	/>
 	
-	<MidiAranger.Droid.Source.Views.Indicator.IndicatorView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-			android:id="@+id/tempoIndicator" 		
-		/>
 
 </LinearLayout>

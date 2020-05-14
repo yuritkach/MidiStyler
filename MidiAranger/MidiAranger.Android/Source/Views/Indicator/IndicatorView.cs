@@ -16,9 +16,11 @@ namespace MidiAranger.Droid.Source.Views.Indicator
 {
     public class IndicatorView : View
     {
-        private int value;
+        public int Value { get; set; }
+   
+        public int Places { get; set; }
 
-        private static readonly byte[] segments = new byte[] {119,36,125,109,46,107,123,37,127,111};
+        private static readonly byte[] segments = new byte[] {119,36,93,109,46,107,123,37,127,111,0};
             
 
         public IndicatorView(Context context, IAttributeSet attrs) :
@@ -36,33 +38,47 @@ namespace MidiAranger.Droid.Source.Views.Indicator
         private Color ActiveSegmentColor;
         private Color PassiveSegmentColor;
 
+        private int currentTact;
+        private int tactCount;
+
         private void Initialize()
         {
-            ActiveSegmentColor = new Color(100, 255, 100);
-            PassiveSegmentColor = new Color(200, 200, 200);
+            ActiveSegmentColor = new Color(100, 100, 100);
+            PassiveSegmentColor = new Color(240, 240, 240);
+            Places = 3;
+            Value = 0; // All segments dark
+            currentTact = 0;
+            tactCount = 4;
         }
 
         protected override void OnDraw(Canvas canvas)
         {
             base.OnDraw(canvas);
-            DrawValue(canvas, 1);
-
-            
-
+            string s = Value.ToString();
+            while (s.Length < Places) s = ' ' + s;
+            for (int i = 0; i < Places; i++)
+                DrawPlace(canvas, s.Substring(i, 1) == " " ? 10 : int.Parse(s.Substring(i, 1)), i);
         }
 
-        private void DrawValue(Canvas canvas, int value)
+        private void DrawPlace(Canvas canvas, int value, int place)
         {
-            DrawHorizontalSegment(canvas, 4 * measureCoefX, 3 * measureCoefY, (segments[value] & 1)==1); //top middle segment
-            DrawHorizontalSegment(canvas, 4 * measureCoefX, 27 * measureCoefY, (segments[value] & 1)==8); //middle middle segment
-            DrawHorizontalSegment(canvas, 4 * measureCoefX, 51 * measureCoefY, (segments[value] & 1)==64); //bottom middle segment
+            DrawHorizontalSegment(canvas, place * 36* measureCoefX + 4 * measureCoefX, 3 * measureCoefY, (segments[value] & 1)==1); //top middle segment
+            DrawHorizontalSegment(canvas, place * 36 * measureCoefX + 4 * measureCoefX, 27 * measureCoefY, (segments[value] & 8)==8); //middle middle segment
+            DrawHorizontalSegment(canvas, place * 36 * measureCoefX + 4 * measureCoefX, 51 * measureCoefY, (segments[value] & 64)==64); //bottom middle segment
 
-            DrawVerticalSegment(canvas, 3 * measureCoefX, 4 * measureCoefY, (segments[value] & 2)==2); //top left segment
-            DrawVerticalSegment(canvas, 24 * measureCoefX, 4 * measureCoefY, (segments[value] & 4)==4); //top right segment
-            DrawVerticalSegment(canvas, 3 * measureCoefX, 28 * measureCoefY, (segments[value] & 16)==16); //bottom left segment
-            DrawVerticalSegment(canvas, 24 * measureCoefX, 28 * measureCoefY, (segments[value] & 32)==32); //bottom right segment
+            DrawVerticalSegment(canvas, place * 36 * measureCoefX + 3 * measureCoefX, 4 * measureCoefY, (segments[value] & 2)==2); //top left segment
+            DrawVerticalSegment(canvas, place * 36 * measureCoefX + 24 * measureCoefX, 4 * measureCoefY, (segments[value] & 4)==4); //top right segment
+            DrawVerticalSegment(canvas, place * 36 * measureCoefX + 3 * measureCoefX, 28 * measureCoefY, (segments[value] & 16)==16); //bottom left segment
+            DrawVerticalSegment(canvas, place * 36 * measureCoefX + 24 * measureCoefX, 28 * measureCoefY, (segments[value] & 32)==32); //bottom right segment
+
+            DrawTactSegment(canvas, place * 36 * measureCoefX, 56 * measureCoefY, place); //bottom middle segment
+
+
+
 
         }
+
+
 
         private void DrawHorizontalSegment(Canvas canvas, float startX, float startY, bool isActiveSegment)
         {
@@ -96,7 +112,41 @@ namespace MidiAranger.Droid.Source.Views.Indicator
             canvas.DrawPath(path, paint);
         }
 
+        private void DrawTactSegment(Canvas canvas, float x, float y, int place)
+        {
+            Paint paint = new Paint();
+            paint.Color = IsActiveTact(place) ? ActiveSegmentColor : PassiveSegmentColor;
+            paint.SetStyle(Paint.Style.Fill);
+            Path path = new Path();
+            path.Reset();
+            path.MoveTo(x, y);
+            path.LineTo(x + (29 * measureCoefX), y);
+            path.LineTo(x + (29 * measureCoefX), y + (6 * measureCoefY));
+            path.LineTo(x , y + (6 * measureCoefY));
+            canvas.DrawPath(path, paint);
 
+        }
+
+        private bool IsActiveTact(int place)
+        {
+            if (currentTact == 0) return true;
+            if (currentTact == place + 1) return true;
+            if (currentTact > 3 && place == 2) return true;
+            return false;
+        }
+
+
+        public void SetValue(int value, int tact)
+        {
+            if ((Value != value)|| (currentTact!=tact))
+            {
+                Value = value;
+                currentTact = tact;
+                Invalidate();
+            }
+            
+
+        }
 
 
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
@@ -104,9 +154,9 @@ namespace MidiAranger.Droid.Source.Views.Indicator
             base.OnMeasure(widthMeasureSpec, heightMeasureSpec);
             measureHeight = MeasureHeight(heightMeasureSpec);
             measureWidth = MeasureWidth(widthMeasureSpec);
-            measureCoefX = measureWidth / 6 / 6;
-            measureCoefY = measureWidth / 6 / 10;
-            SetMeasuredDimension(measureHeight,measureWidth);
+            measureCoefX = measureWidth / 6 / 6 / Places;
+            measureCoefY = measureHeight / 6 / 11;
+            SetMeasuredDimension(measureWidth,measureHeight);
         }
 
 
