@@ -61,19 +61,10 @@ namespace MidiAranger.Droid
             MIDIStyle midiStyle = new MIDIStyle();
             midiStyle.LoadStyle("ddd");
             mplayer = new MIDIPlayer(this,midiStyle);
-            mplayer.OnTactEvent += Mplayer_OnTactEvent;            
+            mplayer.OnTactEvent += (object sender, OnTactEventArgs e)=> playFragment.SetTempoAndTact(60000000 / mplayer.msOnPulse, e.CurrentTact);
             mplayer.Tracks = midiStyle.MidiSection.Tracks;
-
             mplayer.Start();
 
-
-
-        }
-
-        private void Mplayer_OnTactEvent(object sender, OnTactEventArgs e)
-        {
-            playFragment.SetTempoAndTact(60000000 / mplayer.msOnPulse, e.CurrentTact);
-            
         }
 
         protected void SetUIValues(object state)
