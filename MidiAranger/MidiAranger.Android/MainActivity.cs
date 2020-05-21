@@ -25,7 +25,9 @@ namespace MidiAranger.Droid
     [Activity(Label = "MidiAranger", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public partial class MainActivity : Android.Support.V4.App.FragmentActivity, IOnActionEventListener
     {
-        
+        private PlayFragment playFragment;
+        private ToolBarFragment toolbarFragment;
+
         private int timeInterval = 100;
         MIDIPlayer mplayer;
         ChordRecognizer chordRecognizer;
@@ -35,18 +37,20 @@ namespace MidiAranger.Droid
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.ActivityMain);
             Android.Support.V4.App.FragmentManager fm = SupportFragmentManager;
-            PlayFragment playFragment = (PlayFragment)fm.FindFragmentById(Resource.Layout.FragmentPlay);
+            playFragment = (PlayFragment)fm.FindFragmentById(Resource.Layout.FragmentPlay);
             if (playFragment == null)
             {
+                playFragment = new PlayFragment();
                 Android.Support.V4.App.FragmentTransaction ft = fm.BeginTransaction();
-                ft.Add(Resource.Id.main_container, new PlayFragment());
+                ft.Add(Resource.Id.main_container, playFragment);
                 ft.Commit();
             }
-            ToolBarFragment toolbarFragment = (ToolBarFragment)fm.FindFragmentById(Resource.Layout.FragmentToolBar);
+            toolbarFragment = (ToolBarFragment)fm.FindFragmentById(Resource.Layout.FragmentToolBar);
             if (toolbarFragment == null)
             {
+                toolbarFragment = new ToolBarFragment();
                 Android.Support.V4.App.FragmentTransaction ft = fm.BeginTransaction();
-                ft.Add(Resource.Id.toolbar_container, new ToolBarFragment());
+                ft.Add(Resource.Id.toolbar_container, toolbarFragment);
                 ft.Commit();
             }
 
@@ -63,11 +67,13 @@ namespace MidiAranger.Droid
             mplayer.Start();
 
 
+
         }
 
         private void Mplayer_OnTactEvent(object sender, OnTactEventArgs e)
         {
-            RunOnUiThread(() => FindViewById<Source.Views.Indicator.IndicatorView>(Resource.Id.tempoIndicator).SetValue(60000000 / mplayer.msOnPulse, e.CurrentTact));
+            playFragment.SetTempoAndTact(60000000 / mplayer.msOnPulse, e.CurrentTact);
+            
         }
 
         protected void SetUIValues(object state)

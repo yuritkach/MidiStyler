@@ -47,12 +47,21 @@ namespace MidiAranger.Droid.Resources.layout
             // Use this to return your custom view for this Fragment
             View v = inflater.Inflate(Resource.Layout.FragmentPlay, container, false);
 
-            Button button = (Button)v.FindViewById(Resource.Id.MainA);
-            button.Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainAAction);};
+            ((Button)v.FindViewById(Resource.Id.MainA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainAAction);};
+            ((Button)v.FindViewById(Resource.Id.MainB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainBAction); };
+            ((Button)v.FindViewById(Resource.Id.FillAB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInABAction); };
+            ((Button)v.FindViewById(Resource.Id.FillBA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInBAAction); };
+            ((Button)v.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
 
             return v;
             
         }
+
+        public void SetTempoAndTact(int tempo, int tact)
+        {
+            Activity.RunOnUiThread(() => Activity.FindViewById<Source.Views.Indicator.IndicatorView>(Resource.Id.tempoIndicator).SetValue(tempo,tact));
+        }
+
 
         private void Button_Click(object sender, EventArgs e)
         {

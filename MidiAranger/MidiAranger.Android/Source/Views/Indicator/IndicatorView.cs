@@ -39,7 +39,7 @@ namespace MidiAranger.Droid.Source.Views.Indicator
         private Color PassiveSegmentColor;
 
         private int currentTact;
-        private int tactCount;
+ //       private int tactCount;
 
         private void Initialize()
         {
@@ -48,7 +48,7 @@ namespace MidiAranger.Droid.Source.Views.Indicator
             Places = 3;
             Value = 0; // All segments dark
             currentTact = 0;
-            tactCount = 4;
+  //          tactCount = 4;
         }
 
         protected override void OnDraw(Canvas canvas)
