@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/linearLayout1">
+		
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="A"
+			android:id="@+id/MainA"
+			android:layout_marginRight="0.0dp"/>
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="A-B"
+			android:id="@+id/FillAB" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="B"
+			android:id="@+id/MainB" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="BA"
+			android:id="@+id/FillBA" />
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:text="Ending B"
+			android:id="@+id/EndingB" />
+	</LinearLayout>
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text=""
+		android:id="@+id/miditext" />
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text=""
+		android:id="@+id/currenttact" />
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text=""
+		android:id="@+id/midiTempo" />
+	 <MidiAranger.Droid.Source.Views.Indicator.IndicatorView
+			android:layout_width="100dp"
+			android:layout_height="90dp"
+		    android:text="123"
+			android:id="@+id/tempoIndicator"/>
+	/>
+</LinearLayout>

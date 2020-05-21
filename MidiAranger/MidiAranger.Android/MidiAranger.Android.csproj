@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
+    <Compile Include="PlayFragment.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\common\Common.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Source\styler\MIDISection.cs" />
     <Compile Include="Source\styler\MidiStyle.cs" />
     <Compile Include="Source\Views\Indicator\IndicatorView.cs" />
+    <Compile Include="ToolBarFragment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -154,6 +156,16 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\ActivityMain.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\FragmentPlay.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\FragmentToolBar.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

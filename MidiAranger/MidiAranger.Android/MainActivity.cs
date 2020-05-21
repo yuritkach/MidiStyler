@@ -17,11 +17,13 @@ using MidiAranger.Droid.Source.styler;
 using static MidiAranger.Droid.Source.common.Common;
 using MidiAranger.Droid.Source.common;
 using MidiAranger.Droid.Source.Views.Indicator;
+using Android.Support.V4.App;
+using MidiAranger.Droid.Resources.layout;
 
 namespace MidiAranger.Droid
 {
     [Activity(Label = "MidiAranger", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public partial class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public partial class MainActivity : Android.Support.V4.App.FragmentActivity, IOnActionEventListener
     {
         
         private int timeInterval = 100;
@@ -32,18 +34,21 @@ namespace MidiAranger.Droid
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.ActivityMain);
-            
-
-           
-
-            FindViewById<Android.Widget.Button>(Resource.Id.MainA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainA,false); };
-            FindViewById<Android.Widget.Button>(Resource.Id.MainB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.MainB,false); };
-            FindViewById<Android.Widget.Button>(Resource.Id.FillAB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInAB,true); };
-            FindViewById<Android.Widget.Button>(Resource.Id.FillBA).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.FillInBA,true); };
-            FindViewById<Android.Widget.Button>(Resource.Id.EndingB).Click += (object sender, EventArgs e) => { mplayer.GotoSection(StyleSections.EndingB,false); };
-
-
-
+            Android.Support.V4.App.FragmentManager fm = SupportFragmentManager;
+            PlayFragment playFragment = (PlayFragment)fm.FindFragmentById(Resource.Layout.FragmentPlay);
+            if (playFragment == null)
+            {
+                Android.Support.V4.App.FragmentTransaction ft = fm.BeginTransaction();
+                ft.Add(Resource.Id.main_container, new PlayFragment());
+                ft.Commit();
+            }
+            ToolBarFragment toolbarFragment = (ToolBarFragment)fm.FindFragmentById(Resource.Layout.FragmentToolBar);
+            if (toolbarFragment == null)
+            {
+                Android.Support.V4.App.FragmentTransaction ft = fm.BeginTransaction();
+                ft.Add(Resource.Id.toolbar_container, new ToolBarFragment());
+                ft.Commit();
+            }
 
             var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
 
@@ -62,11 +67,7 @@ namespace MidiAranger.Droid
 
         private void Mplayer_OnTactEvent(object sender, OnTactEventArgs e)
         {
-            RunOnUiThread(() => {
-            FindViewById<TextView>(Resource.Id.currenttact).Text = e.CurrentTact.ToString();
-                Source.Views.Indicator.IndicatorView v = FindViewById<Source.Views.Indicator.IndicatorView>(Resource.Id.tempoIndicator);
-            v.SetValue(140,e.CurrentTact);
-            });
+            RunOnUiThread(() => FindViewById<Source.Views.Indicator.IndicatorView>(Resource.Id.tempoIndicator).SetValue(60000000 / mplayer.msOnPulse, e.CurrentTact));
         }
 
         protected void SetUIValues(object state)
@@ -87,7 +88,20 @@ namespace MidiAranger.Droid
             
         }
 
-      
+        public void DoAction(string s)
+        {
+            switch (s)
+            {
+                case StartAction: mplayer.Start(); break;
+                case StopAction: mplayer.Start(); break;
+                case MainAAction: mplayer.GotoSection(StyleSections.MainA, false); break;
+                case MainBAction: mplayer.GotoSection(StyleSections.MainB, false); break;
+                case FillInABAction: mplayer.GotoSection(StyleSections.FillInAB, true); break;
+                case FillInBAAction: mplayer.GotoSection(StyleSections.FillInBA, true); break;
+                case EndingBAction: mplayer.GotoSection(StyleSections.EndingB, false); break;
 
+                default: new ApplicationException("Action "+s+" not implemented!");break;
+            }
+        }
     }
 }

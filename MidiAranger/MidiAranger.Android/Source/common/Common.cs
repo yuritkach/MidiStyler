@@ -13,6 +13,13 @@ using MidiAranger.Droid.Source.styler;
 
 namespace MidiAranger.Droid.Source.common
 {
+    public interface IOnActionEventListener
+    {
+        void DoAction(string s);
+    }
+
+    public enum StyleSections { Init, IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC, none }
+
     public static class Common
     {
         private static readonly DateTime Jan1st1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -44,7 +51,7 @@ namespace MidiAranger.Droid.Source.common
         }
 
 
-        public enum StyleSections {Init,IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC, none }
+      
         public static string GetSectionName(StyleSections styleSection)
         {
             switch (styleSection)
@@ -97,7 +104,17 @@ namespace MidiAranger.Droid.Source.common
 
 
         public static string GetNoteName(byte noteOffset) => NoteNames[noteOffset % 12];
-        
+
+
+
+        public const string StartAction = "0";
+        public const string StopAction = "1";
+        public const string MainAAction = "2";
+        public const string MainBAction = "3";
+        public const string FillInABAction = "4";
+        public const string FillInBAAction = "5";
+        public const string EndingBAction = "6";
+
 
     }
 

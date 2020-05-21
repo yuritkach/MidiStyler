@@ -143,12 +143,12 @@ namespace MidiAranger.Droid.Source.midiplayer
             difTime1 = JavaSystem.NanoTime();
         }
 
-        protected MIDIMarker GetMarkerOnSection(Common.StyleSections section)
+        protected MIDIMarker GetMarkerOnSection(StyleSections section)
         {
             return Tracks[0].MidiMarkers.Where(j => j.Name == Common.GetSectionName(section)).FirstOrDefault();
         }
 
-        public void GotoSection(Common.StyleSections section, bool instant)
+        public void GotoSection(StyleSections section, bool instant)
         {
             currentMarker = GetMarkerOnSection(section);
             if (currentMarker == null)
