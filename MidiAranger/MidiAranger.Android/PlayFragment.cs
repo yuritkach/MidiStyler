@@ -13,6 +13,8 @@ using Android.Widget;
 using Android.Support.V4.App;
 using MidiAranger.Droid.Source.common;
 using Java.Lang;
+using Android.Animation;
+using System.Drawing;
 
 namespace MidiAranger.Droid.Resources.layout
 {
@@ -48,10 +50,18 @@ namespace MidiAranger.Droid.Resources.layout
             View v = inflater.Inflate(Resource.Layout.FragmentPlay, container, false);
 
             ((Button)v.FindViewById(Resource.Id.MainA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainAAction);};
-            ((Button)v.FindViewById(Resource.Id.MainB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainBAction); };
+       //     ((Button)v.FindViewById(Resource.Id.MainB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainBAction); };
             ((Button)v.FindViewById(Resource.Id.FillAB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInABAction); };
             ((Button)v.FindViewById(Resource.Id.FillBA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInBAAction); };
             ((Button)v.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
+
+
+            ObjectAnimator colorAnim = ObjectAnimator.OfInt(((Button)v.FindViewById(Resource.Id.MainA)), "textColor",Color.Red.ToArgb(), Color.Transparent.ToArgb());
+            colorAnim.SetDuration(1000);
+            colorAnim.SetEvaluator(new ArgbEvaluator());
+            colorAnim.RepeatCount=ValueAnimator.Infinite;
+            colorAnim.RepeatMode = ValueAnimatorRepeatMode.Reverse;
+            colorAnim.Start();
 
             return v;
             

@@ -80,7 +80,7 @@ namespace MidiAranger.Droid
                         t = Common.GetNoteName(pressedNotes[cd.RootOffset]) + cd.Chord.ChordName.Substring(1) + " -- " + pressedNotes[cd.RootOffset].ToString();
                     }
                 }
-                FindViewById<TextView>(Resource.Id.miditext).Text = t;
+        //////////        FindViewById<TextView>(Resource.Id.miditext).Text = t;
             });
             
         }
