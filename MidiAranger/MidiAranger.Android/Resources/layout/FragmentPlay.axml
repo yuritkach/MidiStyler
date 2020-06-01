@@ -20,47 +20,47 @@
 	<TableLayout 
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:stretchColumns="*"
 		>
-		<TableRow>
+		<TableRow
+			android:weightSum="4.5"
+			android:layout_width="0dp"
+			>
 			<TextView
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="0"
-				android:gravity="center_horizontal"
+				android:layout_height="match_parent"
+				android:layout_weight=".5"
 				android:text=""
 				android:textSize="20sp"/>
 			<TextView
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:gravity="center_horizontal"
 				android:text="Intro"
 				android:textSize="20sp"/>
 			<TextView
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:gravity="center_horizontal"
 				android:text="Main"
 				android:textSize="20sp"/>
 			<TextView
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:gravity="center_horizontal"
 				android:text="Fill"
 				android:textSize="20sp"/>
 			<TextView
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:gravity="center_horizontal"
 				android:text="Ending"
 				android:textSize="20sp"/>
 		</TableRow>
-		<TableRow>
+		<TableRow android:weightSum="4.5"
+			android:layout_width="0dp">
 			<TextView
-				android:layout_width="wrap_content"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:text="A"
 				android:textSize="24sp"/>
@@ -86,13 +86,14 @@
 				android:layout_weight="1"
 				android:id="@+id/EndingB" />
 		</TableRow>
-		<TableRow>
+		<TableRow android:weightSum="4.5"
+			android:layout_width="0dp">
 			<TextView
-				android:layout_width="30px"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="B"
 				android:textSize="24sp"/>
-						<MidiAranger.Droid.Source.Views.StylerButton
+			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
@@ -115,13 +116,13 @@
 				android:id="@+id/EndingB" />
 
 		</TableRow>
-		<TableRow>
+		<TableRow android:weightSum="4.5"
+			android:layout_width="0dp">
 			<TextView
-				android:layout_width="30px"
 				android:layout_height="wrap_content"
 				android:text="C"
 				android:textSize="24sp"/>
-						<MidiAranger.Droid.Source.Views.StylerButton
+			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
@@ -144,7 +145,8 @@
 				android:id="@+id/EndingB" />
 
 		</TableRow>
-		<TableRow>
+		<TableRow android:weightSum="4.5"
+			android:layout_width="0dp">
 			<TextView
 				android:layout_width="30px"
 				android:layout_height="wrap_content"
