@@ -70,19 +70,19 @@
 				android:layout_weight="1"
 		        android:text="ф"
 				android:id="@+id/MainA"	/>
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:id="@+id/FillAB" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/FillBA" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/EndingB" />
 		</TableRow>
@@ -92,25 +92,25 @@
 				android:layout_height="wrap_content"
 				android:text="B"
 				android:textSize="24sp"/>
-						<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+						<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="intro"
 				android:id="@+id/MainA"	/>
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:id="@+id/FillAB" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/FillBA" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/EndingB" />
 
@@ -121,25 +121,25 @@
 				android:layout_height="wrap_content"
 				android:text="C"
 				android:textSize="24sp"/>
-						<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+						<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="intro"
 				android:id="@+id/MainA"	/>
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:id="@+id/FillAB" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/FillBA" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/EndingB" />
 
@@ -150,25 +150,25 @@
 				android:layout_height="wrap_content"
 				android:text="D"
 				android:textSize="24sp"/>
-						<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+						<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="intro"
 				android:id="@+id/MainA"	/>
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:id="@+id/FillAB" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/FillBA" />
-			<Button
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+			<MidiAranger.Droid.Source.Views.StylerButton
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:layout_weight="1"
 				android:id="@+id/EndingB" />
 

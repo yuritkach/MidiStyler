@@ -52,9 +52,9 @@ namespace MidiAranger.Droid.Resources.layout
 
             ((StylerButton)v.FindViewById(Resource.Id.MainA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainAAction);};
        //     ((Button)v.FindViewById(Resource.Id.MainB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainBAction); };
-            ((Button)v.FindViewById(Resource.Id.FillAB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInABAction); };
-            ((Button)v.FindViewById(Resource.Id.FillBA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInBAAction); };
-            ((Button)v.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
+            ((StylerButton)v.FindViewById(Resource.Id.FillAB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInABAction); };
+            ((StylerButton)v.FindViewById(Resource.Id.FillBA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInBAAction); };
+            ((StylerButton)v.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
 
 
             ObjectAnimator colorAnim = ObjectAnimator.OfInt(((StylerButton)v.FindViewById(Resource.Id.MainA)), "textColor",Color.Red.ToArgb(), Color.Transparent.ToArgb());

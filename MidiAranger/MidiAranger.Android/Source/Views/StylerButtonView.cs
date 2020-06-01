@@ -64,7 +64,7 @@ namespace MidiAranger.Droid.Source.Views
             Path path = new Path();
             path.Reset();
             path.MoveTo(measureWidth/2, measureHeight/2);
-            path.AddCircle(measureWidth / 2, measureHeight / 2, measureHeight / 4,Path.Direction.Ccw);
+            path.AddCircle(measureWidth / 2, measureHeight / 2, measureHeight / 6,Path.Direction.Ccw);
             canvas.DrawPath(path, paint);
         }
 
