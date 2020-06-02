@@ -16,6 +16,7 @@ using Java.Lang;
 using Android.Animation;
 using System.Drawing;
 using MidiAranger.Droid.Source.Views;
+using static MidiAranger.Droid.Source.Views.StylerButton;
 
 namespace MidiAranger.Droid.Resources.layout
 {
@@ -57,14 +58,8 @@ namespace MidiAranger.Droid.Resources.layout
             ((StylerButton)v.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
 
 
-            ObjectAnimator colorAnim = ObjectAnimator.OfInt(((StylerButton)v.FindViewById(Resource.Id.MainA)), "textColor",Color.Red.ToArgb(), Color.Transparent.ToArgb());
-            colorAnim.SetDuration(1000);
-            colorAnim.SetEvaluator(new ArgbEvaluator());
-            colorAnim.RepeatCount=ValueAnimator.Infinite;
-            colorAnim.RepeatMode = ValueAnimatorRepeatMode.Reverse;
-            colorAnim.Start();
-
-            return v;
+            ((StylerButton)v.FindViewById(Resource.Id.MainA)).SetMode(StylerButtonMode.sbFlash);
+             return v;
             
         }
 
