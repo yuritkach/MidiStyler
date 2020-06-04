@@ -21,16 +21,10 @@ namespace MidiAranger.Droid.Source.Views
     {
 
         protected static List<StylerButton> flashButtons = new List<StylerButton>();
-        protected static System.Threading.Timer timer = new System.Threading.Timer((a) =>
+        protected static System.Threading.Timer flashTimer = new System.Threading.Timer((a) =>
         {
             foreach (var o in flashButtons) o.OnFlashTimerTick();
-        }, null, 0, 10000);
-
-
-        protected void OnFlashTimerTick()
-        {
-            //
-        }
+        }, null, 0, 500);
 
 
         public enum StylerButtonMode {sbDisabled,sbEnabled,SbActive,sbFlash}
@@ -59,14 +53,12 @@ namespace MidiAranger.Droid.Source.Views
                     default:break;
                 }
         }
-        public StylerButton(Context context, IAttributeSet attrs) :
-            base(context, attrs)
+        public StylerButton(Context context, IAttributeSet attrs) :base(context, attrs)
         {
             Initialize();
         }
 
-        public StylerButton(Context context, IAttributeSet attrs, int defStyle) :
-            base(context, attrs, defStyle)
+        public StylerButton(Context context, IAttributeSet attrs, int defStyle) :base(context, attrs, defStyle)
         {
             Initialize();
         }
@@ -79,10 +71,18 @@ namespace MidiAranger.Droid.Source.Views
         protected void SetFlashing(bool flashing)
         {
             if (flashing)
+            {
                 flashButtons.Add(this);
+            }
             else
                 flashButtons.Remove(this);
-        } 
+        }
+
+        protected void OnFlashTimerTick()
+        {
+            isLight = !isLight;
+            PostInvalidate();
+        }
 
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
         {
@@ -151,12 +151,6 @@ namespace MidiAranger.Droid.Source.Views
                 result = specSize;
             }
             return result;
-        }
-
-        public void OnAnimationUpdate(ValueAnimator animation)
-        {
-            isLight = !isLight;
-            Invalidate(); 
         }
 
         private int measureHeight;
