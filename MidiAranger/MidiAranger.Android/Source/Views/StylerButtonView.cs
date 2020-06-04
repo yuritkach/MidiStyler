@@ -27,6 +27,12 @@ namespace MidiAranger.Droid.Source.Views
         }, null, 0, 500);
 
 
+        private static Color disabledColor = new Color(200, 200, 200);
+        private static Color enabledColor = new Color(100, 100, 100);
+        private static Color activeColor = new Color(100, 200, 100);
+
+
+
         public enum StylerButtonMode {sbDisabled,sbEnabled,SbActive,sbFlash}
         public StylerButtonMode Mode { get; protected set; }
         public void SetMode(StylerButtonMode value)
@@ -100,13 +106,13 @@ namespace MidiAranger.Droid.Source.Views
 
             switch (Mode)
             {
-                case StylerButtonMode.sbDisabled:paint.Color = new Color(200,200,200); break;
-                case StylerButtonMode.sbEnabled: paint.Color = new Color(0, 0, 0); break;
-                case StylerButtonMode.SbActive:
+                case StylerButtonMode.sbDisabled:paint.Color = disabledColor; break;
+                case StylerButtonMode.sbEnabled: paint.Color = enabledColor; break;
+                case StylerButtonMode.SbActive: paint.Color = activeColor; break;
                 case StylerButtonMode.sbFlash:
                     if (isLight)
-                        paint.Color = new Color(0, 200, 0);
-                    else paint.Color = new Color(0, 100, 0);
+                        paint.Color = activeColor;
+                    else paint.Color = enabledColor;
                     break;
                 default: throw new ApplicationException("Mode undefined!!!");
             }
