@@ -119,6 +119,7 @@ namespace MidiAranger.Droid.Source.midiplayer
                     AddToCurrentPressed(mes[1]);
                 if (Common.IsMasked(mes[0], 0x8))
                     RemoveFromCurrentPressed(mes[1]);
+                OnChordChangeEvent();
             }
         }
 
@@ -196,38 +197,40 @@ namespace MidiAranger.Droid.Source.midiplayer
         }
 
         public event EventHandler<OnTactEventArgs> OnTactEvent;
-              
+        public event Action OnChordChangeEvent;
+
+
         public void Run()
         {
-            difTime1 = Java.Lang.JavaSystem.NanoTime();
-            //difTime1 = JavaLangSystem.NanoTime();
-
-
+            difTime1 = JavaSystem.NanoTime();
+      
             EventHandler<OnTactEventArgs> onTactHandler = OnTactEvent;
             OnTactEventArgs e = new OnTactEventArgs();
             int tact = 0;
             int counter = 1;
-            while (isPlaying)
+            while (true)
             {
-
-                USleep(pulsesPerQuarterNote);
-                PlayCurrentMarkerPositions();
-                
-                currentSongPosition++;
-                counter++;
-                if (counter > pulsesPerQuarterNote)
+                if (isPlaying)
                 {
-                    tact++;
-                    e.CurrentTact = tact % 4;
-                    OnTactEvent(this,e);
-                    counter = 1;
-                }
-                if (currentSongPosition > Tracks[0].MidiEvents[currentMarker.StopIndex].absTime)
-                {
-                    GotoSection(GetNextSection(),false);
-                }
+                    USleep(pulsesPerQuarterNote);
+                    PlayCurrentMarkerPositions();
 
-                
+                    currentSongPosition++;
+                    counter++;
+                    if (counter > pulsesPerQuarterNote)
+                    {
+                        tact++;
+                        e.CurrentTact = tact % 4;
+                        e.CurrentTempo = 60000000 / msOnPulse;
+                        OnTactEvent(this, e);
+                        counter = 1;
+                    }
+                    if (currentSongPosition > Tracks[0].MidiEvents[currentMarker.StopIndex].absTime)
+                    {
+                        GotoSection(GetNextSection(), false);
+                    }
+
+                }
             }
 
         }
@@ -256,6 +259,7 @@ namespace MidiAranger.Droid.Source.midiplayer
     public class OnTactEventArgs : EventArgs
     {
         public int CurrentTact { get; set; }
+        public int CurrentTempo { get; set; }
     }
    
 }

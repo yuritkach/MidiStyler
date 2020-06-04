@@ -16,7 +16,7 @@ using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
 using MidiAranger.Droid.Source.styler;
 using static MidiAranger.Droid.Source.common.Common;
 using MidiAranger.Droid.Source.common;
-using MidiAranger.Droid.Source.Views.Indicator;
+using MidiAranger.Droid.Source.Views;
 using Android.Support.V4.App;
 using MidiAranger.Droid.Resources.layout;
 
@@ -27,8 +27,7 @@ namespace MidiAranger.Droid
     {
         private PlayFragment playFragment;
         private ToolBarFragment toolbarFragment;
-
-        private int timeInterval = 100;
+        
         MIDIPlayer mplayer;
         ChordRecognizer chordRecognizer;
         protected override void OnCreate(Bundle savedInstanceState)
@@ -54,20 +53,21 @@ namespace MidiAranger.Droid
                 ft.Commit();
             }
 
-            var timer = new Timer( SetUIValues, null, timeInterval, timeInterval);
-
             chordRecognizer = new ChordRecognizer();
 
             MIDIStyle midiStyle = new MIDIStyle();
             midiStyle.LoadStyle("ddd");
             mplayer = new MIDIPlayer(this,midiStyle);
-            mplayer.OnTactEvent += (object sender, OnTactEventArgs e)=> playFragment.SetTempoAndTact(60000000 / mplayer.msOnPulse, e.CurrentTact);
+            mplayer.OnTactEvent += (object sender, OnTactEventArgs e)=> playFragment.SetTempoAndTact(e.CurrentTempo, e.CurrentTact);
+            mplayer.OnChordChangeEvent += ()=> SetUIValues();
             mplayer.Tracks = midiStyle.MidiSection.Tracks;
             mplayer.Start();
 
         }
 
-        protected void SetUIValues(object state)
+        
+
+        protected void SetUIValues()
         {
             RunOnUiThread(() => {
                 if (mplayer.currentPressedNotes == null) return;
@@ -77,10 +77,11 @@ namespace MidiAranger.Droid
                     ChordDefinition cd = chordRecognizer.ChordRecognize(pressedNotes);
                     if (cd != null)
                     {
+                        //TODO: error on chord 65-69-71
                         t = Common.GetNoteName(pressedNotes[cd.RootOffset]) + cd.Chord.ChordName.Substring(1) + " -- " + pressedNotes[cd.RootOffset].ToString();
                     }
                 }
-        //////////        FindViewById<TextView>(Resource.Id.miditext).Text = t;
+                FindViewById<TextView>(Resource.Id.currentChord).Text = t;
             });
             
         }

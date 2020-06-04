@@ -10,11 +10,33 @@
 		android:orientation="horizontal"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
-		<MidiAranger.Droid.Source.Views.Indicator.IndicatorView
+		<MidiAranger.Droid.Source.Views.IndicatorView
 			android:layout_width="100dp"
 			android:layout_height="90dp"
 			android:text="000"
 			android:id="@+id/tempoIndicator"/>
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			>	
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight=".5"
+				android:text="Emin"
+				android:id="@+id/currentChord"
+				android:textSize="30sp"/>
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight=".5"
+				android:text="Techno 90-x"
+				android:id="@+id/styleName"
+				android:textSize="20sp"/>
+		</LinearLayout>
+
+
 	</LinearLayout>
 
 	<TableLayout 

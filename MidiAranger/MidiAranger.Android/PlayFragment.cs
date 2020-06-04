@@ -63,15 +63,18 @@ namespace MidiAranger.Droid.Resources.layout
             
         }
 
+        private int oldTempo = 0;
+        private int oldTact = 0;
         public void SetTempoAndTact(int tempo, int tact)
         {
-            Activity.RunOnUiThread(() => Activity.FindViewById<Source.Views.Indicator.IndicatorView>(Resource.Id.tempoIndicator).SetValue(tempo,tact));
+            if (tempo!=oldTempo || tact != oldTact)
+            {
+                oldTact = tact;
+                oldTempo = tempo;
+                Activity.RunOnUiThread(() => Activity.FindViewById<Source.Views.IndicatorView>(Resource.Id.tempoIndicator).SetValue(tempo, tact));
+            }
+            
         }
 
-
-        private void Button_Click(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

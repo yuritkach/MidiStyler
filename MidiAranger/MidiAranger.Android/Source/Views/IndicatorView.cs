@@ -12,7 +12,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 
-namespace MidiAranger.Droid.Source.Views.Indicator
+namespace MidiAranger.Droid.Source.Views
 {
     public class IndicatorView : View
     {

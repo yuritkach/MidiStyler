@@ -118,7 +118,7 @@
     <Compile Include="Source\styler\MIDIFileBase.cs" />
     <Compile Include="Source\styler\MIDISection.cs" />
     <Compile Include="Source\styler\MidiStyle.cs" />
-    <Compile Include="Source\Views\Indicator\IndicatorView.cs" />
+    <Compile Include="Source\Views\IndicatorView.cs" />
     <Compile Include="Source\Views\StylerButtonView.cs" />
     <Compile Include="ToolBarFragment.cs" />
   </ItemGroup>
