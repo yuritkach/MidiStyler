@@ -17,8 +17,22 @@ using static Android.Animation.ValueAnimator;
 namespace MidiAranger.Droid.Source.Views
 {
 
-    public class StylerButton : ImageButton, IAnimatorUpdateListener
+    public class StylerButton : ImageButton
     {
+
+        protected static List<StylerButton> flashButtons = new List<StylerButton>();
+        protected static System.Threading.Timer timer = new System.Threading.Timer((a) =>
+        {
+            foreach (var o in flashButtons) o.OnFlashTimerTick();
+        }, null, 0, 10000);
+
+
+        protected void OnFlashTimerTick()
+        {
+            //
+        }
+
+
         public enum StylerButtonMode {sbDisabled,sbEnabled,SbActive,sbFlash}
         public StylerButtonMode Mode { get; protected set; }
         public void SetMode(StylerButtonMode value)
@@ -57,8 +71,6 @@ namespace MidiAranger.Droid.Source.Views
             Initialize();
         }
 
-        protected ValueAnimator animation;
-
         private void Initialize()
         {
             
@@ -66,16 +78,10 @@ namespace MidiAranger.Droid.Source.Views
 
         protected void SetFlashing(bool flashing)
         {
-            isLight = false;
             if (flashing)
-            {
-                animation = ValueAnimator.OfInt(0, 100);
-                animation.SetDuration(500);
-                animation.AddUpdateListener(this);
-                animation.Start();
-
-            }
-            else ClearAnimation();
+                flashButtons.Add(this);
+            else
+                flashButtons.Remove(this);
         } 
 
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
