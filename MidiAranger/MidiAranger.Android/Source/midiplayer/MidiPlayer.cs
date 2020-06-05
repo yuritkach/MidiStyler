@@ -19,6 +19,7 @@ using System.Threading;
 using MidiAranger.Droid.Source.common;
 using MidiAranger.Droid.Source.styler;
 using static MidiAranger.Droid.Source.common.Common;
+using Thread = Java.Lang.Thread;
 
 namespace MidiAranger.Droid.Source.midiplayer
 {
@@ -31,6 +32,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         private readonly Context context;
         public int currentSongPosition;
         public int msOnPulse;
+        public int СurrentTempo { get; protected set; }
 
         protected MIDIMarker currentMarker;
         protected MIDIMarker nextMarker;
@@ -43,6 +45,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected int pulsesPerQuarterNote;
 
+
         public MIDIPlayer(Context context, MIDIStyle style) {
             this.context = context;
             Style = style;
@@ -51,13 +54,19 @@ namespace MidiAranger.Droid.Source.midiplayer
             MIDISession.GetInstance().Start();
 
             Bundle rinfo = new Bundle();
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
+
+            //rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
+
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
+
             rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
             MIDISession.GetInstance().Connect(rinfo);
            
             currentSongPosition = 0;
-            msOnPulse = 500000; // 120 BPM initial tempo
+            СurrentTempo = 120; // 120BPM
+            msOnPulse = 60000000/ СurrentTempo; // 500 000
+
             pulsesPerQuarterNote = style.MidiSection.MidiHeaderInfo.Ticks;
 
 
@@ -127,7 +136,10 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             switch (mes[1])
             {
-                case 0x51: msOnPulse = (mes[2] * 0x10000) + (mes[3] * 0x100) + mes[4]; break;// SetTempo
+                case 0x51:
+                    msOnPulse = (mes[2] * 0x10000) + (mes[3] * 0x100) + mes[4];
+                    СurrentTempo = 60000000 / msOnPulse;
+                    break;// SetTempo
                 default:break;
             }
 
@@ -146,11 +158,13 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected MIDIMarker GetMarkerOnSection(StyleSections section)
         {
+        //TODO  Убрать бред...наф... полностью
             return Tracks[0].MidiMarkers.Where(j => j.Name == Common.GetSectionName(section)).FirstOrDefault();
         }
 
         public void GotoSection(StyleSections section, bool instant)
         {
+            MIDIMarker oldMarker = currentMarker;
             currentMarker = GetMarkerOnSection(section);
             if (currentMarker == null)
             {
@@ -162,7 +176,15 @@ namespace MidiAranger.Droid.Source.midiplayer
                 Tracks[0].CurrentEventIndex = currentMarker.StartIndex;
                 currentSongPosition = Tracks[0].MidiEvents[currentMarker.StartIndex].absTime;
             }
-            AllNotesOff();
+            if (oldMarker != currentMarker)
+            {
+                AllNotesOff();
+                //MIDISectionChangedEvent(currentMarker.,GetNextSection(currentMarker));
+            }
+            
+
+            
+
         }
 
         protected void AllNotesOff()
@@ -177,9 +199,9 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         }
 
-        protected StyleSections GetNextSection()
+        protected StyleSections GetNextSection(MIDIMarker marker)
         {
-            switch (Common.GetSectionCode(currentMarker.Name))
+            switch (Common.GetSectionCode(marker.Name))
             {
                 case StyleSections.Init: return StyleSections.MainA;
                 case StyleSections.MainA:return StyleSections.MainA;
@@ -212,7 +234,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             {
                 if (isPlaying)
                 {
-                    USleep(pulsesPerQuarterNote);
+                    USleep(pulsesPerQuarterNote*4);
                     PlayCurrentMarkerPositions();
 
                     currentSongPosition++;
@@ -221,16 +243,18 @@ namespace MidiAranger.Droid.Source.midiplayer
                     {
                         tact++;
                         e.CurrentTact = tact % 4;
-                        e.CurrentTempo = 60000000 / msOnPulse;
+                        e.CurrentTempo = СurrentTempo;
                         OnTactEvent(this, e);
                         counter = 1;
                     }
                     if (currentSongPosition > Tracks[0].MidiEvents[currentMarker.StopIndex].absTime)
                     {
-                        GotoSection(GetNextSection(), false);
+                        GotoSection(GetNextSection(currentMarker), false);
                     }
 
                 }
+                else Thread.Yield();
+
             }
 
         }
