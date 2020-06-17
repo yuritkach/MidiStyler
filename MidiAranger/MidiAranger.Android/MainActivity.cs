@@ -59,7 +59,9 @@ namespace MidiAranger.Droid
             midiStyle.LoadStyle("ddd");
             mplayer = new MIDIPlayer(this,midiStyle);
             mplayer.OnTactEvent += (object sender, OnTactEventArgs e)=> playFragment.SetTempoAndTact(e.CurrentTempo, e.CurrentTact);
-            mplayer.OnChordChangeEvent += ()=> SetUIValues();
+            mplayer.OnChordChangeEvent += ()=> OnChordChanged();
+            mplayer.OnSectionChangeEvent += () => OnSectionChanged();
+
             mplayer.Tracks = midiStyle.MidiSection.Tracks;
             mplayer.Start();
 
@@ -67,7 +69,7 @@ namespace MidiAranger.Droid
 
         
 
-        protected void SetUIValues()
+        protected void OnChordChanged()
         {
             RunOnUiThread(() => {
                 if (mplayer.currentPressedNotes == null) return;
@@ -84,6 +86,14 @@ namespace MidiAranger.Droid
                 FindViewById<TextView>(Resource.Id.currentChord).Text = t;
             });
             
+        }
+
+        protected void OnSectionChanged()
+        {
+            RunOnUiThread(() => {
+
+            });
+
         }
 
         public void DoAction(string s)

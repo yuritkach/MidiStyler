@@ -46,22 +46,70 @@ namespace MidiAranger.Droid.Resources.layout
             }
 
         }
+        
+        private View fragmentView;
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             // Use this to return your custom view for this Fragment
-            View v = inflater.Inflate(Resource.Layout.FragmentPlay, container, false);
+            fragmentView = inflater.Inflate(Resource.Layout.FragmentPlay, container, false);
 
-            ((StylerButton)v.FindViewById(Resource.Id.MainA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainAAction);};
+            ((StylerButton)fragmentView.FindViewById(Resource.Id.MainA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainAAction);};
        //     ((Button)v.FindViewById(Resource.Id.MainB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.MainBAction); };
-            ((StylerButton)v.FindViewById(Resource.Id.FillAB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInABAction); };
-            ((StylerButton)v.FindViewById(Resource.Id.FillBA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInBAAction); };
-            ((StylerButton)v.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
+            ((StylerButton)fragmentView.FindViewById(Resource.Id.FillA)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInABAction); };
+            ((StylerButton)fragmentView.FindViewById(Resource.Id.FillB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.FillInBAAction); };
+            ((StylerButton)fragmentView.FindViewById(Resource.Id.EndingB)).Click += (object sender, EventArgs e) => { onActionEventListener.DoAction(Common.EndingBAction); };
 
-
-            ((StylerButton)v.FindViewById(Resource.Id.MainA)).SetMode(StylerButtonMode.sbFlash);
-             return v;
-            
+            SetInitialButtonState();
+            return fragmentView;
         }
+
+
+
+        protected void SetInitialButtonState()
+        {
+            foreach (StyleSections section in System.Enum.GetValues(typeof(StyleSections)))
+                GetButtonBySection(section).SetMode(StylerButtonMode.sbDisabled);
+        }
+
+        protected StylerButton GetButtonBySection(StyleSections currentSection)
+        {
+            int resId;
+            switch (currentSection)
+            {
+                case StyleSections.IntroA: resId = Resource.Id.IntroA;break;
+                case StyleSections.IntroB: resId = Resource.Id.IntroB; break;
+                case StyleSections.IntroC: resId = Resource.Id.IntroC; break;
+                case StyleSections.IntroD: resId = Resource.Id.IntroD; break;// false section
+
+
+                case StyleSections.MainA: resId = Resource.Id.MainA; break;
+                case StyleSections.MainB: resId = Resource.Id.MainB; break;
+                case StyleSections.MainC: resId = Resource.Id.MainC; break;
+                case StyleSections.MainD: resId = Resource.Id.MainD; break;
+
+                case StyleSections.FillInAA: resId = Resource.Id.FillA; break;
+
+                case StyleSections.FillInAB: resId = Resource.Id.FillB; break;
+                case StyleSections.FillInBA: resId = Resource.Id.FillA; break;
+                case StyleSections.FillInBB: resId = Resource.Id.FillB; break;
+                case StyleSections.FillInCC: resId = Resource.Id.FillC; break;
+                case StyleSections.FillInDD: resId = Resource.Id.FillD; break;
+
+                case StyleSections.EndingA: resId = Resource.Id.EndingA; break;
+                case StyleSections.EndingB: resId = Resource.Id.EndingB; break;
+                case StyleSections.EndingC: resId = Resource.Id.EndingC; break;
+                case StyleSections.EndingD: resId = Resource.Id.EndingD; break; // false section
+
+                default: return null;
+            }
+            return (StylerButton)fragmentView.FindViewById(resId);
+        }
+
+        public void SetButtonMode(StyleSections section, StylerButtonMode mode)
+        {
+            GetButtonBySection(section).SetMode(mode);
+        }
+
 
         private int oldTempo = 0;
         private int oldTact = 0;

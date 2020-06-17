@@ -166,6 +166,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             MIDIMarker oldMarker = currentMarker;
             currentMarker = GetMarkerOnSection(section);
+            nextMarker = GetMarkerOnSection(GetNextSection(currentMarker));
             if (currentMarker == null)
             {
                 isPlaying = false;
@@ -179,7 +180,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             if (oldMarker != currentMarker)
             {
                 AllNotesOff();
-                //MIDISectionChangedEvent(currentMarker.,GetNextSection(currentMarker));
+                OnSectionChangeEvent();
             }
             
 
@@ -220,6 +221,8 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         public event EventHandler<OnTactEventArgs> OnTactEvent;
         public event Action OnChordChangeEvent;
+        public event Action OnSectionChangeEvent;
+
 
 
         public void Run()

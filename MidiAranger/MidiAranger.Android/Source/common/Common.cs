@@ -18,7 +18,7 @@ namespace MidiAranger.Droid.Source.common
         void DoAction(string s);
     }
 
-    public enum StyleSections { Init, IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC, none }
+    public enum StyleSections { Init, IntroA, IntroB, IntroC, MainA, MainB, MainC, MainD, FillInAA, FillInBB, FillInCC, FillInDD, FillInBA, FillInAB, EndingA, EndingB, EndingC, none, IntroD, EndingD}
 
     public static class Common
     {

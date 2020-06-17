@@ -8258,22 +8258,58 @@ namespace MidiAranger.Droid
 			public const int CTRL = 2131361867;
 			
 			// aapt resource value: 0x7f0a00be
-			public const int EndingB = 2131361982;
+			public const int EndingA = 2131361982;
+			
+			// aapt resource value: 0x7f0a00c2
+			public const int EndingB = 2131361986;
+			
+			// aapt resource value: 0x7f0a00c6
+			public const int EndingC = 2131361990;
+			
+			// aapt resource value: 0x7f0a00ca
+			public const int EndingD = 2131361994;
 			
 			// aapt resource value: 0x7f0a004c
 			public const int FUNCTION = 2131361868;
 			
-			// aapt resource value: 0x7f0a00bc
-			public const int FillAB = 2131361980;
-			
 			// aapt resource value: 0x7f0a00bd
-			public const int FillBA = 2131361981;
+			public const int FillA = 2131361981;
+			
+			// aapt resource value: 0x7f0a00c1
+			public const int FillB = 2131361985;
+			
+			// aapt resource value: 0x7f0a00c5
+			public const int FillC = 2131361989;
+			
+			// aapt resource value: 0x7f0a00c9
+			public const int FillD = 2131361993;
+			
+			// aapt resource value: 0x7f0a00bb
+			public const int IntroA = 2131361979;
+			
+			// aapt resource value: 0x7f0a00bf
+			public const int IntroB = 2131361983;
+			
+			// aapt resource value: 0x7f0a00c3
+			public const int IntroC = 2131361987;
+			
+			// aapt resource value: 0x7f0a00c7
+			public const int IntroD = 2131361991;
 			
 			// aapt resource value: 0x7f0a004d
 			public const int META = 2131361869;
 			
-			// aapt resource value: 0x7f0a00bb
-			public const int MainA = 2131361979;
+			// aapt resource value: 0x7f0a00bc
+			public const int MainA = 2131361980;
+			
+			// aapt resource value: 0x7f0a00c0
+			public const int MainB = 2131361984;
+			
+			// aapt resource value: 0x7f0a00c4
+			public const int MainC = 2131361988;
+			
+			// aapt resource value: 0x7f0a00c8
+			public const int MainD = 2131361992;
 			
 			// aapt resource value: 0x7f0a004e
 			public const int SHIFT = 2131361870;
@@ -8281,8 +8317,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a004f
 			public const int SYM = 2131361871;
 			
-			// aapt resource value: 0x7f0a00c3
-			public const int action0 = 2131361987;
+			// aapt resource value: 0x7f0a00cf
+			public const int action0 = 2131361999;
 			
 			// aapt resource value: 0x7f0a0091
 			public const int action_bar = 2131361937;
@@ -8305,17 +8341,17 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a006d
 			public const int action_bar_title = 2131361901;
 			
-			// aapt resource value: 0x7f0a00c0
-			public const int action_container = 2131361984;
+			// aapt resource value: 0x7f0a00cc
+			public const int action_container = 2131361996;
 			
 			// aapt resource value: 0x7f0a0092
 			public const int action_context_bar = 2131361938;
 			
-			// aapt resource value: 0x7f0a00c7
-			public const int action_divider = 2131361991;
+			// aapt resource value: 0x7f0a00d3
+			public const int action_divider = 2131362003;
 			
-			// aapt resource value: 0x7f0a00c1
-			public const int action_image = 2131361985;
+			// aapt resource value: 0x7f0a00cd
+			public const int action_image = 2131361997;
 			
 			// aapt resource value: 0x7f0a0003
 			public const int action_menu_divider = 2131361795;
@@ -8332,11 +8368,11 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a006f
 			public const int action_mode_close_button = 2131361903;
 			
-			// aapt resource value: 0x7f0a00c2
-			public const int action_text = 2131361986;
+			// aapt resource value: 0x7f0a00ce
+			public const int action_text = 2131361998;
 			
-			// aapt resource value: 0x7f0a00d0
-			public const int actions = 2131362000;
+			// aapt resource value: 0x7f0a00dc
+			public const int actions = 2131362012;
 			
 			// aapt resource value: 0x7f0a0070
 			public const int activity_chooser_view_content = 2131361904;
@@ -8398,8 +8434,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0076
 			public const int buttonPanel = 2131361910;
 			
-			// aapt resource value: 0x7f0a00c4
-			public const int cancel_action = 2131361988;
+			// aapt resource value: 0x7f0a00d0
+			public const int cancel_action = 2131362000;
 			
 			// aapt resource value: 0x7f0a0029
 			public const int center = 2131361833;
@@ -8413,8 +8449,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a008a
 			public const int checkbox = 2131361930;
 			
-			// aapt resource value: 0x7f0a00cc
-			public const int chronometer = 2131361996;
+			// aapt resource value: 0x7f0a00d8
+			public const int chronometer = 2131362008;
 			
 			// aapt resource value: 0x7f0a002c
 			public const int clip_horizontal = 2131361836;
@@ -8476,8 +8512,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a002e
 			public const int end = 2131361838;
 			
-			// aapt resource value: 0x7f0a00d2
-			public const int end_padder = 2131362002;
+			// aapt resource value: 0x7f0a00de
+			public const int end_padder = 2131362014;
 			
 			// aapt resource value: 0x7f0a0055
 			public const int enterAlways = 2131361877;
@@ -8536,8 +8572,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0075
 			public const int icon = 2131361909;
 			
-			// aapt resource value: 0x7f0a00d1
-			public const int icon_group = 2131362001;
+			// aapt resource value: 0x7f0a00dd
+			public const int icon_group = 2131362013;
 			
 			// aapt resource value: 0x7f0a0052
 			public const int ifRoom = 2131361874;
@@ -8545,8 +8581,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0072
 			public const int image = 2131361906;
 			
-			// aapt resource value: 0x7f0a00cd
-			public const int info = 2131361997;
+			// aapt resource value: 0x7f0a00d9
+			public const int info = 2131362009;
 			
 			// aapt resource value: 0x7f0a006c
 			public const int italic = 2131361900;
@@ -8575,26 +8611,26 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0074
 			public const int list_item = 2131361908;
 			
-			// aapt resource value: 0x7f0a00d3
-			public const int main_appbar = 2131362003;
+			// aapt resource value: 0x7f0a00df
+			public const int main_appbar = 2131362015;
 			
-			// aapt resource value: 0x7f0a00d5
-			public const int main_tablayout = 2131362005;
+			// aapt resource value: 0x7f0a00e1
+			public const int main_tablayout = 2131362017;
 			
-			// aapt resource value: 0x7f0a00d4
-			public const int main_toolbar = 2131362004;
+			// aapt resource value: 0x7f0a00e0
+			public const int main_toolbar = 2131362016;
 			
-			// aapt resource value: 0x7f0a00d6
-			public const int main_viewpager = 2131362006;
+			// aapt resource value: 0x7f0a00e2
+			public const int main_viewpager = 2131362018;
 			
 			// aapt resource value: 0x7f0a00a1
 			public const int main_container = 2131361953;
 			
-			// aapt resource value: 0x7f0a00da
-			public const int masked = 2131362010;
+			// aapt resource value: 0x7f0a00e6
+			public const int masked = 2131362022;
 			
-			// aapt resource value: 0x7f0a00c6
-			public const int media_actions = 2131361990;
+			// aapt resource value: 0x7f0a00d2
+			public const int media_actions = 2131362002;
 			
 			// aapt resource value: 0x7f0a00a0
 			public const int message = 2131361952;
@@ -8602,8 +8638,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0049
 			public const int middle = 2131361865;
 			
-			// aapt resource value: 0x7f0a00bf
-			public const int miditext = 2131361983;
+			// aapt resource value: 0x7f0a00cb
+			public const int miditext = 2131361995;
 			
 			// aapt resource value: 0x7f0a0061
 			public const int mini = 2131361889;
@@ -8629,14 +8665,14 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0037
 			public const int normal = 2131361847;
 			
-			// aapt resource value: 0x7f0a00cf
-			public const int notification_background = 2131361999;
+			// aapt resource value: 0x7f0a00db
+			public const int notification_background = 2131362011;
 			
-			// aapt resource value: 0x7f0a00c9
-			public const int notification_main_column = 2131361993;
+			// aapt resource value: 0x7f0a00d5
+			public const int notification_main_column = 2131362005;
 			
-			// aapt resource value: 0x7f0a00c8
-			public const int notification_main_column_container = 2131361992;
+			// aapt resource value: 0x7f0a00d4
+			public const int notification_main_column_container = 2131362004;
 			
 			// aapt resource value: 0x7f0a0067
 			public const int outline = 2131361895;
@@ -8665,11 +8701,11 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0033
 			public const int right = 2131361843;
 			
-			// aapt resource value: 0x7f0a00ce
-			public const int right_icon = 2131361998;
+			// aapt resource value: 0x7f0a00da
+			public const int right_icon = 2131362010;
 			
-			// aapt resource value: 0x7f0a00ca
-			public const int right_side = 2131361994;
+			// aapt resource value: 0x7f0a00d6
+			public const int right_side = 2131362006;
 			
 			// aapt resource value: 0x7f0a000c
 			public const int save_image_matrix = 2131361804;
@@ -8734,11 +8770,11 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a005d
 			public const int selected = 2131361885;
 			
-			// aapt resource value: 0x7f0a00d7
-			public const int shellcontent_appbar = 2131362007;
+			// aapt resource value: 0x7f0a00e3
+			public const int shellcontent_appbar = 2131362019;
 			
-			// aapt resource value: 0x7f0a00d8
-			public const int shellcontent_toolbar = 2131362008;
+			// aapt resource value: 0x7f0a00e4
+			public const int shellcontent_toolbar = 2131362020;
 			
 			// aapt resource value: 0x7f0a0087
 			public const int shortcut = 2131361927;
@@ -8785,8 +8821,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a0034
 			public const int start = 2131361844;
 			
-			// aapt resource value: 0x7f0a00c5
-			public const int status_bar_latest_event_content = 2131361989;
+			// aapt resource value: 0x7f0a00d1
+			public const int status_bar_latest_event_content = 2131362001;
 			
 			// aapt resource value: 0x7f0a0063
 			public const int stretch = 2131361891;
@@ -8842,8 +8878,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a001a
 			public const int textinput_helper_text = 2131361818;
 			
-			// aapt resource value: 0x7f0a00cb
-			public const int time = 2131361995;
+			// aapt resource value: 0x7f0a00d7
+			public const int time = 2131362007;
 			
 			// aapt resource value: 0x7f0a0023
 			public const int title = 2131361827;
@@ -8899,8 +8935,8 @@ namespace MidiAranger.Droid
 			// aapt resource value: 0x7f0a001b
 			public const int view_offset_helper = 2131361819;
 			
-			// aapt resource value: 0x7f0a00d9
-			public const int visible = 2131362009;
+			// aapt resource value: 0x7f0a00e5
+			public const int visible = 2131362021;
 			
 			// aapt resource value: 0x7f0a0054
 			public const int withText = 2131361876;

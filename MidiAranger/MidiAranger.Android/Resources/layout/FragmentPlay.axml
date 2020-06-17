@@ -91,22 +91,22 @@
 				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="ф"
-				android:id="@+id/MainA"	/>
+				android:id="@+id/IntroA"	/>
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-		        android:id="@+id/FillAB" />
+		        android:id="@+id/MainA" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/FillBA" />
+				android:id="@+id/FillA" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/EndingB" />
+				android:id="@+id/EndingA" />
 		</TableRow>
 		<TableRow android:weightSum="4.5"
 			android:layout_width="0dp">
@@ -120,17 +120,17 @@
 				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="intro"
-				android:id="@+id/MainA"	/>
+				android:id="@+id/IntroB"	/>
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-		        android:id="@+id/FillAB" />
+		        android:id="@+id/MainB" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/FillBA" />
+				android:id="@+id/FillB" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
@@ -149,22 +149,22 @@
 				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="intro"
-				android:id="@+id/MainA"	/>
+				android:id="@+id/IntroC"	/>
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-		        android:id="@+id/FillAB" />
+		        android:id="@+id/MainC" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/FillBA" />
+				android:id="@+id/FillC" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/EndingB" />
+				android:id="@+id/EndingC" />
 
 		</TableRow>
 		<TableRow android:weightSum="4.5"
@@ -179,22 +179,22 @@
 				android:layout_height="match_parent"
 				android:layout_weight="1"
 		        android:text="intro"
-				android:id="@+id/MainA"	/>
+				android:id="@+id/IntroD"	/>
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-		        android:id="@+id/FillAB" />
+		        android:id="@+id/MainD" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/FillBA" />
+				android:id="@+id/FillD" />
 			<MidiAranger.Droid.Source.Views.StylerButton
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_weight="1"
-				android:id="@+id/EndingB" />
+				android:id="@+id/EndingD" />
 
 		</TableRow>
 	</TableLayout>
