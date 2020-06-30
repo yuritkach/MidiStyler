@@ -68,7 +68,7 @@ namespace MidiAranger.Droid.Resources.layout
         protected void SetInitialButtonState()
         {
             foreach (StyleSections section in System.Enum.GetValues(typeof(StyleSections)))
-                GetButtonBySection(section).SetMode(StylerButtonMode.sbDisabled);
+                GetButtonBySection(section)?.SetMode(StylerButtonMode.sbDisabled);
         }
 
         protected StylerButton GetButtonBySection(StyleSections currentSection)
@@ -107,7 +107,7 @@ namespace MidiAranger.Droid.Resources.layout
 
         public void SetButtonMode(StyleSections section, StylerButtonMode mode)
         {
-            GetButtonBySection(section).SetMode(mode);
+            GetButtonBySection(section)?.SetMode(mode);
         }
 
 

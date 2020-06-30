@@ -32,6 +32,7 @@ namespace MidiAranger.Droid.Source.styler
     public class MIDIMarker
     {
         public string Name { get; set; }
+        public MIDISection Section { get; set; }
         public int StartIndex { get; set; }
         public int StopIndex { get; set; }
 
@@ -72,7 +73,7 @@ namespace MidiAranger.Droid.Source.styler
 
 
 
-    class MIDISection : MIDIFileBase,IFileParser
+    public class MIDISection : MIDIFileBase,IFileParser
     {
         public byte[] _debugFileBuff = { 1, 2 };
 
@@ -121,8 +122,10 @@ namespace MidiAranger.Droid.Source.styler
             MIDIMarker marker = new MIDIMarker();
             marker.StartIndex = track.MidiEvents.Count();
             marker.Name = "Init";
+            marker.Section = MIDISection.
             track.CurrentMarker = marker;
             track.MidiMarkers.Add(marker);
+
             ProcessMidiEvents(track);
             if (track.CurrentMarker!=null)
                 track.CurrentMarker.StopIndex = track.MidiEvents.Count() - 1;

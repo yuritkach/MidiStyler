@@ -34,8 +34,8 @@ namespace MidiAranger.Droid.Source.midiplayer
         public int msOnPulse;
         public int СurrentTempo { get; protected set; }
 
-        protected MIDIMarker currentMarker;
-        protected MIDIMarker nextMarker;
+        public MIDIMarker CurrentMarker { get; protected set; }
+        public MIDIMarker NextMarker { get; protected set; }
 
 
         private System.Threading.Thread thread;
@@ -82,10 +82,10 @@ namespace MidiAranger.Droid.Source.midiplayer
     public void Start()
         {
             currentSongPosition = 0;
-            currentMarker = GetMarkerOnSection(StyleSections.Init);
-            nextMarker = GetMarkerOnSection(StyleSections.MainA);
+            CurrentMarker = GetMarkerOnSection(StyleSections.Init);
+            NextMarker = GetMarkerOnSection(StyleSections.MainA);
             isPlaying = true;
-            GotoSection(Common.GetSectionCode(currentMarker.Name),true);
+            GotoSection(Common.GetSectionCode(CurrentMarker.Name),true);
         }
 
         public void Stop()
@@ -164,20 +164,20 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         public void GotoSection(StyleSections section, bool instant)
         {
-            MIDIMarker oldMarker = currentMarker;
-            currentMarker = GetMarkerOnSection(section);
-            nextMarker = GetMarkerOnSection(GetNextSection(currentMarker));
-            if (currentMarker == null)
+            MIDIMarker oldMarker = CurrentMarker;
+            CurrentMarker = GetMarkerOnSection(section);
+            NextMarker = GetMarkerOnSection(GetNextSection(CurrentMarker));
+            if (CurrentMarker == null)
             {
                 isPlaying = false;
             }
             else
             {
                 isPlaying = true;
-                Tracks[0].CurrentEventIndex = currentMarker.StartIndex;
-                currentSongPosition = Tracks[0].MidiEvents[currentMarker.StartIndex].absTime;
+                Tracks[0].CurrentEventIndex = CurrentMarker.StartIndex;
+                currentSongPosition = Tracks[0].MidiEvents[CurrentMarker.StartIndex].absTime;
             }
-            if (oldMarker != currentMarker)
+            if (oldMarker != CurrentMarker)
             {
                 AllNotesOff();
                 OnSectionChangeEvent();
@@ -250,9 +250,9 @@ namespace MidiAranger.Droid.Source.midiplayer
                         OnTactEvent(this, e);
                         counter = 1;
                     }
-                    if (currentSongPosition > Tracks[0].MidiEvents[currentMarker.StopIndex].absTime)
+                    if (currentSongPosition > Tracks[0].MidiEvents[CurrentMarker.StopIndex].absTime)
                     {
-                        GotoSection(GetNextSection(currentMarker), false);
+                        GotoSection(GetNextSection(CurrentMarker), false);
                     }
 
                 }
@@ -266,7 +266,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             MIDISession session = MIDISession.GetInstance();
             foreach (MIDITrack track in Tracks)
             //    for (int i = track.CurrentEventIndex; i < track.MidiEvents.Count; i++)
-                for (int i = currentMarker.StartIndex; i < currentMarker.StopIndex; i++)
+                for (int i = CurrentMarker.StartIndex; i < CurrentMarker.StopIndex; i++)
                 {
                     if (track.MidiEvents[i].absTime == currentSongPosition)
                         if (track.MidiEvents[i].MidiMessage[0] == 0xFF)

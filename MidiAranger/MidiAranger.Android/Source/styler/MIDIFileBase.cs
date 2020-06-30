@@ -12,7 +12,7 @@ using Android.Widget;
 
 namespace MidiAranger.Droid.Source.styler
 {
-    class MIDIFileBase
+    public class MIDIFileBase
     {
         public SectionID SectionId { get; protected set;}
 

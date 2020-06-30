@@ -91,7 +91,7 @@ namespace MidiAranger.Droid
         protected void OnSectionChanged()
         {
             RunOnUiThread(() => {
-
+                
             });
 
         }
