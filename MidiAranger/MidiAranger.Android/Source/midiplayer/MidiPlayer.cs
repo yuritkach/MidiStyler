@@ -166,7 +166,10 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             MIDIMarker oldMarker = CurrentMarker;
             CurrentMarker = GetMarkerOnSection(section);
-            NextMarker = GetMarkerOnSection(GetNextSection(CurrentMarker));
+            CurrentMarker.Section = section;
+            StyleSections nextSection = GetNextSection(CurrentMarker);
+            NextMarker = GetMarkerOnSection(nextSection);
+            NextMarker.Section = nextSection;
             if (CurrentMarker == null)
             {
                 isPlaying = false;
@@ -237,7 +240,7 @@ namespace MidiAranger.Droid.Source.midiplayer
             {
                 if (isPlaying)
                 {
-                    USleep(pulsesPerQuarterNote*4);
+                    USleep(pulsesPerQuarterNote);
                     PlayCurrentMarkerPositions();
 
                     currentSongPosition++;

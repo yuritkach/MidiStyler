@@ -91,7 +91,8 @@ namespace MidiAranger.Droid
         protected void OnSectionChanged()
         {
             RunOnUiThread(() => {
-                
+                playFragment.SetButtonMode(mplayer.CurrentMarker.Section, mplayer.NextMarker.Section);
+
             });
 
         }
