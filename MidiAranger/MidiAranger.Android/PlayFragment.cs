@@ -11,7 +11,6 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Android.Support.V4.App;
-using MidiAranger.Droid.Source.common;
 using Java.Lang;
 using Android.Animation;
 using System.Drawing;

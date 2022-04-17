@@ -14,7 +14,7 @@ using Java.Net;
 using Java.Util;
 using midi.events;
 using midi.internal_events;
-using MidiAranger.Droid.Source.common;
+using MidiAranger;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
@@ -63,7 +63,7 @@ namespace midi {
             this.port = 5008;
             System.Random rand = new System.Random();
             this.ssrc = (int)Math.Round(rand.NextDouble() * Java.Lang.Math.Pow(2, 8 * 4));
-            this.startTime = (Common.CurrentTimeMillis() / 1000L) * (long)this.rate;
+            this.startTime = (Common.NanoTime() / 1000L) * (long)this.rate;
             this.startTimeHR = System.DateTime.Now.Millisecond;// nanoTime();
             this.registered_eb = false;
             this.published_bonjour = false;

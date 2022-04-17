@@ -1,6 +1,6 @@
 /* C:\Users\yuri\source\repos\Midistyler\MidiAranger\MidiAranger.Android\Source\8BEATPOP.STY (10.02.1999 20:16:24)
    StartOffset(h): 00000000, EndOffset(h): 00001C0B, Length(h): 00001C0C */
-namespace MidiAranger.Droid.Source.midiplayer
+namespace MidiAranger
 {
     public class DEBUGDATA
     {

@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using CommonLib;
 
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using MidiAranger.Droid.Source.common;
-
-namespace MidiAranger.Droid.Source.midiplayer
+namespace MidiAranger
 {
 
-    
+
     public class ChordDeclaration
     {
         public int ChordId { get; protected set; }
@@ -152,11 +143,11 @@ namespace MidiAranger.Droid.Source.midiplayer
         {
             List<string> result = new List<string>();
             string s;
-            string[] keys = definition.Split(",");
+            string[] keys = definition.Split(',');
             for (int i = 0; i < keys.Length; i++)
             {
                 s = "";
-                for (int j = 0; j < i; j++) s = s + "," + keys[j];
+                for (int j = 0; j < i; j++) s = s + ',' + keys[j];
                 for (int j = i + 1; j < keys.Length; j++) s = s + "," + keys[j];
                 if (keys.Length > 1)
                 {
@@ -209,10 +200,10 @@ namespace MidiAranger.Droid.Source.midiplayer
             for (int i = 0; i < chordDeclarations.Length; i++)
             {
                 List<string> mixedDefs = GetMixedDefinitions(chordDeclarations[i].ChordOffsets);
-                string rootOffset = chordDeclarations[i].ChordOffsets.Split(",")[0] ;
+                string rootOffset = chordDeclarations[i].ChordOffsets.Split(',')[0] ;
                 foreach (string key in mixedDefs)
                 {
-                    string[] keys = key.Split(",");
+                    string[] keys = key.Split(',');
                     _delta = 0;
                     rootIndex = (byte)Array.IndexOf(keys, rootOffset);
                     SortLeftPart(ref keys, rootIndex);
@@ -243,17 +234,17 @@ namespace MidiAranger.Droid.Source.midiplayer
                 mask = mask | (uint)(1 << ofs);
             }
 
-            int res;
+            int index;
             try
             {
-                res = chordIndex.Get(mask);
+                index = chordIndex.Get(mask);
             }
             catch
             {
-                res = -1;
+                index = -1;
             }
 
-            return res ==-1 ? null : chordDefinitions.GetValueOrDefault(res);
+            return index ==-1 ? null : chordDefinitions[index];
         }
 
         

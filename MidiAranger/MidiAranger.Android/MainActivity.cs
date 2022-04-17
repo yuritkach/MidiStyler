@@ -11,14 +11,10 @@ using midi;
 using Xamarin.Forms;
 using midi.events;
 using System.Threading;
-using MidiAranger.Droid.Source.midiplayer;
-using static MidiAranger.Droid.Source.midiplayer.ChordRecognizer;
-using MidiAranger.Droid.Source.styler;
-using static MidiAranger.Droid.Source.common.Common;
-using MidiAranger.Droid.Source.common;
 using MidiAranger.Droid.Source.Views;
 using Android.Support.V4.App;
 using MidiAranger.Droid.Resources.layout;
+using CommonLib;
 
 namespace MidiAranger.Droid
 {
@@ -57,7 +53,7 @@ namespace MidiAranger.Droid
 
             MIDIStyle midiStyle = new MIDIStyle();
             midiStyle.LoadStyle("ddd");
-            mplayer = new MIDIPlayer(this,midiStyle);
+            mplayer = new MIDIPlayer(/*this,*/midiStyle);
             mplayer.OnTactEvent += (object sender, OnTactEventArgs e)=> playFragment.SetTempoAndTact(e.CurrentTempo, e.CurrentTact);
             mplayer.OnChordChangeEvent += ()=> OnChordChanged();
             mplayer.OnSectionChangeEvent += () => OnSectionChanged();
@@ -101,13 +97,13 @@ namespace MidiAranger.Droid
         {
             switch (s)
             {
-                case StartAction: mplayer.Start(); break;
-                case StopAction: mplayer.Start(); break;
-                case MainAAction: mplayer.GotoSection(StyleSections.MainA, false); break;
-                case MainBAction: mplayer.GotoSection(StyleSections.MainB, false); break;
-                case FillInABAction: mplayer.GotoSection(StyleSections.FillInAB, true); break;
-                case FillInBAAction: mplayer.GotoSection(StyleSections.FillInBA, true); break;
-                case EndingBAction: mplayer.GotoSection(StyleSections.EndingB, false); break;
+                case Common.StartAction: mplayer.Start(); break;
+                case Common.StopAction: mplayer.Start(); break;
+                case Common.MainAAction: mplayer.GotoSection(StyleSections.MainA, false); break;
+                case Common.MainBAction: mplayer.GotoSection(StyleSections.MainB, false); break;
+                case Common.FillInABAction: mplayer.GotoSection(StyleSections.FillInAB, true); break;
+                case Common.FillInBAAction: mplayer.GotoSection(StyleSections.FillInBA, true); break;
+                case Common.EndingBAction: mplayer.GotoSection(StyleSections.EndingB, false); break;
 
                 default: new ApplicationException("Action "+s+" not implemented!");break;
             }

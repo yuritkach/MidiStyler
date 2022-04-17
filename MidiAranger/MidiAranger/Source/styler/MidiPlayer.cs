@@ -1,35 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using System.IO;
-using Xamarin.Forms;
-using midi;
-using midi.events;
-using Android.Util;
-using Java.Lang;
 using System.Threading;
-using MidiAranger.Droid.Source.common;
-using MidiAranger.Droid.Source.styler;
-using static MidiAranger.Droid.Source.common.Common;
-using Thread = Java.Lang.Thread;
 
-namespace MidiAranger.Droid.Source.midiplayer
+namespace MidiAranger
 {
    
 
-    class MIDIPlayer
+    public class MIDIPlayer
     {
         private bool isPlaying = false;
         public List<MIDITrack> Tracks;
-        private readonly Context context;
+      //  private readonly Context context;
         public int currentSongPosition;
         public int msOnPulse;
         public int СurrentTempo { get; protected set; }
@@ -46,22 +29,22 @@ namespace MidiAranger.Droid.Source.midiplayer
         protected int pulsesPerQuarterNote;
 
 
-        public MIDIPlayer(Context context, MIDIStyle style) {
-            this.context = context;
+        public MIDIPlayer(/*Context context,*/ MIDIStyle style) {
+            //this.context = context;
             Style = style;
 
-            MIDISession.GetInstance().Init(context);
-            MIDISession.GetInstance().Start();
+  //          MIDISession.GetInstance().Init(/*context*/);
+//            MIDISession.GetInstance().Start();
 
-            Bundle rinfo = new Bundle();
+ //           Bundle rinfo = new Bundle();
 
             //rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
+//            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
 
-            rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
+ //           rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
 
-            rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
-            MIDISession.GetInstance().Connect(rinfo);
+//            rinfo.PutBoolean(MIDIConstants.RINFO_RECON, true);
+ //           MIDISession.GetInstance().Connect(rinfo);
            
             currentSongPosition = 0;
             СurrentTempo = 120; // 120BPM
@@ -101,13 +84,13 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         private void Subscribe()
         {
-            MessagingCenter.Subscribe<MIDIReceivedEvent>(this, "MIDIReceivedEvent", OnMIDIReceivedEvent);
+          //  MessagingCenter.Subscribe<MIDIReceivedEvent>(this, "MIDIReceivedEvent", OnMIDIReceivedEvent);
         }
 
-        protected void OnMIDIReceivedEvent(MIDIReceivedEvent _event)
-        {
-            ParseMidiMessage(_event.message);
-        }
+     //   protected void OnMIDIReceivedEvent(MIDIReceivedEvent _event)
+     //   {
+     //       ParseMidiMessage(_event.message);
+     //   }
 
         protected void AddToCurrentPressed(byte note)
         {
@@ -145,15 +128,16 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         }
 
+      
 
         protected void USleep(int waitTime)
         {
             do
             {
-                difTime2 = JavaSystem.NanoTime();
+                difTime2 = Common.NanoTime();
             }
             while ((difTime2 - difTime1) / waitTime * 1000 < msOnPulse);
-            difTime1 = JavaSystem.NanoTime();
+            difTime1 = Common.NanoTime();
         }
 
         protected MIDIMarker GetMarkerOnSection(StyleSections section)
@@ -193,12 +177,12 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         protected void AllNotesOff()
         {
-            MIDISession session = MIDISession.GetInstance();
+        //    MIDISession session = MIDISession.GetInstance();
             byte[] b = new byte[3] { 0, 123, 0 };
             for (byte i = 0xB0; i < 0xC0; i++)
             {
                 b[0] =i;
-                session.SendMessage(b);
+   //             session.SendMessage(b);
             }
 
         }
@@ -230,7 +214,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         public void Run()
         {
-            difTime1 = JavaSystem.NanoTime();
+            difTime1 = Common.NanoTime();
       
             EventHandler<OnTactEventArgs> onTactHandler = OnTactEvent;
             OnTactEventArgs e = new OnTactEventArgs();
@@ -266,7 +250,7 @@ namespace MidiAranger.Droid.Source.midiplayer
         }
 
         protected void PlayCurrentMarkerPositions() {
-            MIDISession session = MIDISession.GetInstance();
+        //    MIDISession session = MIDISession.GetInstance();
             foreach (MIDITrack track in Tracks)
             //    for (int i = track.CurrentEventIndex; i < track.MidiEvents.Count; i++)
                 for (int i = CurrentMarker.StartIndex; i < CurrentMarker.StopIndex; i++)
@@ -274,8 +258,8 @@ namespace MidiAranger.Droid.Source.midiplayer
                     if (track.MidiEvents[i].absTime == currentSongPosition)
                         if (track.MidiEvents[i].MidiMessage[0] == 0xFF)
                             ProcessMetaEvent(track.MidiEvents[i].MidiMessage);
-                        else
-                            session.SendMessage(Style.ProcessMessage(track, i));
+         //               else
+           //                 session.SendMessage(Style.ProcessMessage(track, i));
                     else
                         if (track.MidiEvents[i].absTime > currentSongPosition)
                         {

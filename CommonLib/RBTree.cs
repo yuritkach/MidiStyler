@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace MidiAranger.Droid.Source.common
+namespace CommonLib
 {
     internal sealed class RedBlackTreeNode<TValue>
     {
