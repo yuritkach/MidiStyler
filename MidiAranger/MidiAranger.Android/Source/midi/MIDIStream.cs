@@ -5,11 +5,11 @@ using midi.events;
 using midi.internal_events;
 using Xamarin.Forms;
 using Java.Util.Concurrent;
-using MidiAranger.Droid.Source.common;
 using Android.OS;
 using System.Threading;
 using Timer = System.Timers.Timer;
 using static midi.MIDIControl;
+using MidiAranger;
 
 namespace midi { 
 

@@ -1,21 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using MidiAranger.Droid.Source.common;
-using static MidiAranger.Droid.Source.common.Common;
-using static MidiAranger.Droid.Source.midiplayer.MIDIPlayer;
-
-namespace MidiAranger.Droid.Source.styler
+namespace MidiAranger
 {
-    class Sdec : IFileParser
+    public class Sdec : IFileParser
     {
         public List<StyleSections> Sections { get; protected set; }
         public Sdec()
@@ -29,12 +18,12 @@ namespace MidiAranger.Droid.Source.styler
             byte[] b = new byte[sectionSize];
             for (int i = 0; i < sectionSize; i++)
                 b[i] = Common.GetByte(ref buff, ref position);
-            string[] sections = Encoding.Default.GetString(b).Split(",");
+            string[] sections = Encoding.Default.GetString(b).Split(',');
             foreach (string section in sections)
                 Sections.Add(Common.GetSectionCode(section));
         }
     }
-    class Ctab : IFileParser
+    public class Ctab : IFileParser
     {
         public byte SourceChanel { get; protected set; }
         public string Name { get; protected set; }
@@ -70,7 +59,7 @@ namespace MidiAranger.Droid.Source.styler
             SourceChanel = Common.GetByte(ref buff, ref position); 
             byte[] b = new byte[8];
             for (int i = 0; i < 8; i++)
-                b[i] = GetByte(ref buff, ref position);
+                b[i] = Common.GetByte(ref buff, ref position);
             
             Name = Encoding.Default.GetString(b);
             DestionationChanel = Common.GetByte(ref buff, ref position); 
@@ -103,13 +92,13 @@ namespace MidiAranger.Droid.Source.styler
             }
         }
     }
-    class Cntt
+    public class Cntt
     {
     }
 
 
 
-    class CSEGStructure : IFileParser
+    public class CSEGStructure : IFileParser
     {
         public Sdec Sdec { get; protected set; }
         public List<Ctab> Ctabs { get; protected set; }
@@ -152,7 +141,7 @@ namespace MidiAranger.Droid.Source.styler
     }
 
 
-    class CASMSection : IFileParser
+    public class CASMSection : IFileParser
     {
         public List<CSEGStructure> CSEGS { get; protected set; }
 

@@ -69,12 +69,6 @@
     <Compile Include="PlayFragment.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\common\Common.cs" />
-    <Compile Include="Source\common\RBTree.cs" />
-    <Compile Include="Source\midiplayer\8BEATPOP.cs" />
-    <Compile Include="Source\midiplayer\ChordRecognizer.cs" />
-    <Compile Include="Source\midiplayer\lai.cs" />
-    <Compile Include="Source\midiplayer\MidiPlayer.cs" />
     <Compile Include="Source\midi\events\MIDIAddressBookEvent.cs" />
     <Compile Include="Source\midi\events\MIDIConnectionEndEvent.cs" />
     <Compile Include="Source\midi\events\MIDIConnectionEstablishedEvent.cs" />
@@ -113,11 +107,6 @@
     <Compile Include="Source\midi\utility\DataBufferReader.cs" />
     <Compile Include="Source\midi\utility\DataBufferWriter.cs" />
     <Compile Include="Source\midi\utility\OutDataBuffer.cs" />
-    <Compile Include="Source\styler\CASMSection.cs" />
-    <Compile Include="Source\styler\IFileParser.cs" />
-    <Compile Include="Source\styler\MIDIFileBase.cs" />
-    <Compile Include="Source\styler\MIDISection.cs" />
-    <Compile Include="Source\styler\MidiStyle.cs" />
     <Compile Include="Source\Views\IndicatorView.cs" />
     <Compile Include="Source\Views\StylerButtonView.cs" />
     <Compile Include="ToolBarFragment.cs" />
@@ -151,6 +140,10 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CommonLib\CommonLib.csproj">
+      <Project>{5e3812bf-b5ba-4f18-914a-3022a180a6d4}</Project>
+      <Name>CommonLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MidiAranger\MidiAranger.csproj">
       <Project>{8FE8E61C-FC84-4941-BCC7-3A444D1BC062}</Project>
       <Name>MidiAranger</Name>

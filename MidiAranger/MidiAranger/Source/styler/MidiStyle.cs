@@ -1,24 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using MidiAranger.Droid.Source.common;
-using MidiAranger.Droid.Source.midiplayer;
-
-namespace MidiAranger.Droid.Source.styler
+﻿namespace MidiAranger
 {
     public enum SectionID {MTHD=0x4D546864, CASM=0x4341534D,OTS=0x4F545363,MDB=0x464E5263,MH=0x4D486864, CSEG=0x43534547,
        Sdec=0x53646563, Ctab=0x43746162, Cntt=0x436E7474};
 
-    class MIDIStyle
+    public class MIDIStyle
     {
 
 
