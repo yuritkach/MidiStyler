@@ -32,13 +32,16 @@ namespace MidiAranger.Droid.Source.midiplayer
     public class ChordDefinition
     {
         public ChordDeclaration Chord { get; set; }
+        public byte[] ChordVariantOffset { get; set; }
+
         public uint HalfTonesBitMask { get; set; }
         public byte RootOffset { get; set; }
-        public ChordDefinition(ChordDeclaration chord, uint halfToneBitMask, byte rootOffset)
+        public ChordDefinition(ChordDeclaration chord, uint halfToneBitMask, byte rootOffset, byte[] chordVariantOffset)
         {
             Chord = chord;
             HalfTonesBitMask = halfToneBitMask;
             RootOffset = rootOffset;
+            ChordVariantOffset = chordVariantOffset;
         }
     }
 
@@ -89,9 +92,9 @@ namespace MidiAranger.Droid.Source.midiplayer
             new ChordDeclaration(0x21, "R1+2+5", "0,2,7")
         };
        
-        private Dictionary<int,ChordDefinition> chordDefinitions;
+        private Dictionary<uint,ChordDefinition> chordDefinitions;
 
-        private RedBlackTree<int> chordIndex;
+     //   private RedBlackTree<int> chordIndex;
 
         public ChordRecognizer() {
             InitializeChordDefinitions();
@@ -199,13 +202,20 @@ namespace MidiAranger.Droid.Source.midiplayer
             }
         }
 
+        private byte[] KeyToOffsets(string key) 
+        {
+            string[] keys = key.Split(",");
+            byte[] result = new byte[keys.Length];
+            for (int i = 0; i < keys.Length; i++)
+                result[i] = OnlyNumber(keys[i]);
+            return result;
+        }
+
         private void InitializeChordDefinitions()
         {
-            chordIndex = new RedBlackTree<int>();
-            int id = 0;
             uint[] offsets;
             byte rootIndex;
-            chordDefinitions = new Dictionary<int,ChordDefinition>();
+            chordDefinitions = new Dictionary<uint,ChordDefinition>();
             for (int i = 0; i < chordDeclarations.Length; i++)
             {
                 List<string> mixedDefs = GetMixedDefinitions(chordDeclarations[i].ChordOffsets);
@@ -219,41 +229,31 @@ namespace MidiAranger.Droid.Source.midiplayer
                     offsets = ProcessChordDefinition(0, 0, keys, keys.Length, rootIndex);
                     for (int j = 0; j < offsets.Length; j++)
                     {
-                        ChordDefinition cd = new ChordDefinition(chordDeclarations[i], offsets[j],rootIndex);
-                        if (!chordIndex.Exists(cd.HalfTonesBitMask))
-                        {
-                            chordDefinitions.Add(id,cd);
-                            chordIndex.Add(cd.HalfTonesBitMask, id);
-                            id++;
-                        }
+                        ChordDefinition cd = new ChordDefinition(chordDeclarations[i], offsets[j],rootIndex,KeyToOffsets(key));
+                        if (!chordDefinitions.ContainsKey(cd.HalfTonesBitMask))
+                            chordDefinitions.Add(cd.HalfTonesBitMask, cd);
                     }
                 }
             }
         }
 
-        public ChordDefinition ChordRecognize(byte[] notes)
+        private uint MakeMaskFromPressedKeys(byte[] notes)
         {
-            if (notes.Length < 2) return null;
             Array.Sort(notes);
             int initialOffset = notes[0];
             uint mask = 0;
             for (int i = 0; i < notes.Length; i++)
-            {
-                int ofs = 31-(notes[i] - initialOffset);
-                mask = mask | (uint)(1 << ofs);
-            }
+                mask |= (uint)(1 << (31 - (notes[i] - initialOffset)));
+            return mask;
 
-            int res;
-            try
-            {
-                res = chordIndex.Get(mask);
-            }
-            catch
-            {
-                res = -1;
-            }
+        }
 
-            return res ==-1 ? null : chordDefinitions.GetValueOrDefault(res);
+        public ChordDefinition ChordRecognize(byte[] notes)
+        {
+            if (notes.Length < 2) return null;
+            if (chordDefinitions.TryGetValue(MakeMaskFromPressedKeys(notes), out ChordDefinition chordDefinition))
+                return chordDefinition;
+            else return null;
         }
 
         

@@ -75,12 +75,17 @@ namespace MidiAranger.Droid
                 if (mplayer.currentPressedNotes == null) return;
                 string t = "";
                 byte[] pressedNotes = mplayer.currentPressedNotes.ToArray();
+                //byte[] pressedNotes = new byte[3] {65,69,71};  // test
+
                 if (pressedNotes.Length > 0) {
                     ChordDefinition cd = chordRecognizer.ChordRecognize(pressedNotes);
                     if (cd != null)
                     {
-                        //TODO: error on chord 65-69-71
-                        t = Common.GetNoteName(pressedNotes[cd.RootOffset]) + cd.Chord.ChordName.Substring(1) + " -- " + pressedNotes[cd.RootOffset].ToString();
+                        //TODO: error on chord 65-69-71 -- ошибка с необязательной нотой аккорда (когда она явялется основной)
+                        byte rootnote = pressedNotes[0];
+                        if ((cd.RootOffset >= pressedNotes.Length)&& (cd.ChordVariantOffset[cd.RootOffset] < cd.ChordVariantOffset[0]))
+                            rootnote =(byte) (pressedNotes[0] - cd.ChordVariantOffset[0]);
+                        t = Common.GetNoteName(rootnote) + cd.Chord.ChordName.Substring(1);
                     }
                 }
                 FindViewById<TextView>(Resource.Id.currentChord).Text = t;

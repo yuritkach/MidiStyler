@@ -162,6 +162,7 @@ namespace midi {
             try
             {
                 this.bonjourHost = InetAddress.GetByName("127.0.0.1");
+                
             }
             catch (UnknownHostException e)
             {

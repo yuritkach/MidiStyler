@@ -55,8 +55,8 @@ namespace MidiAranger.Droid.Source.midiplayer
 
             Bundle rinfo = new Bundle();
 
-            //rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.63");
-            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
+            rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.1.118");
+            //rinfo.PutString(MIDIConstants.RINFO_ADDR, "192.168.2.229");
 
             rinfo.PutInt(MIDIConstants.RINFO_PORT, 5008);
 
