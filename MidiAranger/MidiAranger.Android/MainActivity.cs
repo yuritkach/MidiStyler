@@ -15,6 +15,7 @@ using MidiAranger.Droid.Source.Views;
 using Android.Support.V4.App;
 using MidiAranger.Droid.Resources.layout;
 using CommonLib;
+using MidiAranger.Droid.Source.midiplayer;
 
 namespace MidiAranger.Droid
 {

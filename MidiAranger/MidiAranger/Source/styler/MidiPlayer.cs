@@ -25,7 +25,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 {
    
 
-    class MIDIPlayer
+    public class MIDIPlayer
     {
         private bool isPlaying = false;
         public List<MIDITrack> Tracks;
@@ -230,7 +230,7 @@ namespace MidiAranger.Droid.Source.midiplayer
 
         public void Run()
         {
-            difTime1 = JavaSystem.NanoTime();
+            difTime1 = Common.NanoTime();
       
             EventHandler<OnTactEventArgs> onTactHandler = OnTactEvent;
             OnTactEventArgs e = new OnTactEventArgs();
