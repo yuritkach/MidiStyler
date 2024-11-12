@@ -11,13 +11,16 @@ using midi;
 using Xamarin.Forms;
 using midi.events;
 using System.Threading;
-using MidiAranger.Droid.Source.Views;
+using MidiAranger;
 using Android.Support.V4.App;
-using MidiAranger.Droid.Resources.layout;
 using CommonLib;
-using MidiAranger.Droid.Source.midiplayer;
+using Android;
+using MidiAranger.Droid.Resources.layout;
+using MidiAranger;
+using Resource = MidiAranger.Droid.Resource;
+using MidiAranger.Droid;
 
-namespace MidiAranger.Droid
+namespace MidiAranger
 {
     [Activity(Label = "MidiAranger", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public partial class MainActivity : Android.Support.V4.App.FragmentActivity, IOnActionEventListener
@@ -54,7 +57,7 @@ namespace MidiAranger.Droid
 
             MIDIStyle midiStyle = new MIDIStyle();
             midiStyle.LoadStyle("ddd");
-            mplayer = new MIDIPlayer(/*this,*/midiStyle);
+            mplayer = new MIDIPlayer(this,midiStyle);
             mplayer.OnTactEvent += (object sender, OnTactEventArgs e)=> playFragment.SetTempoAndTact(e.CurrentTempo, e.CurrentTact);
             mplayer.OnChordChangeEvent += ()=> OnChordChanged();
             mplayer.OnSectionChangeEvent += () => OnSectionChanged();

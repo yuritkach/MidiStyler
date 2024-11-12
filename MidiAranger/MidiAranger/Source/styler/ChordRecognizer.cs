@@ -2,16 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommonLib;
 
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using MidiAranger.Droid.Source.common;
-
-namespace MidiAranger.Droid.Source.midiplayer
+namespace MidiAranger
 {
 
     

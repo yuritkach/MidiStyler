@@ -11,17 +11,12 @@ using Android.Views;
 using Android.Widget;
 using System.IO;
 using Xamarin.Forms;
-using midi;
-using midi.events;
 using Android.Util;
 using Java.Lang;
 using System.Threading;
-using MidiAranger.Droid.Source.common;
-using MidiAranger.Droid.Source.styler;
-using static MidiAranger.Droid.Source.common.Common;
-using Thread = Java.Lang.Thread;
+using Thread = System.Threading.Thread;
 
-namespace MidiAranger.Droid.Source.midiplayer
+namespace MidiAranger
 {
    
 
